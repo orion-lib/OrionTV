@@ -1,0 +1,19 @@
+{
+  "cache_time": 3600,
+  "api_site": {
+    "ffzy": {
+      "key": "ffzy",
+      "name": "非凡资源",
+      "api": "http://cj.ffzy.co/api.php/provide/vod/from/ffm3u8/",
+      "detail": "http://www.ffzy.co"
+    },
+    "test-source": {
+      "key": "test-source",
+      "name": "示例源",
+      "api": "https://test-api.com/api.php"
+    }
+  },
+  "storage": {
+    "type": "localstorage"
+  }
+}

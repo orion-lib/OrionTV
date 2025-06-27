@@ -1,0 +1,7 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- 这是一个react-native android tv项目
+- 请不要修改web/目录下的文件
