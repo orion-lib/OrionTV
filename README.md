@@ -122,9 +122,11 @@ yarn android-tv
 
 2. `docker run -d -p 3001:3001 zimpel1/tv-host`
 
+本地部署后，需要配置https才行，不然会无法访问
+
 #### 使用 demo 地址
 
-在设置中可以使用 demo 地址： https://orion-tv.vercel.app，需要代理且不保证稳定和可用性。
+在设置中可以使用 demo 地址： https://orion-tv.vercel.app 需要代理且不保证稳定和可用性。
 
 ## 📜 主要脚本
 
