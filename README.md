@@ -97,24 +97,7 @@ yarn android-tv
 
 #### [Vercel](https://vercel.com/) 部署
 
-1.  **安装 Vercel CLI**
-
-    如果您尚未安装，请全局安装 Vercel CLI：
-
-    ```sh
-    npm install -g vercel
-    ```
-
-2.  **部署**
-
-    进入 `backend` 目录并运行 `vercel` 命令：
-
-    ```sh
-    cd backend
-    vercel
-    ```
-
-    按照 Vercel CLI 的提示完成登录和部署过程。`vercel.json` 文件已配置好所有必要的构建和路由设置。
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzimplexing%2FOrionTV&root-directory=backend)
 
 #### Docker 部署
 
