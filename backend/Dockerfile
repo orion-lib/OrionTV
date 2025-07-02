@@ -35,4 +35,4 @@ EXPOSE 3001
 
 # The command to run the application
 # You can override the port using -e PORT=... in `docker run`
-CMD [ "node", "dist/index.js" ]
+CMD [ "node", "dist/index.docker.js" ]

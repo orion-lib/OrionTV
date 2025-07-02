@@ -1,98 +1,302 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, ActivityIndicator, FlatList } from "react-native";
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  FlatList,
+  Pressable,
+  Dimensions,
+} from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
-import ScrollableRow from "@/components/ScrollableRow.tv";
-import { MoonTVAPI, DoubanResponse } from "@/services/api";
-import { RowItem } from "@/components/ScrollableRow.tv";
+import { moonTVApi } from "@/services/api";
+import { SearchResult } from "@/services/api";
+import { PlayRecord } from "@/services/storage";
 
-interface ContentRow {
+export type RowItem = (SearchResult | PlayRecord) & {
+  id: string;
+  source: string;
   title: string;
-  data: RowItem[];
+  poster: string;
+  progress?: number;
+  lastPlayed?: number;
+  episodeIndex?: number;
+  sourceName?: string;
+  totalEpisodes?: number;
+  year?: string;
+  rate?: string;
+};
+import VideoCard from "@/components/VideoCard.tv";
+import { PlayRecordManager } from "@/services/storage";
+import { useFocusEffect, useRouter } from "expo-router";
+import { useColorScheme } from "react-native";
+import { Search } from "lucide-react-native";
+
+// --- 类别定义 ---
+interface Category {
+  title: string;
+  type?: "movie" | "tv" | "record";
+  tag?: string;
 }
 
-const categories = [
-  { title: "热门电影", type: "movie", tag: "热门" },
-  { title: "热门剧集", type: "tv", tag: "热门" },
-  { title: "豆瓣 Top250", type: "movie", tag: "top250" },
+const initialCategories: Category[] = [
+  { title: "最近播放", type: "record" },
   { title: "综艺", type: "tv", tag: "综艺" },
+  { title: "热门剧集", type: "tv", tag: "热门" },
+  { title: "热门电影", type: "movie", tag: "热门" },
+  { title: "豆瓣 Top250", type: "movie", tag: "top250" },
   { title: "美剧", type: "tv", tag: "美剧" },
   { title: "韩剧", type: "tv", tag: "韩剧" },
   { title: "日剧", type: "tv", tag: "日剧" },
   { title: "日漫", type: "tv", tag: "日本动画" },
-] as const;
+];
 
-// --- IMPORTANT ---
-// Replace with your computer's LAN IP address to test on a real device or emulator.
-// Find it by running `ifconfig` (macOS/Linux) or `ipconfig` (Windows).
-const API_BASE_URL = "http://192.168.31.123:3001";
-const api = new MoonTVAPI(API_BASE_URL);
+const NUM_COLUMNS = 5;
+const { width } = Dimensions.get("window");
+const ITEM_WIDTH = width / NUM_COLUMNS - 24;
 
 export default function HomeScreen() {
-  const [rows, setRows] = useState<ContentRow[]>([]);
+  const router = useRouter();
+  const colorScheme = useColorScheme();
+
+  const [categories, setCategories] = useState<Category[]>(initialCategories);
+  const [selectedCategory, setSelectedCategory] = useState<Category>(
+    categories[0]
+  );
+  const [contentData, setContentData] = useState<RowItem[]>([]);
+
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchAllData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const promises = categories.map((category) =>
-          api.getDoubanData(category.type, category.tag, 20)
-        );
-        const results = await Promise.all<DoubanResponse>(promises);
+  const [pageStart, setPageStart] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
 
-        const newRows: ContentRow[] = results.map((result, index) => {
-          const category = categories[index];
-          return {
-            title: category.title,
-            data: result.list.map((item) => ({
-              ...item,
-              id: item.title, // Use title as a temporary unique id
-              source: "douban", // Static source for douban items
-            })),
-          };
-        });
+  const flatListRef = useRef<FlatList>(null);
 
-        setRows(newRows);
-      } catch (err) {
-        console.error("Failed to fetch data for home screen:", err);
-        setError("无法加载内容，请稍后重试。");
-      } finally {
-        setLoading(false);
+  // --- 数据获取逻辑 ---
+  const fetchPlayRecords = async () => {
+    const records = await PlayRecordManager.getAll();
+    return Object.entries(records)
+      .map(([key, record]) => {
+        const [source, id] = key.split("+");
+        return {
+          id,
+          source,
+          title: record.title,
+          poster: record.cover,
+          progress: record.play_time / record.total_time,
+          lastPlayed: record.save_time,
+          episodeIndex: record.index,
+          sourceName: record.source_name,
+          totalEpisodes: record.total_episodes,
+        } as RowItem;
+      })
+      .filter(
+        (record) =>
+          record.progress !== undefined &&
+          record.progress > 0 &&
+          record.progress < 1
+      )
+      .sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
+  };
+
+  const fetchData = async (category: Category, start: number) => {
+    if (category.type === "record") {
+      const records = await fetchPlayRecords();
+      if (records.length === 0 && categories[0].type === "record") {
+        // 如果没有播放记录，则移除"最近播放"分类并选择第一个真实分类
+        const newCategories = categories.slice(1);
+        setCategories(newCategories);
+        handleCategorySelect(newCategories[0]);
+      } else {
+        setContentData(records);
+        setHasMore(false);
       }
-    };
+      setLoading(false);
+      return;
+    }
 
-    fetchAllData();
-  }, []);
+    if (!category.type || !category.tag) return;
 
-  if (loading) {
+    setLoadingMore(start > 0);
+    setError(null);
+
+    try {
+      const result = await moonTVApi.getDoubanData(
+        category.type,
+        category.tag,
+        20,
+        start
+      );
+
+      if (result.list.length === 0) {
+        setHasMore(false);
+      } else {
+        const newItems = result.list.map((item) => ({
+          ...item,
+          id: item.title, // 临时ID
+          source: "douban",
+        })) as RowItem[];
+
+        setContentData((prev) =>
+          start === 0 ? newItems : [...prev, ...newItems]
+        );
+        setPageStart((prev) => prev + result.list.length);
+        setHasMore(true);
+      }
+    } catch (err) {
+      console.error("Failed to load data:", err);
+      setError("加载失败，请重试");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  // --- Effects ---
+  useFocusEffect(
+    useCallback(() => {
+      if (selectedCategory.type === "record") {
+        loadInitialData();
+      }
+    }, [selectedCategory])
+  );
+
+  useEffect(() => {
+    loadInitialData();
+  }, [selectedCategory]);
+
+  const loadInitialData = () => {
+    setLoading(true);
+    setContentData([]);
+    setPageStart(0);
+    setHasMore(true);
+    flatListRef.current?.scrollToOffset({ animated: false, offset: 0 });
+    fetchData(selectedCategory, 0);
+  };
+
+  const loadMoreData = () => {
+    if (
+      loading ||
+      loadingMore ||
+      !hasMore ||
+      selectedCategory.type === "record"
+    )
+      return;
+    fetchData(selectedCategory, pageStart);
+  };
+
+  const handleCategorySelect = (category: Category) => {
+    setSelectedCategory(category);
+  };
+
+  // --- 渲染组件 ---
+  const renderCategory = ({ item }: { item: Category }) => {
+    const isSelected = selectedCategory.title === item.title;
     return (
-      <ThemedView style={styles.centerContainer}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
+      <Pressable
+        style={({ focused }) => [
+          styles.categoryButton,
+          isSelected && styles.categoryButtonSelected,
+          focused && styles.categoryButtonFocused,
+        ]}
+        onPress={() => handleCategorySelect(item)}
+      >
+        <ThemedText
+          style={[
+            styles.categoryText,
+            isSelected && styles.categoryTextSelected,
+          ]}
+        >
+          {item.title}
+        </ThemedText>
+      </Pressable>
     );
-  }
+  };
 
-  if (error) {
-    return (
-      <ThemedView style={styles.centerContainer}>
-        <ThemedText type="subtitle">{error}</ThemedText>
-      </ThemedView>
-    );
-  }
+  const renderContentItem = ({ item }: { item: RowItem }) => (
+    <View style={styles.itemContainer}>
+      <VideoCard
+        id={item.id}
+        source={item.source}
+        title={item.title}
+        poster={item.poster}
+        year={item.year}
+        rate={item.rate}
+        progress={item.progress}
+        episodeIndex={item.episodeIndex}
+        sourceName={item.sourceName}
+        totalEpisodes={item.totalEpisodes}
+        api={moonTVApi}
+        onRecordDeleted={loadInitialData} // For "Recent Plays"
+      />
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return <ActivityIndicator style={{ marginVertical: 20 }} size="large" />;
+  };
 
   return (
     <ThemedView style={styles.container}>
-      <FlatList
-        data={rows}
-        renderItem={({ item }) => (
-          <ScrollableRow title={item.title} data={item.data} api={api} />
-        )}
-        keyExtractor={(item) => item.title}
-        contentContainerStyle={styles.listContent}
-      />
+      {/* 顶部导航 */}
+      <View style={styles.headerContainer}>
+        <ThemedText style={styles.headerTitle}>首页</ThemedText>
+        <Pressable
+          style={({ focused }) => [
+            styles.searchButton,
+            focused && styles.searchButtonFocused,
+          ]}
+          onPress={() => router.push({ pathname: "/search" })}
+        >
+          <Search
+            color={colorScheme === "dark" ? "white" : "black"}
+            size={24}
+          />
+        </Pressable>
+      </View>
+
+      {/* 分类选择器 */}
+      <View style={styles.categoryContainer}>
+        <FlatList
+          data={categories}
+          renderItem={renderCategory}
+          keyExtractor={(item) => item.title}
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.categoryListContent}
+        />
+      </View>
+
+      {/* 内容网格 */}
+      {loading ? (
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : error ? (
+        <View style={styles.centerContainer}>
+          <ThemedText type="subtitle">{error}</ThemedText>
+        </View>
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={contentData}
+          renderItem={renderContentItem}
+          keyExtractor={(item, index) => `${item.source}-${item.id}-${index}`}
+          numColumns={NUM_COLUMNS}
+          contentContainerStyle={styles.listContent}
+          onEndReached={loadMoreData}
+          onEndReachedThreshold={0.5}
+          ListFooterComponent={renderFooter}
+          ListEmptyComponent={
+            <View style={styles.centerContainer}>
+              <ThemedText>该分类下暂无内容</ThemedText>
+            </View>
+          }
+        />
+      )}
     </ThemedView>
   );
 }
@@ -100,14 +304,69 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 40,
   },
   centerContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
+  // Header
+  headerContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 24,
+    marginBottom: 10,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: "bold",
+    paddingTop: 16,
+  },
+  searchButton: {
+    padding: 10,
+    borderRadius: 30,
+  },
+  searchButtonFocused: {
+    backgroundColor: "#007AFF",
+    transform: [{ scale: 1.1 }],
+  },
+  // Category Selector
+  categoryContainer: {
+    paddingBottom: 10,
+  },
+  categoryListContent: {
+    paddingHorizontal: 16,
+  },
+  categoryButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginHorizontal: 5,
+  },
+  categoryButtonSelected: {
+    backgroundColor: "#007AFF", // A bright blue for selected state
+  },
+  categoryButtonFocused: {
+    backgroundColor: "#0056b3", // A darker blue for focused state
+    elevation: 5,
+  },
+  categoryText: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  categoryTextSelected: {
+    color: "#FFFFFF",
+  },
+  // Content Grid
   listContent: {
-    paddingTop: 40,
-    paddingBottom: 40,
+    paddingHorizontal: 16,
+    paddingBottom: 20,
+  },
+  itemContainer: {
+    margin: 8,
+    width: ITEM_WIDTH,
+    alignItems: "center",
   },
 });

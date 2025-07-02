@@ -32,14 +32,30 @@
     "experiments": {
       "typedRoutes": true
     },
-    "name": "MyTVProject",
-    "slug": "MyTVProject",
+    "name": "OrionTV",
+    "slug": "OrionTV",
+    "icon": "./assets/images/icon.png",
     "android": {
-      "package": "com.tvproject"
+      "package": "com.oriontv",
+      "usesCleartextTraffic": true,
+      "networkSecurityConfig": "@xml/network_security_config",
+      "icon": "./assets/images/icon.png",
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
     },
     "ios": {
-      "bundleIdentifier": "com.tvproject"
+      "bundleIdentifier": "com.oriontv"
     },
-    "scheme": "tvproject"
+    "scheme": "oriontv",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b4eddfdb-08cb-4ffc-828d-a27f493e10f7"
+      }
+    }
   }
 }

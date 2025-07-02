@@ -1,4 +1,3 @@
-// MoonTV API 服务
 export interface DoubanItem {
   title: string;
   poster: string;
@@ -32,7 +31,7 @@ export interface VideoDetail {
 }
 
 export interface SearchResult {
-  id: string;
+  id: number;
   title: string;
   poster: string;
   episodes: string[];
@@ -57,17 +56,8 @@ export interface PlayRecord {
   user_id: number; // User ID, always 0 in this version
 }
 
-export class MoonTVAPI {
-  private baseURL: string;
-
-  constructor(baseURL: string) {
-    if (!baseURL) {
-      console.warn(
-        "MoonTVAPI base URL not set. Please configure it for your network."
-      );
-    }
-    this.baseURL = baseURL;
-  }
+export class API {
+  private baseURL: string = "https://orion-tv.vercel.app";
 
   /**
    * 生成图片代理 URL
@@ -160,7 +150,7 @@ export class MoonTVAPI {
 }
 
 // 默认实例
-export const moonTVApi = new MoonTVAPI();
+export const moonTVApi = new API();
 
 // 生成模拟数据的辅助函数
 export const generateMockDoubanData = (count: number = 20): DoubanItem[] => {
@@ -202,7 +192,7 @@ export const generateMockSearchResults = (
   count: number = 20
 ): SearchResult[] => {
   return Array.from({ length: count }, (_, index) => ({
-    id: `${index + 1}`,
+    id: index + 1,
     title: `搜索结果：${query} ${index + 1}`,
     poster: `https://picsum.photos/160/240?random=${index + 100}`,
     episodes: [`第1集`, `第2集`, `第3集`],
