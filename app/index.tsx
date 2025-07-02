@@ -30,7 +30,8 @@ import VideoCard from "@/components/VideoCard.tv";
 import { PlayRecordManager } from "@/services/storage";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useColorScheme } from "react-native";
-import { Search } from "lucide-react-native";
+import { Search, Settings } from "lucide-react-native";
+import { SettingsModal } from "@/components/SettingsModal";
 
 // --- 类别定义 ---
 interface Category {
@@ -68,6 +69,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSettingsVisible, setSettingsVisible] = useState(false);
 
   const [pageStart, setPageStart] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -145,9 +147,13 @@ export default function HomeScreen() {
         setPageStart((prev) => prev + result.list.length);
         setHasMore(true);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to load data:", err);
-      setError("加载失败，请重试");
+      if (err.message === "API_URL_NOT_SET") {
+        setError("请点击右上角设置按钮，配置您的 API 地址");
+      } else {
+        setError("加载失败，请重试");
+      }
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -244,18 +250,32 @@ export default function HomeScreen() {
       {/* 顶部导航 */}
       <View style={styles.headerContainer}>
         <ThemedText style={styles.headerTitle}>首页</ThemedText>
-        <Pressable
-          style={({ focused }) => [
-            styles.searchButton,
-            focused && styles.searchButtonFocused,
-          ]}
-          onPress={() => router.push({ pathname: "/search" })}
-        >
-          <Search
-            color={colorScheme === "dark" ? "white" : "black"}
-            size={24}
-          />
-        </Pressable>
+        <View style={styles.rightHeaderButtons}>
+          <Pressable
+            style={({ focused }) => [
+              styles.searchButton,
+              focused && styles.searchButtonFocused,
+            ]}
+            onPress={() => router.push({ pathname: "/search" })}
+          >
+            <Search
+              color={colorScheme === "dark" ? "white" : "black"}
+              size={24}
+            />
+          </Pressable>
+          <Pressable
+            style={({ focused }) => [
+              styles.searchButton,
+              focused && styles.searchButtonFocused,
+            ]}
+            onPress={() => setSettingsVisible(true)}
+          >
+            <Settings
+              color={colorScheme === "dark" ? "white" : "black"}
+              size={24}
+            />
+          </Pressable>
+        </View>
       </View>
 
       {/* 分类选择器 */}
@@ -297,6 +317,14 @@ export default function HomeScreen() {
           }
         />
       )}
+      <SettingsModal
+        visible={isSettingsVisible}
+        onCancel={() => setSettingsVisible(false)}
+        onSave={() => {
+          setSettingsVisible(false);
+          loadInitialData();
+        }}
+      />
     </ThemedView>
   );
 }
@@ -324,9 +352,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     paddingTop: 16,
   },
+  rightHeaderButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   searchButton: {
     padding: 10,
     borderRadius: 30,
+    marginLeft: 10,
   },
   searchButtonFocused: {
     backgroundColor: "#007AFF",

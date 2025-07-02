@@ -1,3 +1,5 @@
+import { SettingsManager } from "./storage";
+
 export interface DoubanItem {
   title: string;
   poster: string;
@@ -57,7 +59,17 @@ export interface PlayRecord {
 }
 
 export class API {
-  private baseURL: string = "https://orion-tv.vercel.app";
+  public baseURL: string = "";
+
+  constructor(baseURL?: string) {
+    if (baseURL) {
+      this.baseURL = baseURL;
+    }
+  }
+
+  public setBaseUrl(url: string) {
+    this.baseURL = url;
+  }
 
   /**
    * 生成图片代理 URL
@@ -77,6 +89,9 @@ export class API {
     pageSize: number = 16,
     pageStart: number = 0
   ): Promise<DoubanResponse> {
+    if (!this.baseURL) {
+      throw new Error("API_URL_NOT_SET");
+    }
     const url = `${
       this.baseURL
     }/api/douban?type=${type}&tag=${encodeURIComponent(
@@ -92,6 +107,9 @@ export class API {
    * 搜索视频
    */
   async searchVideos(query: string): Promise<{ results: SearchResult[] }> {
+    if (!this.baseURL) {
+      throw new Error("API_URL_NOT_SET");
+    }
     const url = `${this.baseURL}/api/search?q=${encodeURIComponent(query)}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -102,6 +120,9 @@ export class API {
    * 获取视频详情
    */
   async getVideoDetail(source: string, id: string): Promise<VideoDetail> {
+    if (!this.baseURL) {
+      throw new Error("API_URL_NOT_SET");
+    }
     const url = `${this.baseURL}/api/detail?source=${source}&id=${id}`;
     const response = await fetch(url);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -150,56 +171,10 @@ export class API {
 }
 
 // 默认实例
-export const moonTVApi = new API();
+export let moonTVApi = new API();
 
-// 生成模拟数据的辅助函数
-export const generateMockDoubanData = (count: number = 20): DoubanItem[] => {
-  const movieTitles = [
-    "肖申克的救赎",
-    "霸王别姬",
-    "阿甘正传",
-    "泰坦尼克号",
-    "这个杀手不太冷",
-    "千与千寻",
-    "美丽人生",
-    "辛德勒的名单",
-    "星际穿越",
-    "盗梦空间",
-    "忠犬八公的故事",
-    "教父",
-    "龙猫",
-    "当幸福来敲门",
-    "三傻大闹宝莱坞",
-    "机器人总动员",
-    "放牛班的春天",
-    "无间道",
-    "楚门的世界",
-    "大话西游之大圣娶亲",
-  ];
-
-  return Array.from(
-    { length: Math.min(count, movieTitles.length) },
-    (_, index) => ({
-      title: movieTitles[index] || `影片 ${index + 1}`,
-      poster: `https://picsum.photos/160/240?random=${index}`,
-      rate: (Math.random() * 3 + 7).toFixed(1),
-    })
-  );
-};
-
-export const generateMockSearchResults = (
-  query: string,
-  count: number = 20
-): SearchResult[] => {
-  return Array.from({ length: count }, (_, index) => ({
-    id: index + 1,
-    title: `搜索结果：${query} ${index + 1}`,
-    poster: `https://picsum.photos/160/240?random=${index + 100}`,
-    episodes: [`第1集`, `第2集`, `第3集`],
-    source: "mock",
-    source_name: "模拟源",
-    year: (2020 + Math.floor(Math.random() * 4)).toString(),
-    desc: `这是关于 ${query} 的搜索结果 ${index + 1}`,
-    type_name: Math.random() > 0.5 ? "电影" : "电视剧",
-  }));
+// 初始化 API
+export const initializeApi = async () => {
+  const settings = await SettingsManager.get();
+  moonTVApi.setBaseUrl(settings.apiBaseUrl);
 };

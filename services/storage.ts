@@ -25,6 +25,7 @@ export interface AppSettings {
   theme: "light" | "dark" | "auto";
   autoPlay: boolean;
   playbackSpeed: number;
+  apiBaseUrl: string;
 }
 
 // --- Helper ---
@@ -177,6 +178,7 @@ export class SettingsManager {
       theme: "auto",
       autoPlay: true,
       playbackSpeed: 1.0,
+      apiBaseUrl: "http://127.0.0.1:3001",
     };
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);

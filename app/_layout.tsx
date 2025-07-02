@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { Platform } from "react-native";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { initializeApi } from "@/services/api";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -28,6 +29,10 @@ export default function RootLayout() {
       }
     }
   }, [loaded, error]);
+
+  useEffect(() => {
+    initializeApi();
+  }, []);
 
   if (!loaded && !error) {
     return null;
