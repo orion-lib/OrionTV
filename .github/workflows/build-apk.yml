@@ -1,0 +1,48 @@
+name: Build Android TV APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  direct_build:
+    name: Build Android TV APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Get version from package.json
+        id: package-version
+        run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
+      - name: Setup JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "17"
+
+      - name: Prebuild TV App
+        run: yarn prebuild-tv
+
+      - name: Build TV APK
+        run: yarn build-local
+
+      - name: Rename APK file
+        run: |
+          mkdir -p artifacts
+          cp android/app/build/outputs/apk/release/app-release.apk artifacts/orionTV.${{ steps.package-version.outputs.version }}.apk
+
+      - name: Upload TV APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: orionTV-apk
+          path: artifacts/orionTV.${{ steps.package-version.outputs.version }}.apk

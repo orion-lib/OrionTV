@@ -124,3 +124,21 @@ yarn android-tv
 - `yarn android-tv`: 在 Android TV 上构建并运行应用。
 - `yarn prebuild-tv`: 为 TV 构建生成原生项目文件。
 - `yarn lint`: 检查代码风格。
+
+## 📸 应用截图
+
+![首页界面](screenshot/image.png)
+![详情页面](screenshot/image1.png)
+![搜索界面](screenshot/image3.png)
+![视频播放](screenshot/image2.png)
+
+## 📝 License
+
+本项目采用 MIT 许可证。
+
+## 🙏 致谢
+
+本项目受到以下开源项目的启发：
+
+- [MoonTV](https://github.com/senshinya/MoonTV) - 一个基于 Next.js 的视频聚合应用
+- [LibreTV](https://github.com/LibreSpark/LibreTV) - 一个开源的视频流媒体应用
