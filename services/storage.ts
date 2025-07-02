@@ -178,7 +178,7 @@ export class SettingsManager {
       theme: "auto",
       autoPlay: true,
       playbackSpeed: 1.0,
-      apiBaseUrl: "http://127.0.0.1:3001",
+      apiBaseUrl: "",
     };
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);

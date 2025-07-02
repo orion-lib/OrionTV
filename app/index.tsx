@@ -148,7 +148,6 @@ export default function HomeScreen() {
         setHasMore(true);
       }
     } catch (err: any) {
-      console.error("Failed to load data:", err);
       if (err.message === "API_URL_NOT_SET") {
         setError("请点击右上角设置按钮，配置您的 API 地址");
       } else {
@@ -297,7 +296,9 @@ export default function HomeScreen() {
         </View>
       ) : error ? (
         <View style={styles.centerContainer}>
-          <ThemedText type="subtitle">{error}</ThemedText>
+          <ThemedText type="subtitle" style={{ padding: 10 }}>
+            {error}
+          </ThemedText>
         </View>
       ) : (
         <FlatList

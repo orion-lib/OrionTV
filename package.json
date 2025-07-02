@@ -15,7 +15,7 @@
     "test": "jest --watchAll",
     "lint": "expo lint",
     "prebuild": "EXPO_USE_METRO_WORKSPACE_ROOT=1 expo prebuild --clean",
-    "prebuild-tv": "EXPO_TV=1 EXPO_USE_METRO_WORKSPACE_ROOT=1 expo prebuild --clean && yarn copy-config",
+    "prebuild-tv": "EXPO_TV=1 EXPO_USE_METRO_WORKSPACE_ROOT=1 expo prebuild --clean",
     "copy-config": "cp -r xml/* android/app/src/*",
     "build-local": "cd android && ./gradlew assembleRelease"
   },

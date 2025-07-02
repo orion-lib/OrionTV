@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Modal,
   View,
@@ -25,13 +25,19 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   onSave,
 }) => {
   const [apiUrl, setApiUrl] = useState("");
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const colorScheme = useColorScheme();
+  const inputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (visible) {
       SettingsManager.get().then((settings) => {
         setApiUrl(settings.apiBaseUrl);
       });
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [visible]);
 
@@ -71,6 +77,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
       backgroundColor: colorScheme === "dark" ? "#3a3a3c" : "#f0f0f0",
       color: colorScheme === "dark" ? "white" : "black",
       borderColor: "transparent",
+    },
+    inputFocused: {
+      borderColor: "#007AFF",
+      shadowColor: "#007AFF",
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.8,
+      shadowRadius: 10,
+      elevation: 5,
     },
     buttonContainer: {
       flexDirection: "row",
@@ -115,13 +129,16 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
         <ThemedView style={styles.modalContent}>
           <ThemedText style={styles.title}>设置</ThemedText>
           <TextInput
-            style={styles.input}
+            ref={inputRef}
+            style={[styles.input, isInputFocused && styles.inputFocused]}
             value={apiUrl}
             onChangeText={setApiUrl}
             placeholder="输入 API 地址"
             placeholderTextColor={colorScheme === "dark" ? "#888" : "#555"}
             autoCapitalize="none"
             autoCorrect={false}
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
           />
           <View style={styles.buttonContainer}>
             <Pressable
