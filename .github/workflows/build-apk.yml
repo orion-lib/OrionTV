@@ -3,6 +3,9 @@ name: Build Android TV APK
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   direct_build:
     name: Build Android TV APK
