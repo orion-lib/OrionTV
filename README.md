@@ -93,9 +93,9 @@ yarn android-tv
 
 ## 部署
 
-### 后端部署 (Vercel)
+### 后端部署
 
-后端服务已配置为可以轻松部署到 [Vercel](https://vercel.com/)。
+#### [Vercel](https://vercel.com/) 部署
 
 1.  **安装 Vercel CLI**
 
@@ -115,6 +115,16 @@ yarn android-tv
     ```
 
     按照 Vercel CLI 的提示完成登录和部署过程。`vercel.json` 文件已配置好所有必要的构建和路由设置。
+
+#### Docker 部署
+
+1. `docker pull zimpel1/tv-host`
+
+2. `docker run -d -p 3001:3001 zimpel1/tv-host`
+
+#### 使用 demo 地址
+
+在设置中可以使用 demo 地址： https://orion-tv.vercel.app，需要代理且不保证稳定和可用性。
 
 ## 📜 主要脚本
 
