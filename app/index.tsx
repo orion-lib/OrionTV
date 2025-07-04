@@ -46,6 +46,7 @@ const initialCategories: Category[] = [
   { title: "热门剧集", type: "tv", tag: "热门" },
   { title: "热门电影", type: "movie", tag: "热门" },
   { title: "豆瓣 Top250", type: "movie", tag: "top250" },
+  // { title: "儿童", type: "movie", tag: "儿童" },
   { title: "美剧", type: "tv", tag: "美剧" },
   { title: "韩剧", type: "tv", tag: "韩剧" },
   { title: "日剧", type: "tv", tag: "日剧" },

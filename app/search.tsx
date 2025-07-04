@@ -43,7 +43,11 @@ export default function SearchScreen() {
     setError(null);
     try {
       const response = await moonTVApi.searchVideos(keyword);
-      setResults(response.results);
+      if (response.results.length > 0) {
+        setResults(response.results);
+      } else {
+        setError("没有找到相关内容");
+      }
     } catch (err) {
       setError("搜索失败，请稍后重试。");
       console.error("Search failed:", err);

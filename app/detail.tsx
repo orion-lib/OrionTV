@@ -97,7 +97,7 @@ export default function DetailScreen() {
   if (error) {
     return (
       <ThemedView style={styles.centered}>
-        <ThemedText type="subtitle">Error: {error}</ThemedText>
+        <ThemedText type="subtitle">{error}</ThemedText>
       </ThemedView>
     );
   }
