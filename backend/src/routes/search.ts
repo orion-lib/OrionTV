@@ -59,6 +59,15 @@ async function searchFromApi(
 
     const data = await response.json();
 
+    console.log(
+      "apiUrl",
+      apiSite.name,
+      "response status",
+      response.ok,
+      "response data",
+      data.list.length
+    );
+
     if (
       !data ||
       !data.list ||

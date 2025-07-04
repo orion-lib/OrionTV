@@ -1,12 +1,12 @@
 {
-  "name": "mytv-backend",
-  "version": "1.0.0",
+  "name": "OrionTV-proxy",
+  "version": "1.0.1",
   "description": "Backend service for MyTV application",
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/index.js",
     "build": "tsc",
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+    "dev": "ts-node-dev --respawn --transpile-only src/index.docker.ts"
   },
   "keywords": [],
   "author": "",
