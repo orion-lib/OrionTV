@@ -48,7 +48,7 @@ export const API_CONFIG = {
 };
 
 // Adjust path to read from project root, not from `backend/`
-const configPath = path.join(process.cwd(), "config.json");
+const configPath = path.join(__dirname, "config.json");
 let cachedConfig: Config;
 
 try {
