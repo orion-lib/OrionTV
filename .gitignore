@@ -21,3 +21,5 @@ web-build/
 expo-env.d.ts
 # @end expo-cli
 web/** 
+.bmad-core
+.kilocodemodes
