@@ -6,6 +6,7 @@ import VideoCard from "@/components/VideoCard.tv";
 import { api, SearchResult } from "@/services/api";
 import { Search } from "lucide-react-native";
 import { StyledButton } from "@/components/StyledButton";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function SearchScreen() {
   const [keyword, setKeyword] = useState("");
@@ -15,6 +16,10 @@ export default function SearchScreen() {
   const textInputRef = useRef<TextInput>(null);
   const colorScheme = "dark"; // Replace with useColorScheme() if needed
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const { isMobile, screenWidth, numColumns } = useResponsive();
+
+  const itemWidth = isMobile ? screenWidth / numColumns(150, 16) - 24 : screenWidth / 5 - 24;
+  const calculatedNumColumns = numColumns(150, 16);
 
   useEffect(() => {
     // Focus the text input when the screen loads
@@ -48,15 +53,17 @@ export default function SearchScreen() {
   };
 
   const renderItem = ({ item }: { item: SearchResult }) => (
-    <VideoCard
-      id={item.id.toString()}
-      source={item.source}
-      title={item.title}
-      poster={item.poster}
-      year={item.year}
-      sourceName={item.source_name}
-      api={api}
-    />
+    <View style={{ width: itemWidth, margin: 8 }}>
+      <VideoCard
+        id={item.id.toString()}
+        source={item.source}
+        title={item.title}
+        poster={item.poster}
+        year={item.year}
+        sourceName={item.source_name}
+        api={api}
+      />
+    </View>
   );
 
   return (
@@ -99,7 +106,8 @@ export default function SearchScreen() {
           data={results}
           renderItem={renderItem}
           keyExtractor={(item, index) => `${item.id}-${item.source}-${index}`}
-          numColumns={5} // Adjust based on your card size and desired layout
+          numColumns={calculatedNumColumns}
+          key={calculatedNumColumns}
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
             <View style={styles.centerContainer}>

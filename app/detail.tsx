@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, FlatList } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { api, SearchResult } from "@/services/api";
 import { getResolutionFromM3U8 } from "@/services/m3u8";
 import { StyledButton } from "@/components/StyledButton";
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function DetailScreen() {
   const { source, q } = useLocalSearchParams();
   const router = useRouter();
+  const { isMobile, screenWidth, numColumns } = useResponsive();
   const [searchResults, setSearchResults] = useState<(SearchResult & { resolution?: string | null })[]>([]);
   const [detail, setDetail] = useState<(SearchResult & { resolution?: string | null }) | null>(null);
   const [loading, setLoading] = useState(true);
@@ -147,9 +149,12 @@ export default function DetailScreen() {
   return (
     <ThemedView style={styles.container}>
       <ScrollView>
-        <View style={styles.topContainer}>
-          <Image source={{ uri: detail.poster }} style={styles.poster} />
-          <View style={styles.infoContainer}>
+        <View style={[styles.topContainer, isMobile && screenWidth < 600 && styles.topContainerMobile]}>
+          <Image
+            source={{ uri: detail.poster }}
+            style={[styles.poster, isMobile && screenWidth < 600 && styles.posterMobile]}
+          />
+          <View style={[styles.infoContainer, isMobile && screenWidth < 600 && styles.infoContainerMobile]}>
             <ThemedText style={styles.title} numberOfLines={1}>
               {detail.title}
             </ThemedText>
@@ -197,17 +202,26 @@ export default function DetailScreen() {
           </View>
           <View style={styles.episodesContainer}>
             <ThemedText style={styles.episodesTitle}>播放列表</ThemedText>
-            <ScrollView contentContainerStyle={styles.episodeList}>
-              {detail.episodes.map((episode, index) => (
+            <FlatList
+              data={detail.episodes}
+              renderItem={({ item, index }) => (
                 <StyledButton
-                  key={index}
                   style={styles.episodeButton}
-                  onPress={() => handlePlay(episode, index)}
+                  onPress={() => handlePlay(item, index)}
                   text={`第 ${index + 1} 集`}
                   textStyle={styles.episodeButtonText}
                 />
-              ))}
-            </ScrollView>
+              )}
+              keyExtractor={(_item, index) => index.toString()}
+              numColumns={numColumns(80, 10)}
+              key={numColumns(80, 10)} // Re-render on column change
+              contentContainerStyle={styles.episodeList}
+              // The FlatList should not be scrollable itself, the parent ScrollView handles it.
+              // This can be achieved by making it non-scrollable and letting it expand.
+              // However, for performance, if the list is very long, a fixed height would be better.
+              // For now, we let the parent ScrollView handle scrolling.
+              scrollEnabled={false}
+            />
           </View>
         </View>
       </ScrollView>
@@ -222,15 +236,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     padding: 20,
   },
+  topContainerMobile: {
+    flexDirection: "column",
+    alignItems: "center",
+  },
   poster: {
     width: 200,
     height: 300,
     borderRadius: 8,
   },
+  posterMobile: {
+    width: "80%",
+    height: undefined,
+    aspectRatio: 2 / 3, // Maintain aspect ratio
+    marginBottom: 20,
+  },
   infoContainer: {
     flex: 1,
     marginLeft: 20,
     justifyContent: "flex-start",
+  },
+  infoContainerMobile: {
+    marginLeft: 0,
+    width: "100%",
+    alignItems: "center",
   },
   title: {
     fontSize: 28,
@@ -302,8 +331,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   episodeList: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    // flexDirection is now handled by FlatList's numColumns
   },
   episodeButton: {
     margin: 5,

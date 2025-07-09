@@ -3,6 +3,7 @@ import { Animated, Pressable, StyleSheet, StyleProp, ViewStyle, PressableProps, 
 import { ThemedText } from "./ThemedText";
 import { Colors } from "@/constants/Colors";
 import { useButtonAnimation } from "@/hooks/useButtonAnimation";
+import { useResponsive } from "@/hooks/useResponsive";
 
 interface StyledButtonProps extends PressableProps {
   children?: React.ReactNode;
@@ -26,6 +27,7 @@ export const StyledButton: React.FC<StyledButtonProps> = ({
   const colors = Colors[colorScheme];
   const [isFocused, setIsFocused] = React.useState(false);
   const animationStyle = useButtonAnimation(isFocused);
+  const { isMobile } = useResponsive();
 
   const variantStyles = {
     default: StyleSheet.create({
@@ -81,8 +83,8 @@ export const StyledButton: React.FC<StyledButtonProps> = ({
 
   const styles = StyleSheet.create({
     button: {
-      paddingHorizontal: 16,
-      paddingVertical: 10,
+      paddingHorizontal: isMobile ? 12 : 16,
+      paddingVertical: isMobile ? 8 : 10,
       borderRadius: 8,
       borderWidth: 2,
       borderColor: "transparent",
@@ -103,7 +105,7 @@ export const StyledButton: React.FC<StyledButtonProps> = ({
       backgroundColor: colors.tint,
     },
     text: {
-      fontSize: 16,
+      fontSize: isMobile ? 14 : 16,
       fontWeight: "500",
       color: colors.text,
     },

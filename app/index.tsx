@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef } from "react";
-import { View, StyleSheet, ActivityIndicator, FlatList, Pressable, Dimensions } from "react-native";
+import { View, StyleSheet, ActivityIndicator, FlatList, Pressable } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { api } from "@/services/api";
@@ -10,15 +10,17 @@ import { SettingsModal } from "@/components/SettingsModal";
 import { StyledButton } from "@/components/StyledButton";
 import useHomeStore, { RowItem, Category } from "@/stores/homeStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-
-const NUM_COLUMNS = 5;
-const { width } = Dimensions.get("window");
-const ITEM_WIDTH = width / NUM_COLUMNS - 24;
+import { useResponsive } from "@/hooks/useResponsive";
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { isMobile, screenWidth, numColumns } = useResponsive();
   const colorScheme = "dark";
   const flatListRef = useRef<FlatList>(null);
+
+  // Calculate item width based on screen size and number of columns
+  const itemWidth = isMobile ? screenWidth / numColumns(150, 16) - 24 : screenWidth / 5 - 24;
+  const calculatedNumColumns = numColumns(150, 16);
 
   const {
     categories,
@@ -64,7 +66,7 @@ export default function HomeScreen() {
   };
 
   const renderContentItem = ({ item }: { item: RowItem }) => (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer, { width: itemWidth }]}>
       <VideoCard
         id={item.id}
         source={item.source}
@@ -136,7 +138,8 @@ export default function HomeScreen() {
           data={contentData}
           renderItem={renderContentItem}
           keyExtractor={(item, index) => `${item.source}-${item.id}-${index}`}
-          numColumns={NUM_COLUMNS}
+          numColumns={calculatedNumColumns}
+          key={calculatedNumColumns} // Re-render FlatList when numColumns changes
           contentContainerStyle={styles.listContent}
           onEndReached={loadMoreData}
           onEndReachedThreshold={0.5}
@@ -210,7 +213,7 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     margin: 8,
-    width: ITEM_WIDTH,
+    // width is now set dynamically in renderContentItem
     alignItems: "center",
   },
 });
