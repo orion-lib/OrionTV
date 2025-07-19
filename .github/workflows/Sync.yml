@@ -25,8 +25,8 @@ jobs:
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
           upstream_sync_repo: zimplexing/OrionTV
-          upstream_sync_branch: main
-          target_sync_branch: main
+          upstream_sync_branch: master
+          target_sync_branch: master
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync check
