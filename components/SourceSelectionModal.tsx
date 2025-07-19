@@ -72,7 +72,9 @@ const styles = StyleSheet.create({
   sourceItem: {
     paddingVertical: 2,
     margin: 4,
-    width: "31%",
+    marginLeft: 10,
+    marginRight: 8,
+    width: "30%",
   },
   sourceItemText: {
     fontSize: 14,

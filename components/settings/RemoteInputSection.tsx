@@ -6,6 +6,7 @@ import { SettingsSection } from "./SettingsSection";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useRemoteControlStore } from "@/stores/remoteControlStore";
 import { useButtonAnimation } from "@/hooks/useAnimation";
+import { Colors } from "@/constants/Colors";
 
 interface RemoteInputSectionProps {
   onChanged: () => void;
@@ -59,7 +60,7 @@ export const RemoteInputSection: React.FC<RemoteInputSectionProps> = ({ onChange
           <Switch
             value={remoteInputEnabled}
             onValueChange={() => {}} // 禁用Switch的直接交互
-            trackColor={{ false: "#767577", true: "#007AFF" }}
+            trackColor={{ false: "#767577", true: Colors.dark.primary }}
             thumbColor={remoteInputEnabled ? "#ffffff" : "#f4f3f4"}
             pointerEvents="none"
           />
@@ -70,7 +71,7 @@ export const RemoteInputSection: React.FC<RemoteInputSectionProps> = ({ onChange
         <View style={styles.statusContainer}>
           <View style={styles.statusItem}>
             <ThemedText style={styles.statusLabel}>服务状态：</ThemedText>
-            <ThemedText style={[styles.statusValue, { color: isServerRunning ? "#00FF00" : "#FF6B6B" }]}>
+            <ThemedText style={[styles.statusValue, { color: isServerRunning ? Colors.dark.primary : "#FF6B6B" }]}>
               {isServerRunning ? "运行中" : "已停止"}
             </ThemedText>
           </View>

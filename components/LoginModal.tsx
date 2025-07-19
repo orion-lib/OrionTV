@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, View, TextInput, StyleSheet, ActivityIndicator, useTVEventHandler } from "react-native";
+import { usePathname } from "expo-router";
 import Toast from "react-native-toast-message";
 import useAuthStore from "@/stores/authStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -20,9 +21,11 @@ const LoginModal = () => {
   const passwordInputRef = useRef<TextInput>(null);
   const loginButtonRef = useRef<View>(null);
   const [focused, setFocused] = useState("username");
+  const pathname = usePathname();
+  const isSettingsPage = pathname.includes("settings");
 
   const tvEventHandler = (evt: any) => {
-    if (!evt || !isLoginModalVisible) {
+    if (!evt || !isLoginModalVisible || isSettingsPage) {
       return;
     }
 
@@ -48,7 +51,7 @@ const LoginModal = () => {
   useTVEventHandler(tvEventHandler);
 
   useEffect(() => {
-    if (isLoginModalVisible) {
+    if (isLoginModalVisible && !isSettingsPage) {
       const isUsernameVisible = serverConfig?.StorageType !== "localstorage";
       setTimeout(() => {
         if (isUsernameVisible) {
@@ -58,7 +61,7 @@ const LoginModal = () => {
         }
       }, 200);
     }
-  }, [isLoginModalVisible, serverConfig]);
+  }, [isLoginModalVisible, serverConfig, isSettingsPage]);
 
   const handleLogin = async () => {
     const isLocalStorage = serverConfig?.StorageType === "localstorage";
@@ -83,7 +86,12 @@ const LoginModal = () => {
   };
 
   return (
-    <Modal transparent={true} visible={isLoginModalVisible} animationType="fade" onRequestClose={hideLoginModal}>
+    <Modal
+      transparent={true}
+      visible={isLoginModalVisible && !isSettingsPage}
+      animationType="fade"
+      onRequestClose={hideLoginModal}
+    >
       <View style={styles.overlay}>
         <ThemedView style={styles.container}>
           <ThemedText style={styles.title}>需要登录</ThemedText>

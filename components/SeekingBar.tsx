@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
   },
   seekingBarFilled: {
     height: "100%",
-    backgroundColor: "#ff0000",
+    backgroundColor: "#fff",
     borderRadius: 2.5,
   },
 });

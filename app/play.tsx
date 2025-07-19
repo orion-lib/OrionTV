@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { StyleSheet, TouchableOpacity, ActivityIndicator, BackHandler, AppState, AppStateStatus } from "react-native";
+import { StyleSheet, TouchableOpacity, BackHandler, AppState, AppStateStatus, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Video, ResizeMode } from "expo-av";
 import { useKeepAwake } from "expo-keep-awake";
@@ -9,7 +9,7 @@ import { EpisodeSelectionModal } from "@/components/EpisodeSelectionModal";
 import { SourceSelectionModal } from "@/components/SourceSelectionModal";
 import { SeekingBar } from "@/components/SeekingBar";
 import { NextEpisodeOverlay } from "@/components/NextEpisodeOverlay";
-import { LoadingOverlay } from "@/components/LoadingOverlay";
+import VideoLoadingAnimation from "@/components/VideoLoadingAnimation";
 import useDetailStore from "@/stores/detailStore";
 import { useTVRemoteHandler } from "@/hooks/useTVRemoteHandler";
 import Toast from "react-native-toast-message";
@@ -116,11 +116,7 @@ export default function PlayScreen() {
   }, [isLoading]);
 
   if (!detail) {
-    return (
-      <ThemedView style={[styles.container, styles.centered]}>
-        <ActivityIndicator size="large" color="#fff" />
-      </ThemedView>
-    );
+    return <VideoLoadingAnimation showProgressBar />;
   }
 
   return (
@@ -130,7 +126,6 @@ export default function PlayScreen() {
           ref={videoRef}
           style={styles.videoPlayer}
           source={{ uri: currentEpisode?.url || "" }}
-          usePoster
           posterSource={{ uri: detail?.poster ?? "" }}
           resizeMode={ResizeMode.CONTAIN}
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
@@ -150,7 +145,11 @@ export default function PlayScreen() {
 
         <SeekingBar />
 
-        <LoadingOverlay visible={isLoading} />
+        {isLoading && (
+          <View style={styles.videoContainer}>
+            <VideoLoadingAnimation showProgressBar />
+          </View>
+        )}
 
         <NextEpisodeOverlay visible={showNextEpisodeOverlay} onCancel={() => setShowNextEpisodeOverlay(false)} />
       </TouchableOpacity>

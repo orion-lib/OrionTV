@@ -27,7 +27,13 @@ interface PlayerState {
   introEndTime?: number;
   outroStartTime?: number;
   setVideoRef: (ref: RefObject<Video>) => void;
-  loadVideo: (options: {source: string, id: string, title: string; episodeIndex: number, position?: number}) => Promise<void>;
+  loadVideo: (options: {
+    source: string;
+    id: string;
+    title: string;
+    episodeIndex: number;
+    position?: number;
+  }) => Promise<void>;
   playEpisode: (index: number) => void;
   togglePlayPause: () => void;
   seek: (duration: number) => void;
@@ -41,8 +47,9 @@ interface PlayerState {
   setOutroStartTime: () => void;
   reset: () => void;
   _seekTimeout?: NodeJS.Timeout;
+  _isRecordSaveThrottled: boolean;
   // Internal helper
-  _savePlayRecord: (updates?: Partial<PlayRecord>) => void;
+  _savePlayRecord: (updates?: Partial<PlayRecord>, options?: { immediate?: boolean }) => void;
 }
 
 const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -62,6 +69,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
   introEndTime: undefined,
   outroStartTime: undefined,
   _seekTimeout: undefined,
+  _isRecordSaveThrottled: false,
 
   setVideoRef: (ref) => set({ videoRef: ref }),
 
@@ -81,7 +89,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
         console.info("Detail not found after initialization");
         return;
       }
-    };
+    }
 
     try {
       const playRecord = await PlayRecordManager.get(detail.source, detail.id.toString());
@@ -170,7 +178,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     if (existingIntroEndTime) {
       // Clear the time
       set({ introEndTime: undefined });
-      get()._savePlayRecord({ introEndTime: undefined });
+      get()._savePlayRecord({ introEndTime: undefined }, { immediate: true });
       Toast.show({
         type: "info",
         text1: "已清除片头时间",
@@ -179,7 +187,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
       // Set the time
       const newIntroEndTime = status.positionMillis;
       set({ introEndTime: newIntroEndTime });
-      get()._savePlayRecord({ introEndTime: newIntroEndTime });
+      get()._savePlayRecord({ introEndTime: newIntroEndTime }, { immediate: true });
       Toast.show({
         type: "success",
         text1: "设置成功",
@@ -196,7 +204,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     if (existingOutroStartTime) {
       // Clear the time
       set({ outroStartTime: undefined });
-      get()._savePlayRecord({ outroStartTime: undefined });
+      get()._savePlayRecord({ outroStartTime: undefined }, { immediate: true });
       Toast.show({
         type: "info",
         text1: "已清除片尾时间",
@@ -206,7 +214,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
       if (!status.durationMillis) return;
       const newOutroStartTime = status.durationMillis - status.positionMillis;
       set({ outroStartTime: newOutroStartTime });
-      get()._savePlayRecord({ outroStartTime: newOutroStartTime });
+      get()._savePlayRecord({ outroStartTime: newOutroStartTime }, { immediate: true });
       Toast.show({
         type: "success",
         text1: "设置成功",
@@ -215,7 +223,18 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  _savePlayRecord: (updates = {}) => {
+  _savePlayRecord: (updates = {}, options = {}) => {
+    const { immediate = false } = options;
+    if (!immediate) {
+      if (get()._isRecordSaveThrottled) {
+        return;
+      }
+      set({ _isRecordSaveThrottled: true });
+      setTimeout(() => {
+        set({ _isRecordSaveThrottled: false });
+      }, 10000); // 10 seconds
+    }
+
     const { detail } = useDetailStore.getState();
     const { currentEpisodeIndex, episodes, status, introEndTime, outroStartTime } = get();
     if (detail && status?.isLoaded) {
@@ -235,6 +254,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
         ...existingRecord,
         ...updates,
       });
+      console.log("Play record saved")
     }
   },
 

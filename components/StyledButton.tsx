@@ -29,11 +29,10 @@ export const StyledButton = forwardRef<View, StyledButtonProps>(
           color: colors.text,
         },
         selectedButton: {
-          backgroundColor: colors.tint,
+          backgroundColor: colors.primary,
         },
         focusedButton: {
-          backgroundColor: colors.link,
-          borderColor: colors.background,
+          borderColor: colors.primary,
         },
         selectedText: {
           color: Colors.dark.text,
@@ -47,11 +46,11 @@ export const StyledButton = forwardRef<View, StyledButtonProps>(
           color: colors.text,
         },
         focusedButton: {
-          backgroundColor: colors.link,
+          backgroundColor: colors.primary,
           borderColor: colors.background,
         },
         selectedButton: {
-          backgroundColor: "rgba(0, 122, 255, 0.3)",
+          backgroundColor: colors.primary,
         },
         selectedText: {
           color: colors.link,
@@ -65,7 +64,8 @@ export const StyledButton = forwardRef<View, StyledButtonProps>(
           color: colors.text,
         },
         focusedButton: {
-          backgroundColor: "rgba(119, 119, 119, 0.9)",
+          backgroundColor: "rgba(119, 119, 119, 0.2)",
+          borderColor: colors.primary,
         },
         selectedButton: {},
         selectedText: {},

@@ -124,9 +124,9 @@ export default function HomeScreen() {
           </Pressable>
         </View>
         <View style={styles.rightHeaderButtons}>
-          {/* <StyledButton style={styles.searchButton} onPress={() => router.push("/favorites")} variant="ghost">
+          <StyledButton style={styles.searchButton} onPress={() => router.push("/favorites")} variant="ghost">
             <Heart color={colorScheme === "dark" ? "white" : "black"} size={24} />
-          </StyledButton> */}
+          </StyledButton>
           <StyledButton
             style={styles.searchButton}
             onPress={() => router.push({ pathname: "/search" })}

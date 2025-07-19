@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-import { View, TextInput, StyleSheet, FlatList, ActivityIndicator, Alert, Keyboard } from "react-native";
+import { View, TextInput, StyleSheet, FlatList, Alert, Keyboard } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import VideoCard from "@/components/VideoCard.tv";
+import VideoLoadingAnimation from "@/components/VideoLoadingAnimation";
 import { api, SearchResult } from "@/services/api";
 import { Search, QrCode } from "lucide-react-native";
 import { StyledButton } from "@/components/StyledButton";
@@ -10,6 +11,7 @@ import { useRemoteControlStore } from "@/stores/remoteControlStore";
 import { RemoteControlModal } from "@/components/RemoteControlModal";
 import { useSettingsStore } from "@/stores/settingsStore";
 import { useRouter } from "expo-router";
+import { Colors } from "@/constants/Colors";
 
 export default function SearchScreen() {
   const [keyword, setKeyword] = useState("");
@@ -100,7 +102,7 @@ export default function SearchScreen() {
             {
               backgroundColor: colorScheme === "dark" ? "#2c2c2e" : "#f0f0f0",
               color: colorScheme === "dark" ? "white" : "black",
-              borderColor: isInputFocused ? "#007bff" : "transparent",
+              borderColor: isInputFocused ? Colors.dark.primary : "transparent",
             },
           ]}
           placeholder="搜索电影、剧集..."
@@ -121,9 +123,7 @@ export default function SearchScreen() {
       </View>
 
       {loading ? (
-        <View style={styles.centerContainer}>
-          <ActivityIndicator size="large" />
-        </View>
+        <VideoLoadingAnimation showProgressBar={false} />
       ) : error ? (
         <View style={styles.centerContainer}>
           <ThemedText style={styles.errorText}>{error}</ThemedText>

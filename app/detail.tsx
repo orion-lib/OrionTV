@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import { StyledButton } from "@/components/StyledButton";
+import VideoLoadingAnimation from "@/components/VideoLoadingAnimation";
 import useDetailStore from "@/stores/detailStore";
 import { FontAwesome } from "@expo/vector-icons";
 
@@ -49,11 +50,7 @@ export default function DetailScreen() {
   };
 
   if (loading) {
-    return (
-      <ThemedView style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
-    );
+    return <VideoLoadingAnimation showProgressBar={false} />;
   }
 
   if (error) {
@@ -80,17 +77,23 @@ export default function DetailScreen() {
         <View style={styles.topContainer}>
           <Image source={{ uri: detail.poster }} style={styles.poster} />
           <View style={styles.infoContainer}>
-            <ThemedText style={styles.title} numberOfLines={1}>
-              {detail.title}
-            </ThemedText>
+            <View style={styles.titleContainer}>
+              <ThemedText style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+                {detail.title}
+              </ThemedText>
+              <StyledButton onPress={toggleFavorite} variant="ghost" style={styles.favoriteButton}>
+                <FontAwesome
+                  name={isFavorited ? "heart" : "heart-o"}
+                  size={24}
+                  color={isFavorited ? "#feff5f" : "#ccc"}
+                />
+              </StyledButton>
+            </View>
             <View style={styles.metaContainer}>
               <ThemedText style={styles.metaText}>{detail.year}</ThemedText>
               <ThemedText style={styles.metaText}>{detail.type_name}</ThemedText>
             </View>
-            {/* <Pressable onPress={toggleFavorite} style={styles.favoriteButton}>
-              <FontAwesome name={isFavorited ? "star" : "star-o"} size={24} color={isFavorited ? "#FFD700" : "#ccc"} />
-              <ThemedText style={styles.favoriteButtonText}>{isFavorited ? "已收藏" : "收藏"}</ThemedText>
-            </Pressable> */}
+
             <ScrollView style={styles.descriptionScrollView}>
               <ThemedText style={styles.description}>{detail.desc}</ThemedText>
             </ScrollView>
@@ -104,29 +107,32 @@ export default function DetailScreen() {
               {!allSourcesLoaded && <ActivityIndicator style={{ marginLeft: 10 }} />}
             </View>
             <View style={styles.sourceList}>
-              {searchResults.map((item, index) => (
-                <StyledButton
-                  key={index}
-                  onPress={() => setDetail(item)}
-                  hasTVPreferredFocus={index === 0}
-                  isSelected={detail?.source === item.source}
-                  style={styles.sourceButton}
-                >
-                  <ThemedText style={styles.sourceButtonText}>{item.source_name}</ThemedText>
-                  {item.episodes.length > 1 && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>
-                        {item.episodes.length > 99 ? "99+" : `${item.episodes.length}`} 集
-                      </Text>
-                    </View>
-                  )}
-                  {item.resolution && (
-                    <View style={[styles.badge, { backgroundColor: "#28a745" }]}>
-                      <Text style={styles.badgeText}>{item.resolution}</Text>
-                    </View>
-                  )}
-                </StyledButton>
-              ))}
+              {searchResults.map((item, index) => {
+                const isSelected = detail?.source === item.source;
+                return (
+                  <StyledButton
+                    key={index}
+                    onPress={() => setDetail(item)}
+                    hasTVPreferredFocus={index === 0}
+                    isSelected={isSelected}
+                    style={styles.sourceButton}
+                  >
+                    <ThemedText style={styles.sourceButtonText}>{item.source_name}</ThemedText>
+                    {item.episodes.length > 1 && (
+                      <View style={[styles.badge, isSelected && styles.selectedBadge]}>
+                        <Text style={styles.badgeText}>
+                          {item.episodes.length > 99 ? "99+" : `${item.episodes.length}`} 集
+                        </Text>
+                      </View>
+                    )}
+                    {item.resolution && (
+                      <View style={[styles.badge, { backgroundColor: "#666" }, isSelected && styles.selectedBadge]}>
+                        <Text style={styles.badgeText}>{item.resolution}</Text>
+                      </View>
+                    )}
+                  </StyledButton>
+                );
+              })}
             </View>
           </View>
           <View style={styles.episodesContainer}>
@@ -170,11 +176,15 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     justifyContent: "flex-start",
   },
+  titleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
   title: {
+    paddingTop: 16,
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 10,
-    paddingTop: 20,
+    flexShrink: 1,
   },
   metaContainer: {
     flexDirection: "row",
@@ -194,13 +204,9 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   favoriteButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 10,
     padding: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 5,
-    alignSelf: "flex-start",
+    marginLeft: 10,
+    backgroundColor: "transparent",
   },
   favoriteButtonText: {
     marginLeft: 8,
@@ -233,16 +239,23 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   badge: {
-    backgroundColor: "red",
+    backgroundColor: "#666",
     borderRadius: 10,
     paddingHorizontal: 6,
     paddingVertical: 2,
     marginLeft: 8,
   },
   badgeText: {
-    color: "white",
+    color: "#fff",
     fontSize: 12,
     fontWeight: "bold",
+    paddingBottom: 2.5,
+  },
+  selectedBadge: {
+    backgroundColor: "#4c4c4c",
+  },
+  selectedbadgeText: {
+    color: "#333",
   },
   episodesContainer: {
     marginTop: 20,

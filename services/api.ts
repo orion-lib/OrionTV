@@ -43,7 +43,6 @@ export interface SearchResult {
 export interface Favorite {
   cover: string;
   title: string;
-  poster: string;
   source_name: string;
   total_episodes: number;
   search_title: string;

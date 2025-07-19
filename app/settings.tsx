@@ -6,18 +6,17 @@ import { ThemedView } from "@/components/ThemedView";
 import { StyledButton } from "@/components/StyledButton";
 import { useThemeColor } from "@/hooks/useThemeColor";
 import { useSettingsStore } from "@/stores/settingsStore";
-import useAuthStore from "@/stores/authStore";
+// import useAuthStore from "@/stores/authStore";
 import { useRemoteControlStore } from "@/stores/remoteControlStore";
 import { APIConfigSection } from "@/components/settings/APIConfigSection";
 import { LiveStreamSection } from "@/components/settings/LiveStreamSection";
 import { RemoteInputSection } from "@/components/settings/RemoteInputSection";
-import { VideoSourceSection } from "@/components/settings/VideoSourceSection";
+// import { VideoSourceSection } from "@/components/settings/VideoSourceSection";
 import Toast from "react-native-toast-message";
 
 export default function SettingsScreen() {
   const { loadSettings, saveSettings, setApiBaseUrl, setM3uUrl } = useSettingsStore();
   const { lastMessage } = useRemoteControlStore();
-  const { isLoggedIn, logout } = useAuthStore();
   const backgroundColor = useThemeColor({}, "background");
 
   const [hasChanges, setHasChanges] = useState(false);
@@ -111,18 +110,18 @@ export default function SettingsScreen() {
       ),
       key: "livestream",
     },
-    {
-      component: (
-        <VideoSourceSection
-          onChanged={markAsChanged}
-          onFocus={() => {
-            setCurrentFocusIndex(3);
-            setCurrentSection("videoSource");
-          }}
-        />
-      ),
-      key: "videoSource",
-    },
+    // {
+    //   component: (
+    //     <VideoSourceSection
+    //       onChanged={markAsChanged}
+    //       onFocus={() => {
+    //         setCurrentFocusIndex(3);
+    //         setCurrentSection("videoSource");
+    //       }}
+    //     />
+    //   ),
+    //   key: "videoSource",
+    // },
   ];
 
   // TV遥控器事件处理

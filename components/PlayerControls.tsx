@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 0,
     height: 8,
-    backgroundColor: "#ff0000",
+    backgroundColor: "#fff",
     borderRadius: 4,
   },
   progressBarTouchable: {
