@@ -15,8 +15,8 @@ export const parseM3U = (m3uText: string): Channel[] => {
 
   for (const line of lines) {
     const trimmedLine = line.trim();
+    currentChannelInfo = { id: '', name: '', url: '', logo: '', group: '' };
     if (trimmedLine.startsWith('#EXTINF:')) {
-      currentChannelInfo = { id: '', name: '', url: '', logo: '', group: '' };
       const commaIndex = trimmedLine.indexOf(',');
       if (commaIndex !== -1) {
         currentChannelInfo.name = trimmedLine.substring(commaIndex + 1).trim();
@@ -32,7 +32,6 @@ export const parseM3U = (m3uText: string): Channel[] => {
       currentChannelInfo.url = trimmedLine;
       currentChannelInfo.id = currentChannelInfo.url; // Use URL as ID
       parsedChannels.push(currentChannelInfo as Channel);
-      currentChannelInfo = null;
     }
   }
   return parsedChannels;
