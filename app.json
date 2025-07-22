@@ -38,6 +38,7 @@
     "android": {
       "package": "com.oriontv",
       "usesCleartextTraffic": true,
+      "hardwareAcceleration": true,
       "networkSecurityConfig": "@xml/network_security_config",
       "icon": "./assets/images/icon.png",
       "permissions": [

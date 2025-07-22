@@ -106,7 +106,7 @@ export default function LiveScreen() {
               <View style={styles.groupColumn}>
                 <FlatList
                   data={channelGroups}
-                  keyExtractor={(item) => item}
+                  keyExtractor={(item, index) => `group-${item}-${index}`}
                   renderItem={({ item }) => (
                     <StyledButton
                       text={item}
@@ -124,7 +124,7 @@ export default function LiveScreen() {
                 ) : (
                   <FlatList
                     data={groupedChannels[selectedGroup] || []}
-                    keyExtractor={(item) => item.id}
+                    keyExtractor={(item, index) => `${item.id}-${item.group}-${index}`}
                     renderItem={({ item }) => (
                       <StyledButton
                         text={item.name || "Unknown Channel"}
@@ -190,6 +190,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 4,
     marginVertical: 4,
+    paddingLeft: 10,
+    paddingRight: 10,
   },
   groupButtonText: {
     fontSize: 13,
@@ -198,6 +200,8 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 4,
     marginVertical: 3,
+    paddingLeft: 16,
+    paddingRight: 16,
   },
   channelItemText: {
     fontSize: 12,
