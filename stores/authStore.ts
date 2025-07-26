@@ -26,7 +26,7 @@ const useAuthStore = create<AuthState>((set) => ({
     try {
       const serverConfig = useSettingsStore.getState().serverConfig;
       if (!serverConfig?.StorageType) {
-        Toast.show({ type: "error", text1: "请检查网络或者 API 地址是否可用" });
+        Toast.show({ type: "error", text1: "请检查网络或者服务器地址是否可用" });
         return
       }
       const cookies = await Cookies.get(api.baseURL);

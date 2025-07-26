@@ -147,7 +147,7 @@ const useHomeStore = create<HomeState>((set, get) => ({
       }
     } catch (err: any) {
       if (err.message === "API_URL_NOT_SET") {
-        set({ error: "请点击右上角设置按钮，配置您的 API 地址" });
+        set({ error: "请点击右上角设置按钮，配置您的服务器地址" });
       } else {
         set({ error: "加载失败，请重试" });
       }

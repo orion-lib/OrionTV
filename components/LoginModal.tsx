@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Modal, View, TextInput, StyleSheet, ActivityIndicator } from "react-native";
+import { Modal, View, TextInput, StyleSheet, ActivityIndicator, Alert } from "react-native";
 import { usePathname } from "expo-router";
 import Toast from "react-native-toast-message";
 import useAuthStore from "@/stores/authStore";
@@ -26,7 +26,7 @@ const LoginModal = () => {
   useEffect(() => {
     if (isLoginModalVisible && !isSettingsPage) {
       const isUsernameVisible = serverConfig?.StorageType !== "localstorage";
-      
+
       // Use a small delay to ensure the modal is fully rendered
       const focusTimeout = setTimeout(() => {
         if (isUsernameVisible) {
@@ -35,7 +35,7 @@ const LoginModal = () => {
           passwordInputRef.current?.focus();
         }
       }, 100);
-      
+
       return () => clearTimeout(focusTimeout);
     }
   }, [isLoginModalVisible, serverConfig, isSettingsPage]);
@@ -55,6 +55,13 @@ const LoginModal = () => {
       hideLoginModal();
       setUsername("");
       setPassword("");
+
+      // Show disclaimer alert after successful login
+      Alert.alert(
+        "免责声明",
+        "本应用仅提供影视信息搜索服务，所有内容均来自第三方网站。本站不存储任何视频资源，不对任何内容的准确性、合法性、完整性负责。",
+        [{ text: "确定" }]
+      );
     } catch {
       Toast.show({ type: "error", text1: "登录失败", text2: "用户名或密码错误" });
     } finally {

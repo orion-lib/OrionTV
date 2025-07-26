@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useCallback } from "react";
 import { View, StyleSheet, ScrollView, Dimensions, ActivityIndicator } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
 
@@ -91,7 +91,7 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
         <>
           {/* Render content in a grid layout */}
           {Array.from({ length: Math.ceil(data.length / numColumns) }).map((_, rowIndex) => (
-            <View key={rowIndex} style={{ flexDirection: "row", justifyContent: "space-between" }}>
+            <View key={rowIndex} style={styles.rowContainer}>
               {data.slice(rowIndex * numColumns, (rowIndex + 1) * numColumns).map((item, index) => (
                 <View key={index} style={[styles.itemContainer, { width: ITEM_WIDTH }]}>
                   {renderItem({ item, index: rowIndex * numColumns + index })}
@@ -120,6 +120,11 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: 16,
     paddingBottom: 20,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    flexWrap: "wrap",
   },
   itemContainer: {
     margin: 8,
