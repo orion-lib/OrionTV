@@ -26,7 +26,7 @@ jobs:
         with:
           upstream_sync_repo: zimplexing/OrionTV
           upstream_sync_branch: v1.1.1
-          target_sync_branch: v1.1.1
+          target_sync_branch: V1.1.1
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Sync check
