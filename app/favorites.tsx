@@ -1,11 +1,12 @@
 import React, { useEffect } from "react";
-import { View, FlatList, StyleSheet, ActivityIndicator } from "react-native";
+import { View, StyleSheet, ActivityIndicator } from "react-native";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
 import useFavoritesStore from "@/stores/favoritesStore";
 import { Favorite } from "@/services/storage";
 import VideoCard from "@/components/VideoCard.tv";
 import { api } from "@/services/api";
+import CustomScrollView from "@/components/CustomScrollView";
 
 export default function FavoritesScreen() {
   const { favorites, loading, error, fetchFavorites } = useFavoritesStore();
@@ -14,31 +15,7 @@ export default function FavoritesScreen() {
     fetchFavorites();
   }, [fetchFavorites]);
 
-  if (loading) {
-    return (
-      <ThemedView style={styles.centered}>
-        <ActivityIndicator size="large" />
-      </ThemedView>
-    );
-  }
-
-  if (error) {
-    return (
-      <ThemedView style={styles.centered}>
-        <ThemedText type="subtitle">{error}</ThemedText>
-      </ThemedView>
-    );
-  }
-
-  if (favorites.length === 0) {
-    return (
-      <ThemedView style={styles.centered}>
-        <ThemedText type="subtitle">暂无收藏</ThemedText>
-      </ThemedView>
-    );
-  }
-
-  const renderItem = ({ item }: { item: Favorite & { key: string } }) => {
+  const renderItem = ({ item }: { item: Favorite & { key: string }; index: number }) => {
     const [source, id] = item.key.split("+");
     return (
       <VideoCard
@@ -60,12 +37,13 @@ export default function FavoritesScreen() {
       <View style={styles.headerContainer}>
         <ThemedText style={styles.headerTitle}>我的收藏</ThemedText>
       </View>
-      <FlatList
+      <CustomScrollView
         data={favorites}
         renderItem={renderItem}
-        keyExtractor={(item) => item.key}
         numColumns={5}
-        contentContainerStyle={styles.list}
+        loading={loading}
+        error={error}
+        emptyMessage="暂无收藏"
       />
     </ThemedView>
   );

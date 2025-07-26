@@ -2,6 +2,7 @@ import { create } from "zustand";
 import Cookies from "@react-native-cookies/cookies";
 import { api } from "@/services/api";
 import { useSettingsStore } from "./settingsStore";
+import Toast from "react-native-toast-message";
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -24,6 +25,10 @@ const useAuthStore = create<AuthState>((set) => ({
     }
     try {
       const serverConfig = useSettingsStore.getState().serverConfig;
+      if (!serverConfig?.StorageType) {
+        Toast.show({ type: "error", text1: "请检查网络或者 API 地址是否可用" });
+        return
+      }
       const cookies = await Cookies.get(api.baseURL);
       if (serverConfig && serverConfig.StorageType === "localstorage" && !cookies.auth) {
         const loginResult = await api.login().catch(() => {

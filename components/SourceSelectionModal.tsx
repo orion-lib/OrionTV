@@ -5,12 +5,24 @@ import useDetailStore from "@/stores/detailStore";
 import usePlayerStore from "@/stores/playerStore";
 
 export const SourceSelectionModal: React.FC = () => {
-  const { showSourceModal, setShowSourceModal } = usePlayerStore();
+  const { showSourceModal, setShowSourceModal, loadVideo, currentEpisodeIndex, status } = usePlayerStore();
   const { searchResults, detail, setDetail } = useDetailStore();
 
   const onSelectSource = (index: number) => {
+    console.log("onSelectSource", index, searchResults[index].source, detail?.source);
     if (searchResults[index].source !== detail?.source) {
-      setDetail(searchResults[index]);
+      const newDetail = searchResults[index];
+      setDetail(newDetail);
+      
+      // Reload the video with the new source, preserving current position
+      const currentPosition = status?.isLoaded ? status.positionMillis : undefined;
+      loadVideo({
+        source: newDetail.source,
+        id: newDetail.id.toString(),
+        episodeIndex: currentEpisodeIndex,
+        title: newDetail.title,
+        position: currentPosition
+      });
     }
     setShowSourceModal(false);
   };

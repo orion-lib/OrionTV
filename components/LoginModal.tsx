@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Modal, View, TextInput, StyleSheet, ActivityIndicator, useTVEventHandler } from "react-native";
+import { Modal, View, TextInput, StyleSheet, ActivityIndicator } from "react-native";
 import { usePathname } from "expo-router";
 import Toast from "react-native-toast-message";
 import useAuthStore from "@/stores/authStore";
@@ -19,47 +19,24 @@ const LoginModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const usernameInputRef = useRef<TextInput>(null);
   const passwordInputRef = useRef<TextInput>(null);
-  const loginButtonRef = useRef<View>(null);
-  const [focused, setFocused] = useState("username");
   const pathname = usePathname();
   const isSettingsPage = pathname.includes("settings");
 
-  const tvEventHandler = (evt: any) => {
-    if (!evt || !isLoginModalVisible || isSettingsPage) {
-      return;
-    }
-
-    const isUsernameVisible = serverConfig?.StorageType !== "localstorage";
-
-    if (evt.eventType === "down") {
-      if (focused === "username" && isUsernameVisible) {
-        passwordInputRef.current?.focus();
-      } else if (focused === "password") {
-        loginButtonRef.current?.focus();
-      }
-    }
-
-    if (evt.eventType === "up") {
-      if (focused === "button") {
-        passwordInputRef.current?.focus();
-      } else if (focused === "password" && isUsernameVisible) {
-        usernameInputRef.current?.focus();
-      }
-    }
-  };
-
-  useTVEventHandler(tvEventHandler);
-
+  // Focus management with better TV remote handling
   useEffect(() => {
     if (isLoginModalVisible && !isSettingsPage) {
       const isUsernameVisible = serverConfig?.StorageType !== "localstorage";
-      setTimeout(() => {
+      
+      // Use a small delay to ensure the modal is fully rendered
+      const focusTimeout = setTimeout(() => {
         if (isUsernameVisible) {
           usernameInputRef.current?.focus();
         } else {
           passwordInputRef.current?.focus();
         }
-      }, 200);
+      }, 100);
+      
+      return () => clearTimeout(focusTimeout);
     }
   }, [isLoginModalVisible, serverConfig, isSettingsPage]);
 
@@ -85,6 +62,11 @@ const LoginModal = () => {
     }
   };
 
+  // Handle navigation between inputs using returnKeyType
+  const handleUsernameSubmit = () => {
+    passwordInputRef.current?.focus();
+  };
+
   return (
     <Modal
       transparent={true}
@@ -105,7 +87,8 @@ const LoginModal = () => {
               value={username}
               onChangeText={setUsername}
               returnKeyType="next"
-              onFocus={() => setFocused("username")}
+              onSubmitEditing={handleUsernameSubmit}
+              blurOnSubmit={false}
             />
           )}
           <TextInput
@@ -117,16 +100,14 @@ const LoginModal = () => {
             value={password}
             onChangeText={setPassword}
             returnKeyType="go"
-            onFocus={() => setFocused("password")}
             onSubmitEditing={handleLogin}
           />
           <StyledButton
-            ref={loginButtonRef}
-            onFocus={() => setFocused("button")}
             text={isLoading ? "" : "登录"}
             onPress={handleLogin}
             disabled={isLoading}
             style={styles.button}
+            hasTVPreferredFocus={!serverConfig || serverConfig.StorageType === "localstorage"}
           >
             {isLoading && <ActivityIndicator color="#fff" />}
           </StyledButton>

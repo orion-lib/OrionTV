@@ -9,15 +9,17 @@ import { Search, Settings, LogOut, Heart } from "lucide-react-native";
 import { StyledButton } from "@/components/StyledButton";
 import useHomeStore, { RowItem, Category } from "@/stores/homeStore";
 import useAuthStore from "@/stores/authStore";
+import CustomScrollView from "@/components/CustomScrollView";
 
 const NUM_COLUMNS = 5;
 const { width } = Dimensions.get("window");
-const ITEM_WIDTH = width / NUM_COLUMNS - 24;
+
+// Threshold for triggering load more data (in pixels)
+const LOAD_MORE_THRESHOLD = 200;
 
 export default function HomeScreen() {
   const router = useRouter();
   const colorScheme = "dark";
-  const flatListRef = useRef<FlatList>(null);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const {
@@ -43,7 +45,6 @@ export default function HomeScreen() {
   useEffect(() => {
     if (selectedCategory && !selectedCategory.tags) {
       fetchInitialData();
-      flatListRef.current?.scrollToOffset({ animated: false, offset: 0 });
     } else if (selectedCategory?.tags && !selectedCategory.tag) {
       // Category with tags selected, but no specific tag yet. Select the first one.
       const defaultTag = selectedCategory.tags[0];
@@ -55,7 +56,6 @@ export default function HomeScreen() {
   useEffect(() => {
     if (selectedCategory && selectedCategory.tag) {
       fetchInitialData();
-      flatListRef.current?.scrollToOffset({ animated: false, offset: 0 });
     }
   }, [fetchInitialData, selectedCategory, selectedCategory.tag]);
 
@@ -86,7 +86,7 @@ export default function HomeScreen() {
     );
   };
 
-  const renderContentItem = ({ item }: { item: RowItem }) => (
+  const renderContentItem = ({ item, index }: { item: RowItem; index: number }) => (
     <View style={styles.itemContainer}>
       <VideoCard
         id={item.id}
@@ -196,21 +196,17 @@ export default function HomeScreen() {
           </ThemedText>
         </View>
       ) : (
-        <FlatList
-          ref={flatListRef}
+        <CustomScrollView
           data={contentData}
           renderItem={renderContentItem}
-          keyExtractor={(item, index) => `${item.source}-${item.id}-${index}`}
           numColumns={NUM_COLUMNS}
-          contentContainerStyle={styles.listContent}
+          loading={loading}
+          loadingMore={loadingMore}
+          error={error}
           onEndReached={loadMoreData}
-          onEndReachedThreshold={0.5}
+          loadMoreThreshold={LOAD_MORE_THRESHOLD}
+          emptyMessage={selectedCategory?.tags ? "请选择一个子分类" : "该分类下暂无内容"}
           ListFooterComponent={renderFooter}
-          ListEmptyComponent={
-            <View style={styles.centerContainer}>
-              <ThemedText>{selectedCategory?.tags ? "请选择一个子分类" : "该分类下暂无内容"}</ThemedText>
-            </View>
-          }
         />
       )}
     </ThemedView>
@@ -272,7 +268,6 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     margin: 8,
-    width: ITEM_WIDTH,
     alignItems: "center",
   },
 });

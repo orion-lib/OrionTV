@@ -1,13 +1,12 @@
 # OrionTV 📺
 
-一个基于 React Native TVOS 和 Expo 构建的跨平台电视应用，旨在提供流畅的视频观看体验。项目包含一个用于数据服务的 Express 后端。
+一个基于 React Native TVOS 和 Expo 构建的跨平台应用，旨在提供流畅的视频观看体验。
 
 ## ✨ 功能特性
 
 - **框架跨平台支持**: 同时支持构建 Apple TV 和 Android TV。
 - **现代化前端**: 使用 Expo、React Native TVOS 和 TypeScript 构建，性能卓越。
 - **Expo Router**: 基于文件系统的路由，使导航逻辑清晰简单。
-- **后端服务**: 配套 Express 后端，用于处理数据获取、搜索和详情展示。
 - **TV 优化的 UI**: 专为电视遥控器交互设计的用户界面。
 
 ## 🛠️ 技术栈
@@ -88,14 +87,7 @@ yarn android-tv
 - `yarn ios-tv`: 在 Apple TV 上构建并运行应用。
 - `yarn android-tv`: 在 Android TV 上构建并运行应用。
 - `yarn prebuild-tv`: 为 TV 构建生成原生项目文件。
-- `yarn lint`: 检查代码风格。
-
-## 📸 应用截图
-
-![首页界面](screenshot/image.png)
-![视频播放](screenshot/image2.png)
-![搜索界面](screenshot/image3.png)
-![详情页面](screenshot/image1.png)
+- `yarn lint`: 检查代码风格
 
 ## 📝 License
 

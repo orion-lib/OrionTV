@@ -56,9 +56,10 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       const config = await api.getServerConfig();
       if (config) {
         storageConfig.setStorageType(config.StorageType);
+        set({ serverConfig: config });
       }
-      set({ serverConfig: config });
     } catch (error) {
+      set({ serverConfig: null });
       console.info("Failed to fetch server config:", error);
     }
   },
