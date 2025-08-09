@@ -26,6 +26,12 @@ interface PlayerState {
   initialPosition: number;
   introEndTime?: number;
   outroStartTime?: number;
+  // 新增：播放速度相关
+  playbackRate: number;
+  showSpeedModal: boolean;
+  // 新增：拖动相关
+  isDragging: boolean;
+  dragPosition: number;
   setVideoRef: (ref: RefObject<Video>) => void;
   loadVideo: (options: {
     source: string;
@@ -46,7 +52,18 @@ interface PlayerState {
   setIntroEndTime: () => void;
   setOutroStartTime: () => void;
   reset: () => void;
-  _seekTimeout?: NodeJS.Timeout;
+  // 新增：快进/快退方法
+  fastForward: (seconds?: number) => void;
+  rewind: (seconds?: number) => void;
+  // 新增：播放速度方法
+  setPlaybackRate: (rate: number) => void;
+  setShowSpeedModal: (show: boolean) => void;
+  // 新增：拖动相关方法
+  seekToPosition: (position: number) => void;
+  startDragging: (position: number) => void;
+  updateDragging: (position: number) => void;
+  endDragging: () => void;
+  _seekTimeout?: any;
   _isRecordSaveThrottled: boolean;
   // Internal helper
   _savePlayRecord: (updates?: Partial<PlayRecord>, options?: { immediate?: boolean }) => void;
@@ -68,12 +85,23 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
   initialPosition: 0,
   introEndTime: undefined,
   outroStartTime: undefined,
+  // 新增初始状态
+  playbackRate: 1.0,
+  showSpeedModal: false,
+  isDragging: false,
+  dragPosition: 0,
   _seekTimeout: undefined,
   _isRecordSaveThrottled: false,
 
-  setVideoRef: (ref) => set({ videoRef: ref }),
+  setVideoRef: (ref: RefObject<Video>) => set({ videoRef: ref }),
 
-  loadVideo: async ({ source, id, episodeIndex, position, title }) => {
+  loadVideo: async ({ source, id, episodeIndex, position, title }: {
+    source: string;
+    id: string;
+    title: string;
+    episodeIndex: number;
+    position?: number;
+  }) => {
     let detail = useDetailStore.getState().detail;
     let episodes = episodesSelectorBySource(source)(useDetailStore.getState());
 
@@ -98,7 +126,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
         isLoading: false,
         currentEpisodeIndex: episodeIndex,
         initialPosition: position || initialPositionFromRecord,
-        episodes: episodes.map((ep, index) => ({
+        episodes: episodes.map((ep: string, index: number) => ({
           url: ep,
           title: `第 ${index + 1} 集`,
         })),
@@ -111,7 +139,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  playEpisode: async (index) => {
+  playEpisode: async (index: number) => {
     const { episodes, videoRef } = get();
     if (index >= 0 && index < episodes.length) {
       set({
@@ -146,7 +174,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  seek: async (duration) => {
+  seek: async (duration: number) => {
     const { status, videoRef } = get();
     if (!status?.isLoaded || !status.durationMillis) return;
 
@@ -163,6 +191,86 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
       seekPosition: newPosition / status.durationMillis,
     });
 
+    if (get()._seekTimeout) {
+      clearTimeout(get()._seekTimeout);
+    }
+    const timeoutId = setTimeout(() => set({ isSeeking: false }), 1000);
+    set({ _seekTimeout: timeoutId });
+  },
+
+  // 新增：快进功能
+  fastForward: (seconds = 10) => {
+    get().seek(seconds * 1000);
+  },
+
+  // 新增：快退功能
+  rewind: (seconds = 10) => {
+    get().seek(-seconds * 1000);
+  },
+
+  // 新增：设置播放速度
+  setPlaybackRate: async (rate: number) => {
+    const { videoRef, status } = get();
+    if (status?.isLoaded && videoRef?.current) {
+      try {
+        await videoRef.current.setRateAsync(rate, true); // shouldCorrectPitch = true
+        set({ playbackRate: rate });
+        Toast.show({
+          type: "success",
+          text1: "播放速度已调整",
+          text2: `${rate}x`,
+        });
+      } catch (error) {
+        console.error("Failed to set playback rate:", error);
+        Toast.show({ type: "error", text1: "调整播放速度失败" });
+      }
+    }
+  },
+
+  // 新增：显示/隐藏速度选择模态
+  setShowSpeedModal: (show: boolean) => set({ showSpeedModal: show }),
+
+  // 新增：跳转到指定位置
+  seekToPosition: async (position: number) => {
+    const { status, videoRef } = get();
+    if (!status?.isLoaded || !status.durationMillis) return;
+
+    const targetPosition = Math.max(0, Math.min(position * status.durationMillis, status.durationMillis));
+    try {
+      await videoRef?.current?.setPositionAsync(targetPosition);
+    } catch (error) {
+      console.error("Failed to seek to position:", error);
+      Toast.show({ type: "error", text1: "跳转失败" });
+    }
+  },
+
+  // 新增：开始拖动
+  startDragging: (position: number) => {
+    set({
+      isDragging: true,
+      dragPosition: position,
+      isSeeking: true,
+      seekPosition: position,
+    });
+  },
+
+  // 新增：更新拖动位置
+  updateDragging: (position: number) => {
+    if (get().isDragging) {
+      set({
+        dragPosition: position,
+        seekPosition: position,
+      });
+    }
+  },
+
+  // 新增：结束拖动
+  endDragging: () => {
+    const { dragPosition } = get();
+    set({ isDragging: false });
+    get().seekToPosition(dragPosition);
+    
+    // 延时隐藏seeking状态
     if (get()._seekTimeout) {
       clearTimeout(get()._seekTimeout);
     }
@@ -223,7 +331,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  _savePlayRecord: (updates = {}, options = {}) => {
+  _savePlayRecord: (updates: Partial<PlayRecord> = {}, options: { immediate?: boolean } = {}) => {
     const { immediate = false } = options;
     if (!immediate) {
       if (get()._isRecordSaveThrottled) {
@@ -257,7 +365,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     }
   },
 
-  handlePlaybackStatusUpdate: (newStatus) => {
+  handlePlaybackStatusUpdate: (newStatus: AVPlaybackStatus) => {
     if (!newStatus.isLoaded) {
       if (newStatus.error) {
         console.info(`Playback Error: ${newStatus.error}`);
@@ -301,11 +409,11 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     set({ status: newStatus, progressPosition });
   },
 
-  setLoading: (loading) => set({ isLoading: loading }),
-  setShowControls: (show) => set({ showControls: show }),
-  setShowEpisodeModal: (show) => set({ showEpisodeModal: show }),
-  setShowSourceModal: (show) => set({ showSourceModal: show }),
-  setShowNextEpisodeOverlay: (show) => set({ showNextEpisodeOverlay: show }),
+  setLoading: (loading: boolean) => set({ isLoading: loading }),
+  setShowControls: (show: boolean) => set({ showControls: show }),
+  setShowEpisodeModal: (show: boolean) => set({ showEpisodeModal: show }),
+  setShowSourceModal: (show: boolean) => set({ showSourceModal: show }),
+  setShowNextEpisodeOverlay: (show: boolean) => set({ showNextEpisodeOverlay: show }),
 
   reset: () => {
     set({
@@ -317,9 +425,13 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
       showEpisodeModal: false,
       showSourceModal: false,
       showNextEpisodeOverlay: false,
+      showSpeedModal: false,
       initialPosition: 0,
       introEndTime: undefined,
       outroStartTime: undefined,
+      playbackRate: 1.0,
+      isDragging: false,
+      dragPosition: 0,
     });
   },
 }));

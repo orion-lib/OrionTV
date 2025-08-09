@@ -1,8 +1,21 @@
 import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { Pause, Play, SkipForward, List, Tv, ArrowDownToDot, ArrowUpFromDot } from "lucide-react-native";
+import {
+  Pause,
+  Play,
+  SkipForward,
+  FastForward,
+  Rewind,
+  Gauge,
+  List,
+  Tv,
+  ArrowDownToDot,
+  ArrowUpFromDot
+} from "lucide-react-native";
 import { ThemedText } from "@/components/ThemedText";
 import { MediaButton } from "@/components/MediaButton";
+import { PlaybackSpeedModal } from "@/components/PlaybackSpeedModal";
+import { DraggableProgressBar } from "@/components/DraggableProgressBar";
 
 import usePlayerStore from "@/stores/playerStore";
 import useDetailStore from "@/stores/detailStore";
@@ -29,6 +42,21 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
     setOutroStartTime,
     introEndTime,
     outroStartTime,
+    // 新增：快进/快退方法
+    fastForward,
+    rewind,
+    // 新增：播放速度相关
+    playbackRate,
+    showSpeedModal,
+    setPlaybackRate,
+    setShowSpeedModal,
+    // 新增：拖动相关
+    isDragging,
+    dragPosition,
+    seekToPosition,
+    startDragging,
+    updateDragging,
+    endDragging,
   } = usePlayerStore();
 
   const { detail } = useDetailStore();
@@ -55,6 +83,29 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
     }
   };
 
+  // 处理进度条点击
+  const handleProgressBarPress = (event: any) => {
+    const { locationX } = event.nativeEvent;
+    const containerWidth = event.currentTarget.offsetWidth || 300; // 估计值
+    const position = Math.max(0, Math.min(1, locationX / containerWidth));
+    seekToPosition(position);
+  };
+
+  // 处理快进按钮（10秒）
+  const handleFastForward = () => {
+    fastForward(10);
+  };
+
+  // 处理快退按钮（10秒）
+  const handleRewind = () => {
+    rewind(10);
+  };
+
+  // 处理倍速按钮
+  const handleSpeedPress = () => {
+    setShowSpeedModal(true);
+  };
+
   return (
     <View style={styles.controlsOverlay}>
       <View style={styles.topControls}>
@@ -65,18 +116,7 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
       </View>
 
       <View style={styles.bottomControlsContainer}>
-        <View style={styles.progressBarContainer}>
-          <View style={styles.progressBarBackground} />
-          <View
-            style={[
-              styles.progressBarFilled,
-              {
-                width: `${(isSeeking ? seekPosition : progressPosition) * 100}%`,
-              },
-            ]}
-          />
-          <Pressable style={styles.progressBarTouchable} />
-        </View>
+        <DraggableProgressBar style={styles.progressBarContainer} />
 
         <ThemedText style={{ color: "white", marginTop: 5 }}>
           {status?.isLoaded
@@ -89,6 +129,10 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
             <ArrowDownToDot color="white" size={24} />
           </MediaButton>
 
+          <MediaButton onPress={handleRewind}>
+            <Rewind color="white" size={24} />
+          </MediaButton>
+
           <MediaButton onPress={togglePlayPause} hasTVPreferredFocus={showControls}>
             {status?.isLoaded && status.isPlaying ? (
               <Pause color="white" size={24} />
@@ -97,8 +141,19 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
             )}
           </MediaButton>
 
+          <MediaButton onPress={handleFastForward}>
+            <FastForward color="white" size={24} />
+          </MediaButton>
+
           <MediaButton onPress={onPlayNextEpisode} disabled={!hasNextEpisode}>
             <SkipForward color={hasNextEpisode ? "white" : "#666"} size={24} />
+          </MediaButton>
+
+          <MediaButton
+            onPress={handleSpeedPress}
+            timeLabel={playbackRate !== 1.0 ? `${playbackRate}x` : undefined}
+          >
+            <Gauge color={playbackRate !== 1.0 ? "#4CAF50" : "white"} size={24} />
           </MediaButton>
 
           <MediaButton onPress={setOutroStartTime} timeLabel={outroStartTime ? formatTime(outroStartTime) : undefined}>
@@ -113,6 +168,14 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
             <Tv color="white" size={24} />
           </MediaButton>
         </View>
+
+        {/* 播放速度选择模态框 */}
+        <PlaybackSpeedModal
+          visible={showSpeedModal}
+          currentRate={playbackRate}
+          onSelectRate={setPlaybackRate}
+          onClose={() => setShowSpeedModal(false)}
+        />
       </View>
     </View>
   );
