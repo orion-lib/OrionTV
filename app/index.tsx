@@ -13,27 +13,30 @@ import CustomScrollView from "@/components/CustomScrollView";
 
 const { width } = Dimensions.get("window");
 
-// 根据屏幕宽度动态计算列数
+// 根据屏幕宽度动态计算列数 - 与CustomScrollView保持一致
 const getNumColumns = () => {
-  const minCardWidth = 160; // VideoCard的最小宽度
-  const padding = 32; // 左右内边距
-  const cardMargin = 16; // 卡片间距
+  const minCardWidth = 120; // 与VideoCard保持一致
+  const containerPadding = 32; // 容器左右内边距
+  const itemMargin = 16; // 每个item的总margin
   
-  const availableWidth = width - padding;
-  const cardWithMargin = minCardWidth + cardMargin;
+  const availableWidth = width - containerPadding;
+  const cardWithMargin = minCardWidth + itemMargin;
   
-  const columns = Math.floor(availableWidth / cardWithMargin);
+  const maxPossibleColumns = Math.floor(availableWidth / cardWithMargin);
   
   // 根据屏幕宽度设置不同的列数范围
-  if (width < 600) {
-    // 手机：2-3列
-    return Math.max(2, Math.min(columns, 3));
+  if (width < 500) {
+    // 小屏手机：固定2列
+    return 2;
+  } else if (width < 700) {
+    // 大屏手机：2-3列
+    return Math.max(2, Math.min(maxPossibleColumns, 3));
   } else if (width < 1024) {
     // 平板：3-4列
-    return Math.max(3, Math.min(columns, 4));
+    return Math.max(3, Math.min(maxPossibleColumns, 4));
   } else {
     // 电视/桌面：4-6列
-    return Math.max(4, Math.min(columns, 6));
+    return Math.max(4, Math.min(maxPossibleColumns, 6));
   }
 };
 

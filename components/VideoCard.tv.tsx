@@ -217,16 +217,16 @@ const MAX_CARD_WIDTH = 200;
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginHorizontal: 8,
-    flex: 1,
+    // 移除 flex: 1，使用固定宽度布局
     maxWidth: MAX_CARD_WIDTH,
+    minWidth: MIN_CARD_WIDTH,
   },
   pressable: {
     alignItems: "center",
-    flex: 1,
+    width: "100%",
   },
   card: {
-    flex: 1,
+    width: "100%",
     aspectRatio: ASPECT_RATIO,
     minWidth: MIN_CARD_WIDTH,
     borderRadius: 8,
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   infoContainer: {
-    flex: 1,
+    width: "100%",
     marginTop: 8,
     alignItems: "flex-start",
     marginBottom: 16,

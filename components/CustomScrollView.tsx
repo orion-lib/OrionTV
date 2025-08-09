@@ -29,13 +29,13 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
   emptyMessage = "暂无内容",
   ListFooterComponent,
 }) => {
-  // 改进响应式布局计算
+  // 简化布局计算 - 让每个item自动填充可用空间
   const getItemWidth = () => {
-    const padding = 32; // 总的左右内边距
-    const itemMargin = 16; // 每个item的左右margin
-    const availableWidth = width - padding;
-    const itemWithMargin = availableWidth / numColumns - itemMargin;
-    return Math.max(120, itemWithMargin); // 确保最小宽度
+    const containerPadding = 32; // 容器左右内边距
+    const itemMargin = 16; // 每个item的总margin (left + right)
+    const availableWidth = width - containerPadding;
+    const itemWidth = (availableWidth - (itemMargin * numColumns)) / numColumns;
+    return Math.max(120, itemWidth); // 确保最小宽度120
   };
   
   const ITEM_WIDTH = getItemWidth();
@@ -106,6 +106,13 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
                   {renderItem({ item, index: rowIndex * numColumns + index })}
                 </View>
               ))}
+              {/* 填充空白项，确保最后一行对齐 */}
+              {rowIndex === Math.ceil(data.length / numColumns) - 1 &&
+               data.length % numColumns !== 0 &&
+               Array.from({ length: numColumns - (data.length % numColumns) }).map((_, emptyIndex) => (
+                 <View key={`empty-${emptyIndex}`} style={[styles.itemContainer, { width: ITEM_WIDTH }]} />
+               ))
+              }
             </View>
           ))}
           {renderFooter()}
@@ -132,14 +139,13 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: "row",
-    justifyContent: "space-around", // 改为均匀分布
-    flexWrap: "wrap",
+    justifyContent: "flex-start", // 左对齐，避免不均匀分布
+    marginBottom: 16,
   },
   itemContainer: {
-    margin: 8,
+    marginHorizontal: 8,
     alignItems: "center",
-    flex: 1,
-    minWidth: 120, // 设置最小宽度
+    // 移除flex: 1，使用固定宽度
   },
 });
 
