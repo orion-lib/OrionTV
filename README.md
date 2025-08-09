@@ -88,6 +88,43 @@ yarn android-tv
 
 - 1.2.x 以上版本需配合 [MoonTV](https://github.com/senshinya/MoonTV) 使用。
 
+## 📱 APK下载与构建
+
+### 🎯 下载预构建APK
+
+1. **GitHub Releases**: 访问 [Releases页面](https://github.com/longxingdeng/OrionTV/releases) 下载最新版本
+2. **自动构建**: 每次代码更新都会触发自动构建，可在Actions页面下载
+
+### 🛠 自助构建
+
+#### 方式1: GitHub Actions (推荐)
+1. Fork本项目到你的GitHub
+2. 在Actions页面选择"Build Android TV APK"工作流
+3. 点击"Run workflow"选择构建类型
+4. 等待构建完成后下载APK
+
+#### 方式2: 本地构建
+```bash
+# 1. 预构建TV版本
+yarn prebuild-tv
+
+# 2. 构建APK
+yarn build-local
+
+# APK位置: android/app/build/outputs/apk/release/app-release.apk
+```
+
+#### 方式3: EAS Build
+```bash
+# 安装EAS CLI并登录
+npm install -g @expo/eas-cli
+eas login
+
+# 构建生产版本
+eas build --platform android --profile production_tv
+```
+
+📋 **详细构建指南**: [BUILD.md](docs/BUILD.md)
 
 ## 📜 主要脚本
 

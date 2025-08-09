@@ -1,6 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, Pressable } from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, Pressable, LayoutChangeEvent, PanResponder } from 'react-native';
 import usePlayerStore from '@/stores/playerStore';
 
 interface DraggableProgressBarProps {
@@ -20,40 +19,55 @@ export const DraggableProgressBar: React.FC<DraggableProgressBarProps> = ({ styl
     endDragging,
   } = usePlayerStore();
 
+  const [containerWidth, setContainerWidth] = useState(300);
+
+  // 获取容器布局信息
+  const onLayout = useCallback((event: LayoutChangeEvent) => {
+    const { width } = event.nativeEvent.layout;
+    setContainerWidth(width);
+  }, []);
+
   // 处理点击跳转
-  const handlePress = (event: any) => {
+  const handlePress = useCallback((event: any) => {
+    if (isDragging) return; // 如果正在拖动，忽略点击
     const { locationX } = event.nativeEvent;
-    const { width } = event.currentTarget.measure || { width: 300 };
-    const position = Math.max(0, Math.min(1, locationX / width));
+    const position = Math.max(0, Math.min(1, locationX / containerWidth));
     seekToPosition(position);
-  };
+  }, [containerWidth, seekToPosition, isDragging]);
 
-  // 处理拖动手势
-  const onGestureEvent = (event: any) => {
-    const { translationX, absoluteX } = event.nativeEvent;
-    // 这里需要根据容器宽度计算位置
-    // 简化处理：基于手势的相对移动
-    const containerWidth = 300; // 估计值，实际应该通过 onLayout 获取
-    const position = Math.max(0, Math.min(1, absoluteX / containerWidth));
-    updateDragging(position);
-  };
-
-  const onHandlerStateChange = (event: any) => {
-    const { state, absoluteX } = event.nativeEvent;
+  // 使用PanResponder替代PanGestureHandler，更可靠
+  const panResponder = PanResponder.create({
+    onStartShouldSetPanResponder: () => true,
+    onMoveShouldSetPanResponder: () => true,
     
-    if (state === State.BEGAN) {
-      const containerWidth = 300; // 估计值
-      const position = Math.max(0, Math.min(1, absoluteX / containerWidth));
+    onPanResponderGrant: (event) => {
+      const { locationX } = event.nativeEvent;
+      const position = Math.max(0, Math.min(1, locationX / containerWidth));
       startDragging(position);
-    } else if (state === State.END || state === State.CANCELLED) {
+    },
+
+    onPanResponderMove: (event) => {
+      const { locationX } = event.nativeEvent;
+      const position = Math.max(0, Math.min(1, locationX / containerWidth));
+      updateDragging(position);
+    },
+
+    onPanResponderRelease: () => {
       endDragging();
-    }
-  };
+    },
+
+    onPanResponderTerminate: () => {
+      endDragging();
+    },
+  });
 
   const currentPosition = isDragging ? dragPosition : isSeeking ? seekPosition : progressPosition;
 
   return (
-    <View style={[styles.container, style]}>
+    <View 
+      style={[styles.container, style]}
+      onLayout={onLayout}
+    >
       <View style={styles.progressBarBackground} />
       <View
         style={[
@@ -74,20 +88,16 @@ export const DraggableProgressBar: React.FC<DraggableProgressBarProps> = ({ styl
         ]} 
       />
       
-      {/* 手势处理层 */}
-      <PanGestureHandler
-        onGestureEvent={onGestureEvent}
-        onHandlerStateChange={onHandlerStateChange}
-        activeOffsetX={[-10, 10]}
+      {/* 手势和点击处理层 */}
+      <View
+        style={styles.interactionArea}
+        {...panResponder.panHandlers}
       >
-        <View style={styles.gestureArea} />
-      </PanGestureHandler>
-      
-      {/* 点击处理层 */}
-      <Pressable 
-        style={styles.pressableArea} 
-        onPress={handlePress}
-      />
+        <Pressable 
+          style={styles.pressableArea} 
+          onPress={handlePress}
+        />
+      </View>
     </View>
   );
 };
@@ -131,7 +141,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 4,
   },
-  gestureArea: {
+  interactionArea: {
     position: 'absolute',
     left: 0,
     right: 0,
@@ -144,7 +154,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 44,
-    top: -18,
-    zIndex: 10,
+    top: 0,
   },
 });

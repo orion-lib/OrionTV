@@ -1,57 +1,192 @@
 name: Build Android TV APK
 
 on:
+  # 手动触发构建
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build Type'
+        required: true
+        default: 'release'
+        type: choice
+        options:
+          - release
+          - debug
+  # 自动构建触发器
+  push:
+    # 当推送tag时构建release版本
+    tags:
+      - 'v*'
+    # 当推送到master分支时构建debug版本
+    branches:
+      - master
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
 
 permissions:
   contents: write
 
 jobs:
-  direct_build:
+  build:
     name: Build Android TV APK
     runs-on: ubuntu-latest
+    
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
+      - name: 🏗 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: 🏗 Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: "yarn"
+          cache: yarn
 
-      - name: Install dependencies
+      - name: 🏗 Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: 🏗 Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: 🏗 Cache Gradle dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            android/.gradle
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: 📦 Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Get version from package.json
+      - name: 🔧 Get version from package.json
         id: package-version
         run: echo "version=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
-      - name: Setup JDK
-        uses: actions/setup-java@v3
-        with:
-          distribution: "zulu"
-          java-version: "17"
+      - name: 🔧 Determine build type
+        id: build-config
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            BUILD_TYPE="${{ inputs.build_type }}"
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            BUILD_TYPE="release"
+          else
+            BUILD_TYPE="debug"
+          fi
+          echo "build_type=$BUILD_TYPE" >> $GITHUB_OUTPUT
+          echo "Building $BUILD_TYPE version..."
 
-      - name: Prebuild TV App
+      - name: 🛠 Prebuild TV App
         run: yarn prebuild-tv
 
-      - name: Build TV APK
-        run: yarn build-local
+      - name: 🔧 Make gradlew executable
+        run: chmod +x android/gradlew
 
-      - name: Rename APK file
+      - name: 🚀 Build APK (${{ steps.build-config.outputs.build_type }})
+        run: |
+          cd android
+          if [[ "${{ steps.build-config.outputs.build_type }}" == "release" ]]; then
+            ./gradlew assembleRelease
+            APK_PATH="app/build/outputs/apk/release/app-release.apk"
+          else
+            ./gradlew assembleDebug
+            APK_PATH="app/build/outputs/apk/debug/app-debug.apk"
+          fi
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+        id: build
+
+      - name: 📱 Prepare artifacts
         run: |
           mkdir -p artifacts
-          cp android/app/build/outputs/apk/release/app-release.apk artifacts/orionTV.${{ steps.package-version.outputs.version }}.apk
+          BUILD_TYPE="${{ steps.build-config.outputs.build_type }}"
+          VERSION="${{ steps.package-version.outputs.version }}"
+          
+          if [[ "$BUILD_TYPE" == "release" ]]; then
+            APK_NAME="orionTV.v${VERSION}.apk"
+            cp android/app/build/outputs/apk/release/app-release.apk "artifacts/${APK_NAME}"
+          else
+            COMMIT_SHORT=$(git rev-parse --short HEAD)
+            APK_NAME="orionTV.v${VERSION}-debug-${COMMIT_SHORT}.apk"
+            cp android/app/build/outputs/apk/debug/app-debug.apk "artifacts/${APK_NAME}"
+          fi
+          
+          echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+          
+          # 生成构建信息
+          cat > artifacts/build-info.txt << EOF
+          OrionTV Build Information
+          ========================
+          Version: $VERSION
+          Build Type: $BUILD_TYPE
+          Commit: $(git rev-parse HEAD)
+          Branch: ${{ github.ref_name }}
+          Build Time: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          Workflow: ${{ github.workflow }}
+          Run ID: ${{ github.run_id }}
+          EOF
+        id: artifacts
 
-      - name: Create Release and Upload APK
-        uses: softprops/action-gh-release@v2
+      - name: 📤 Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: OrionTV-${{ steps.build-config.outputs.build_type }}-v${{ steps.package-version.outputs.version }}
+          path: artifacts/
+          retention-days: 30
+
+      - name: 🏷 Create Release (Release builds only)
+        if: steps.build-config.outputs.build_type == 'release'
+        uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ steps.package-version.outputs.version }}
-          name: Release v${{ steps.package-version.outputs.version }}
-          body: Automated release for version v${{ steps.package-version.outputs.version }}.
+          name: OrionTV v${{ steps.package-version.outputs.version }}
+          body: |
+            ## 🎉 OrionTV v${{ steps.package-version.outputs.version }}
+            
+            ### 📱 下载
+            - [OrionTV APK](${{ steps.artifacts.outputs.apk_name }}) - Android TV版本
+            
+            ### ✨ 功能特性
+            - 🎬 电影和电视剧播放
+            - ⚡ 快进/快退功能 (10秒间隔)
+            - 🎚️ 播放速度调节 (0.75x-2.25x)
+            - 🎯 可拖拽进度条
+            - 📱 响应式布局设计
+            - 📺 TV界面优化
+            
+            ### 🔧 技术规格
+            - React Native TV OS
+            - Expo 51
+            - TypeScript
+            - Zustand状态管理
+            
+            > 构建时间: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+            > 构建ID: ${{ github.run_id }}
           draft: false
           prerelease: false
-          files: artifacts/orionTV.${{ steps.package-version.outputs.version }}.apk
+          files: |
+            artifacts/${{ steps.artifacts.outputs.apk_name }}
+            artifacts/build-info.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 💬 Build Summary
+        run: |
+          echo "## 🎉 构建完成!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| 参数 | 值 |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|-----|" >> $GITHUB_STEP_SUMMARY
+          echo "| 版本 | ${{ steps.package-version.outputs.version }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 构建类型 | ${{ steps.build-config.outputs.build_type }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| APK文件 | ${{ steps.artifacts.outputs.apk_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| 提交ID | $(git rev-parse --short HEAD) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 下载APK" >> $GITHUB_STEP_SUMMARY
+          echo "请前往 [Actions artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) 下载构建产物" >> $GITHUB_STEP_SUMMARY
