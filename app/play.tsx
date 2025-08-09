@@ -121,7 +121,7 @@ export default function PlayScreen() {
   }
 
   return (
-    <ThemedView focusable style={styles.container}>
+    <ThemedView focusable darkColor="black" lightColor="black" style={styles.container}>
       <TouchableOpacity activeOpacity={1} style={styles.videoContainer} onPress={onScreenPress}>
         <Video
           ref={videoRef}
