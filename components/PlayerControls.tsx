@@ -7,6 +7,7 @@ import {
   FastForward,
   Rewind,
   Gauge,
+  Maximize2,
   List,
   Tv,
   ArrowDownToDot,
@@ -57,6 +58,9 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
     startDragging,
     updateDragging,
     endDragging,
+    // 新增：视频缩放模式
+    videoResizeMode,
+    toggleVideoResizeMode,
   } = usePlayerStore();
 
   const { detail } = useDetailStore();
@@ -104,6 +108,11 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
   // 处理倍速按钮
   const handleSpeedPress = () => {
     setShowSpeedModal(true);
+  };
+
+  // 处理缩放模式按钮
+  const handleResizeModePress = () => {
+    toggleVideoResizeMode();
   };
 
   return (
@@ -154,6 +163,13 @@ export const PlayerControls: React.FC<PlayerControlsProps> = ({ showControls, se
             timeLabel={playbackRate !== 1.0 ? `${playbackRate}x` : undefined}
           >
             <Gauge color={playbackRate !== 1.0 ? "#4CAF50" : "white"} size={24} />
+          </MediaButton>
+
+          <MediaButton
+            onPress={handleResizeModePress}
+            timeLabel={videoResizeMode !== "cover" ? videoResizeMode : undefined}
+          >
+            <Maximize2 color={videoResizeMode !== "cover" ? "#4CAF50" : "white"} size={24} />
           </MediaButton>
 
           <MediaButton onPress={setOutroStartTime} timeLabel={outroStartTime ? formatTime(outroStartTime) : undefined}>

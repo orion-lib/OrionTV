@@ -45,6 +45,7 @@ export default function PlayScreen() {
     // showNextEpisodeOverlay,
     initialPosition,
     introEndTime,
+    videoResizeMode,
     setVideoRef,
     handlePlaybackStatusUpdate,
     setShowControls,
@@ -127,7 +128,7 @@ export default function PlayScreen() {
           style={styles.videoPlayer}
           source={{ uri: currentEpisode?.url || "" }}
           posterSource={{ uri: detail?.poster ?? "" }}
-          resizeMode={ResizeMode.CONTAIN}
+          resizeMode={videoResizeMode || ResizeMode.COVER}
           onPlaybackStatusUpdate={handlePlaybackStatusUpdate}
           onLoad={() => {
             const jumpPosition = initialPosition || introEndTime || 0;

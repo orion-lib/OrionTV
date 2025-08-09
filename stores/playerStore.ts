@@ -32,6 +32,8 @@ interface PlayerState {
   // 新增：拖动相关
   isDragging: boolean;
   dragPosition: number;
+  // 新增：视频缩放模式
+  videoResizeMode: string;
   setVideoRef: (ref: RefObject<Video>) => void;
   loadVideo: (options: {
     source: string;
@@ -63,6 +65,9 @@ interface PlayerState {
   startDragging: (position: number) => void;
   updateDragging: (position: number) => void;
   endDragging: () => void;
+  // 新增：视频缩放模式方法
+  toggleVideoResizeMode: () => void;
+  setVideoResizeMode: (mode: string) => void;
   _seekTimeout?: any;
   _isRecordSaveThrottled: boolean;
   // Internal helper
@@ -90,6 +95,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
   showSpeedModal: false,
   isDragging: false,
   dragPosition: 0,
+  videoResizeMode: "cover", // 默认使用cover模式消除黑边
   _seekTimeout: undefined,
   _isRecordSaveThrottled: false,
 
@@ -278,6 +284,32 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
     set({ _seekTimeout: timeoutId });
   },
 
+  // 新增：切换视频缩放模式
+  toggleVideoResizeMode: () => {
+    const { videoResizeMode } = get();
+    const modes = ["cover", "contain", "stretch"];
+    const currentIndex = modes.indexOf(videoResizeMode);
+    const nextMode = modes[(currentIndex + 1) % modes.length];
+    set({ videoResizeMode: nextMode });
+    
+    const modeNames = {
+      cover: "覆盖模式（无黑边）",
+      contain: "适应模式（保持比例）",
+      stretch: "拉伸模式（填充屏幕）"
+    };
+    
+    Toast.show({
+      type: "success",
+      text1: "视频缩放模式已切换",
+      text2: modeNames[nextMode as keyof typeof modeNames],
+    });
+  },
+
+  // 新增：设置视频缩放模式
+  setVideoResizeMode: (mode: string) => {
+    set({ videoResizeMode: mode });
+  },
+
   setIntroEndTime: () => {
     const { status, introEndTime: existingIntroEndTime } = get();
     const detail = useDetailStore.getState().detail;
@@ -432,6 +464,7 @@ const usePlayerStore = create<PlayerState>((set, get) => ({
       playbackRate: 1.0,
       isDragging: false,
       dragPosition: 0,
+      videoResizeMode: "cover",
     });
   },
 }));
