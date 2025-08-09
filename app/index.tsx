@@ -11,8 +11,33 @@ import useHomeStore, { RowItem, Category } from "@/stores/homeStore";
 import useAuthStore from "@/stores/authStore";
 import CustomScrollView from "@/components/CustomScrollView";
 
-const NUM_COLUMNS = 5;
 const { width } = Dimensions.get("window");
+
+// 根据屏幕宽度动态计算列数
+const getNumColumns = () => {
+  const minCardWidth = 160; // VideoCard的最小宽度
+  const padding = 32; // 左右内边距
+  const cardMargin = 16; // 卡片间距
+  
+  const availableWidth = width - padding;
+  const cardWithMargin = minCardWidth + cardMargin;
+  
+  const columns = Math.floor(availableWidth / cardWithMargin);
+  
+  // 根据屏幕宽度设置不同的列数范围
+  if (width < 600) {
+    // 手机：2-3列
+    return Math.max(2, Math.min(columns, 3));
+  } else if (width < 1024) {
+    // 平板：3-4列
+    return Math.max(3, Math.min(columns, 4));
+  } else {
+    // 电视/桌面：4-6列
+    return Math.max(4, Math.min(columns, 6));
+  }
+};
+
+const NUM_COLUMNS = getNumColumns();
 
 // Threshold for triggering load more data (in pixels)
 const LOAD_MORE_THRESHOLD = 200;

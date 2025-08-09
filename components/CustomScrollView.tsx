@@ -29,7 +29,16 @@ const CustomScrollView: React.FC<CustomScrollViewProps> = ({
   emptyMessage = "暂无内容",
   ListFooterComponent,
 }) => {
-  const ITEM_WIDTH = numColumns > 0 ? width / numColumns - 24 : width - 24;
+  // 改进响应式布局计算
+  const getItemWidth = () => {
+    const padding = 32; // 总的左右内边距
+    const itemMargin = 16; // 每个item的左右margin
+    const availableWidth = width - padding;
+    const itemWithMargin = availableWidth / numColumns - itemMargin;
+    return Math.max(120, itemWithMargin); // 确保最小宽度
+  };
+  
+  const ITEM_WIDTH = getItemWidth();
 
   const handleScroll = useCallback(
     ({ nativeEvent }: { nativeEvent: any }) => {
@@ -123,12 +132,14 @@ const styles = StyleSheet.create({
   },
   rowContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start",
+    justifyContent: "space-around", // 改为均匀分布
     flexWrap: "wrap",
   },
   itemContainer: {
     margin: 8,
     alignItems: "center",
+    flex: 1,
+    minWidth: 120, // 设置最小宽度
   },
 });
 

@@ -210,19 +210,25 @@ VideoCard.displayName = "VideoCard";
 
 export default VideoCard;
 
-const CARD_WIDTH = 160;
-const CARD_HEIGHT = 240;
+// 移除固定宽度，改为响应式
+const ASPECT_RATIO = 2/3; // 宽高比例 (宽:高 = 2:3)
+const MIN_CARD_WIDTH = 120;
+const MAX_CARD_WIDTH = 200;
 
 const styles = StyleSheet.create({
   wrapper: {
     marginHorizontal: 8,
+    flex: 1,
+    maxWidth: MAX_CARD_WIDTH,
   },
   pressable: {
     alignItems: "center",
+    flex: 1,
   },
   card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
+    flex: 1,
+    aspectRatio: ASPECT_RATIO,
+    minWidth: MIN_CARD_WIDTH,
     borderRadius: 8,
     backgroundColor: "#222",
     overflow: "hidden",
@@ -273,7 +279,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   infoContainer: {
-    width: CARD_WIDTH,
+    flex: 1,
     marginTop: 8,
     alignItems: "flex-start",
     marginBottom: 16,
