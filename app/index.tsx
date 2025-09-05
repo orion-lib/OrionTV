@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useRef, useState } from "react";
-import { View, StyleSheet, ActivityIndicator, FlatList, Pressable, Animated, StatusBar, Platform } from "react-native";
+import { View, StyleSheet, ActivityIndicator, FlatList, Pressable, Animated, StatusBar, Platform, BackHandler, ToastAndroid } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedView } from "@/components/ThemedView";
 import { ThemedText } from "@/components/ThemedText";
@@ -52,6 +52,41 @@ export default function HomeScreen() {
       refreshPlayRecords();
     }, [refreshPlayRecords])
   );
+
+    // 双击返回退出逻辑（只限当前页面）
+  const backPressTimeRef = useRef<number | null>(null);
+  const exitToastShownRef = useRef(false); // 防止重复显示提示
+
+  useFocusEffect(
+    useCallback(() => {
+    const handleBackPress = () => {
+      const now = Date.now();
+
+      // 如果还没按过返回键，或距离上次超过2秒
+      if (!backPressTimeRef.current || now - backPressTimeRef.current > 2000) {
+        backPressTimeRef.current = now;
+        ToastAndroid.show("再按一次返回键退出", ToastAndroid.SHORT);
+        return true; // 拦截返回事件，不退出
+      }
+
+      // 两次返回键间隔小于2秒，退出应用
+      BackHandler.exitApp();
+      return true;
+    };
+
+    // 仅限 Android 平台启用此功能
+    if (Platform.OS === "android") {
+      const backHandler = BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+      // 返回首页时重置状态
+      return () => {
+        backHandler.remove();
+        backPressTimeRef.current = null;
+        exitToastShownRef.current = false;
+      };
+    }
+  }, [])
+);
 
   // 统一的数据获取逻辑
   useEffect(() => {
