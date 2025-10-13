@@ -39,6 +39,7 @@ export interface AppSettings {
     };
   };
   m3uUrl: string;
+  userAgent: string;
 }
 
 export interface LoginCredentials {
@@ -322,6 +323,7 @@ export class SettingsManager {
         sources: {},
       },
       m3uUrl: "",
+      userAgent: "",
     };
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);

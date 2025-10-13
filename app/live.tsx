@@ -13,6 +13,7 @@ import { DeviceUtils } from "@/utils/DeviceUtils";
 
 export default function LiveScreen() {
   const { m3uUrl } = useSettingsStore();
+  const { userAgent } = useSettingsStore();
   
   // 响应式布局配置
   const responsiveConfig = useResponsiveLayout();
@@ -109,6 +110,7 @@ export default function LiveScreen() {
     <>
       <LivePlayer 
         streamUrl={selectedChannelUrl} 
+        userAgent={userAgent}
         channelTitle={channelTitle} 
         onPlaybackStatusUpdate={() => {}} 
       />

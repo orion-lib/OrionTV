@@ -1,6 +1,8 @@
 import Logger from '@/utils/Logger';
+import { useSettingsStore } from '@/stores/settingsStore';
 
 const logger = Logger.withTag('M3U');
+const { userAgent } = useSettingsStore.getState();
 
 export interface Channel {
   id: string;
@@ -56,7 +58,9 @@ export const parseM3U = (m3uText: string): Channel[] => {
 
 export const fetchAndParseM3u = async (m3uUrl: string): Promise<Channel[]> => {
   try {
-    const response = await fetch(m3uUrl);
+    const response = await fetch(m3uUrl,
+      userAgent ? { headers: { 'User-Agent': userAgent } } : {}
+    );
     if (!response.ok) {
       throw new Error(`Failed to fetch M3U: ${response.statusText}`);
     }

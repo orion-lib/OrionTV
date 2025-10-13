@@ -9,6 +9,7 @@ const logger = Logger.withTag('SettingsStore');
 interface SettingsState {
   apiBaseUrl: string;
   m3uUrl: string;
+  userAgent: string;
   remoteInputEnabled: boolean;
   videoSource: {
     enabledAll: boolean;
@@ -23,6 +24,7 @@ interface SettingsState {
   fetchServerConfig: () => Promise<void>;
   setApiBaseUrl: (url: string) => void;
   setM3uUrl: (url: string) => void;
+  setUserAgent: (ua: string) => void;
   setRemoteInputEnabled: (enabled: boolean) => void;
   saveSettings: () => Promise<void>;
   setVideoSource: (config: { enabledAll: boolean; sources: { [key: string]: boolean } }) => void;
@@ -33,6 +35,7 @@ interface SettingsState {
 export const useSettingsStore = create<SettingsState>((set, get) => ({
   apiBaseUrl: "",
   m3uUrl: "",
+  userAgent: "",
   liveStreamSources: [],
   remoteInputEnabled: false,
   isModalVisible: false,
@@ -47,6 +50,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     set({
       apiBaseUrl: settings.apiBaseUrl,
       m3uUrl: settings.m3uUrl,
+      userAgent: settings.userAgent,
       remoteInputEnabled: settings.remoteInputEnabled || false,
       videoSource: settings.videoSource || {
         enabledAll: true,
@@ -75,10 +79,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   },
   setApiBaseUrl: (url) => set({ apiBaseUrl: url }),
   setM3uUrl: (url) => set({ m3uUrl: url }),
+  setUserAgent: (ua) => set({ userAgent: ua }),
   setRemoteInputEnabled: (enabled) => set({ remoteInputEnabled: enabled }),
   setVideoSource: (config) => set({ videoSource: config }),
   saveSettings: async () => {
-    const { apiBaseUrl, m3uUrl, remoteInputEnabled, videoSource } = get();
+    const { apiBaseUrl, m3uUrl, userAgent, remoteInputEnabled, videoSource } = get();
 
     let processedApiBaseUrl = apiBaseUrl.trim();
     if (processedApiBaseUrl.endsWith("/")) {
@@ -102,6 +107,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
     await SettingsManager.save({
       apiBaseUrl: processedApiBaseUrl,
       m3uUrl,
+      userAgent,
       remoteInputEnabled,
       videoSource,
     });
