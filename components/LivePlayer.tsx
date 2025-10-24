@@ -116,14 +116,10 @@ export default function LivePlayer({ streamUrl, userAgent, channelTitle, onPlayb
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#000",
+    ...StyleSheet.absoluteFillObject,
   },
   video: {
-    flex: 1,
-    alignSelf: "stretch",
+    ...StyleSheet.absoluteFillObject,
   },
   overlay: {
     position: "absolute",
