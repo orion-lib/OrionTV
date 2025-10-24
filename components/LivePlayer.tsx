@@ -5,13 +5,14 @@ import { useKeepAwake } from "expo-keep-awake";
 
 interface LivePlayerProps {
   streamUrl: string | null;
+  userAgent: string | null;
   channelTitle?: string | null;
   onPlaybackStatusUpdate: (status: AVPlaybackStatus) => void;
 }
 
 const PLAYBACK_TIMEOUT = 15000; // 15 seconds
 
-export default function LivePlayer({ streamUrl, channelTitle, onPlaybackStatusUpdate }: LivePlayerProps) {
+export default function LivePlayer({ streamUrl, userAgent, channelTitle, onPlaybackStatusUpdate }: LivePlayerProps) {
   const video = useRef<Video>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isTimeout, setIsTimeout] = useState(false);
@@ -88,6 +89,7 @@ export default function LivePlayer({ streamUrl, channelTitle, onPlaybackStatusUp
         style={styles.video}
         source={{
           uri: streamUrl,
+          headers: userAgent ? { "User-Agent": userAgent } : {},
         }}
         resizeMode={ResizeMode.CONTAIN}
         shouldPlay
