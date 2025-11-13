@@ -40,6 +40,7 @@ export interface AppSettings {
   };
   m3uUrl: string;
   userAgent: string;
+  decryptionPassword: string;
 }
 
 export interface LoginCredentials {
@@ -324,6 +325,7 @@ export class SettingsManager {
       },
       m3uUrl: "",
       userAgent: "",
+      decryptionPassword: "",
     };
     try {
       const data = await AsyncStorage.getItem(STORAGE_KEYS.SETTINGS);

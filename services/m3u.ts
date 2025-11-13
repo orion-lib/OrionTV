@@ -1,8 +1,11 @@
 import Logger from '@/utils/Logger';
 import { useSettingsStore } from '@/stores/settingsStore';
+import { install } from 'react-native-quick-crypto';
+install();
+import QuickCrypto from 'react-native-quick-crypto';
+import { Buffer } from '@craftzdog/react-native-buffer';
 
 const logger = Logger.withTag('M3U');
-const { userAgent } = useSettingsStore.getState();
 
 export interface Channel {
   id: string;
@@ -10,6 +13,28 @@ export interface Channel {
   url: string;
   logo: string;
   group: string;
+}
+
+export const decryptM3U = (encryptedText: Uint8Array, passwordStr: string): string | "" => {
+  try {
+    const [password, saltHex, ivHex, iterationsArg] = passwordStr.split('|');
+    const salt = Buffer.from(saltHex, 'hex');
+    const iv = Buffer.from(ivHex, 'hex');
+    const iterations = parseInt(iterationsArg, 10);
+    const algorithm = 'aes-256-cbc';
+    const digest = 'sha256';
+    const keyLen = 32 + 16;
+
+    const derivedKey = QuickCrypto.pbkdf2Sync(password, salt, iterations, keyLen, digest);
+    const aesKey = derivedKey.slice(0, 32);
+    const decipher = QuickCrypto.createDecipheriv(algorithm, aesKey, iv);
+    let decrypted = decipher.update(encryptedText, undefined, 'utf8').toString();
+    decrypted += decipher.final('utf8');
+    return decrypted;
+  } catch (error) {
+    logger.info("Decryption failed:", error);
+    return "";
+  }
 }
 
 export const parseM3U = (m3uText: string): Channel[] => {
@@ -39,7 +64,7 @@ export const parseM3U = (m3uText: string): Channel[] => {
     } else if (currentChannelInfo && trimmedLine && !trimmedLine.startsWith('#') && trimmedLine.includes('://')) {
       currentChannelInfo.url = trimmedLine;
       currentChannelInfo.id = currentChannelInfo.url; // Use URL as ID
-      
+
       // Ensure all required fields are present, providing defaults if necessary
       const finalChannel: Channel = {
         id: currentChannelInfo.id,
@@ -48,7 +73,7 @@ export const parseM3U = (m3uText: string): Channel[] => {
         logo: currentChannelInfo.logo || '',
         group: currentChannelInfo.group || 'Default',
       };
-      
+
       parsedChannels.push(finalChannel);
       currentChannelInfo = null; // Reset for the next channel
     }
@@ -57,6 +82,9 @@ export const parseM3U = (m3uText: string): Channel[] => {
 };
 
 export const fetchAndParseM3u = async (m3uUrl: string): Promise<Channel[]> => {
+  const userAgent = useSettingsStore.getState().userAgent;
+  const decryptionPassword = useSettingsStore.getState().decryptionPassword;
+
   try {
     const response = await fetch(m3uUrl,
       userAgent ? { headers: { 'User-Agent': userAgent } } : {}
@@ -64,8 +92,11 @@ export const fetchAndParseM3u = async (m3uUrl: string): Promise<Channel[]> => {
     if (!response.ok) {
       throw new Error(`Failed to fetch M3U: ${response.statusText}`);
     }
-    const m3uText = await response.text();
+
+    const m3uText = decryptionPassword ? decryptM3U(new Uint8Array(await response.arrayBuffer()), decryptionPassword) : await response.text();
+    
     return parseM3U(m3uText);
+
   } catch (error) {
     logger.info("Error fetching or parsing M3U:", error);
     return []; // Return empty array on error

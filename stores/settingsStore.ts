@@ -10,6 +10,7 @@ interface SettingsState {
   apiBaseUrl: string;
   m3uUrl: string;
   userAgent: string;
+  decryptionPassword: string;
   remoteInputEnabled: boolean;
   videoSource: {
     enabledAll: boolean;
@@ -25,6 +26,7 @@ interface SettingsState {
   setApiBaseUrl: (url: string) => void;
   setM3uUrl: (url: string) => void;
   setUserAgent: (ua: string) => void;
+  setDecryptionPassword: (dp: string) => void;
   setRemoteInputEnabled: (enabled: boolean) => void;
   saveSettings: () => Promise<void>;
   setVideoSource: (config: { enabledAll: boolean; sources: { [key: string]: boolean } }) => void;
@@ -36,6 +38,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   apiBaseUrl: "",
   m3uUrl: "",
   userAgent: "",
+  decryptionPassword: "",
   liveStreamSources: [],
   remoteInputEnabled: false,
   isModalVisible: false,
@@ -51,6 +54,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       apiBaseUrl: settings.apiBaseUrl,
       m3uUrl: settings.m3uUrl,
       userAgent: settings.userAgent,
+      decryptionPassword: settings.decryptionPassword,
       remoteInputEnabled: settings.remoteInputEnabled || false,
       videoSource: settings.videoSource || {
         enabledAll: true,
@@ -80,10 +84,11 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setApiBaseUrl: (url) => set({ apiBaseUrl: url }),
   setM3uUrl: (url) => set({ m3uUrl: url }),
   setUserAgent: (ua) => set({ userAgent: ua }),
+  setDecryptionPassword: (dp) => set({ decryptionPassword: dp }),
   setRemoteInputEnabled: (enabled) => set({ remoteInputEnabled: enabled }),
   setVideoSource: (config) => set({ videoSource: config }),
   saveSettings: async () => {
-    const { apiBaseUrl, m3uUrl, userAgent, remoteInputEnabled, videoSource } = get();
+    const { apiBaseUrl, m3uUrl, userAgent, decryptionPassword, remoteInputEnabled, videoSource } = get();
 
     let processedApiBaseUrl = apiBaseUrl.trim();
     if (processedApiBaseUrl.endsWith("/")) {
@@ -108,6 +113,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       apiBaseUrl: processedApiBaseUrl,
       m3uUrl,
       userAgent,
+      decryptionPassword,
       remoteInputEnabled,
       videoSource,
     });

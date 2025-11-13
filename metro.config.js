@@ -37,4 +37,27 @@ config.resolver.nodeModulesPaths = [
 ];
 config.resolver.disableHierarchicalLookup = true;
 
+// 3. Let Metro know to use 'react-native-quick-crypto' when 'crypto' is imported, and '@craftzdog/react-native-buffer' when 'Buffer' is imported
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (moduleName === 'crypto') {
+    // when importing crypto, resolve to react-native-quick-crypto
+    return context.resolveRequest(
+      context,
+      'react-native-quick-crypto',
+      platform,
+    )
+  }
+  if (moduleName === 'buffer') {
+    // when importing Buffer, resolve to @craftzdog/react-native-buffer
+    return context.resolveRequest(
+      context,
+      '@craftzdog/react-native-buffer',
+      platform,
+    )
+  }
+
+  // otherwise chain to the standard Metro resolver.
+  return context.resolveRequest(context, moduleName, platform)
+}
+
 module.exports = config;

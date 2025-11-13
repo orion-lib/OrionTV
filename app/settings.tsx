@@ -12,6 +12,7 @@ import { useRemoteControlStore } from "@/stores/remoteControlStore";
 import { APIConfigSection } from "@/components/settings/APIConfigSection";
 import { LiveStreamSection } from "@/components/settings/LiveStreamSection";
 import { UserAgentSection } from "@/components/settings/UserAgentSection";
+// import { DecryptionPasswordSection } from "@/components/settings/DecryptionPasswordSection";
 import { RemoteInputSection } from "@/components/settings/RemoteInputSection";
 import { UpdateSection } from "@/components/settings/UpdateSection";
 // import { VideoSourceSection } from "@/components/settings/VideoSourceSection";
@@ -37,6 +38,8 @@ function isSectionItem(
 
 export default function SettingsScreen() {
   const { loadSettings, saveSettings, setApiBaseUrl, setM3uUrl, setUserAgent } = useSettingsStore();
+  // const { loadSettings, saveSettings, setApiBaseUrl, setM3uUrl, setUserAgent, setDecryptionPassword } = useSettingsStore();
+
   const { lastMessage, targetPage, clearMessage } = useRemoteControlStore();
   const backgroundColor = useThemeColor({}, "background");
   const insets = useSafeAreaInsets();
@@ -55,6 +58,7 @@ export default function SettingsScreen() {
   const apiSectionRef = useRef<any>(null);
   const liveStreamSectionRef = useRef<any>(null);
   const uaSectionRef = useRef<any>(null);
+  // const dpSectionRef = useRef<any>(null);
 
   useEffect(() => {
     loadSettings();
@@ -81,6 +85,9 @@ export default function SettingsScreen() {
     } else if (currentSection === "ua" && uaSectionRef.current) {
       // User Agent Section
       setUserAgent(message);
+      // } else if (currentSection === "dp" && dpSectionRef.current) {
+      //   // Decryption Password Section
+      //   setDecryptionPassword(message);
     }
   };
 
@@ -216,6 +223,19 @@ export default function SettingsScreen() {
       ),
       key: "ua",
     },
+    // deviceType !== "mobile" && {
+    //   component: (
+    //     <DecryptionPasswordSection
+    //       ref={dpSectionRef}
+    //       onChanged={markAsChanged}
+    //       onFocus={() => {
+    //         setCurrentFocusIndex(4);
+    //         setCurrentSection("dp");
+    //       }}
+    //     />
+    //   ),
+    //   key: "dp",
+    // },
     Platform.OS === "android" && {
       component: <UpdateSection />,
       key: "update",
