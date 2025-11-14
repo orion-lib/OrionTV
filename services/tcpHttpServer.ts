@@ -1,6 +1,7 @@
 import TcpSocket from 'react-native-tcp-socket';
 import NetInfo from '@react-native-community/netinfo';
 import Logger from '@/utils/Logger';
+import '@/services/bufferFix';
 
 const logger = Logger.withTag('TCPHttpServer');
 

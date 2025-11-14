@@ -88,7 +88,7 @@ export const DecryptionPasswordSection = forwardRef<DecryptionPasswordSectionRef
           <View style={styles.titleContainer}>
             <ThemedText style={styles.sectionTitle}>M3U解密信息</ThemedText>
             {remoteInputEnabled && serverUrl && (
-              <ThemedText style={styles.subtitle}>用手机访问 {serverUrl}，可远程输入，格式: password|saltHex|ivHex|iterations, 例如: mypassword|a151a5f9ced2a950|c8dd939d779d043fbbdad2ace3068d5d|1024</ThemedText>
+              <ThemedText style={styles.subtitle}>用手机访问 {serverUrl}，可远程输入</ThemedText>
             )}
           </View>
           <Animated.View style={inputAnimationStyle}>
@@ -97,7 +97,7 @@ export const DecryptionPasswordSection = forwardRef<DecryptionPasswordSectionRef
               style={[styles.input, isInputFocused && styles.inputFocused]}
               value={decryptionPassword}
               onChangeText={handleDpChange}
-              placeholder="输入M3U解密信息"
+              placeholder="格式: password|saltHex|ivHex|iterations, 例如: mypassword|a151a5f9ced2a950|c8dd939d779d043fbbdad2ace3068d5d|1024"
               placeholderTextColor="#888"
               autoCapitalize="none"
               autoCorrect={false}
@@ -120,6 +120,9 @@ export const DecryptionPasswordSection = forwardRef<DecryptionPasswordSectionRef
             // onPress={handlePress}
             />
           </Animated.View>
+          <View style={styles.titleContainer}>
+            <ThemedText style={styles.subtitle}>openssl加密参数: -e -aes-256-cbc -iv ivHex -pbkdf2 -pass pass:password -S saltHex -iter iterations -md sha256</ThemedText>
+          </View>
         </View>
       </SettingsSection>
     );
