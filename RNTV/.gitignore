@@ -1,0 +1,8 @@
+node_modules/
+.gradle/
+*.iml
+.DS_Store
+/build/
+*.keystore
+npm-debug.log*
+jest-cache/
