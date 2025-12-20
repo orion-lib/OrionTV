@@ -80,6 +80,35 @@ npm run start
 - 直播：示例频道切换与播放。
 - 设置：自动播放下一集、保持常亮、清空收藏（示例）。
 
+5. 需手动放回的二进制文件（为便于提交已移除）：
+
+- `RNTV/android/gradle/wrapper/gradle-wrapper.jar`
+- 各分辨率启动图标：
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png`
+5. 需手动放回的二进制文件（为便于提交已移除）：
+
+- `RNTV/android/gradle/wrapper/gradle-wrapper.jar`
+- 各分辨率启动图标：
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png`
+
 ### 项目启动
 
 接下来，在项目根目录运行前端应用：
