@@ -1,106 +1,97 @@
-# OrionTV 📺
+# RNTV（纯 React Native 版本）
 
-一个基于 React Native TVOS 和 Expo 构建的播放器，旨在提供流畅的视频观看体验。
+一个基于 React Native 打造的 TV/移动端播放器示例，覆盖首页推荐、搜索、收藏、详情、播放、直播、设置等基础体验，去除了 Expo 依赖，便于直接集成到原生工程。
 
-## ✨ 功能特性
-
-- **框架跨平台支持**: 同时支持构建 Apple TV 和 Android TV。
-- **现代化前端**: 使用 Expo、React Native TVOS 和 TypeScript 构建，性能卓越。
-- **Expo Router**: 基于文件系统的路由，使导航逻辑清晰简单。
-- **TV 优化的 UI**: 专为电视遥控器交互设计的用户界面。
-
-## 🛠️ 技术栈
-
-- **前端**:
-  - [React Native TVOS](https://github.com/react-native-tvos/react-native-tvos)
-  - [Expo](https://expo.dev/) (~51.0)
-  - [Expo Router](https://docs.expo.dev/router/introduction/)
-  - [Expo AV](https://docs.expo.dev/versions/latest/sdk/av/)
-  - TypeScript
-
-## 📂 项目结构
-
-本项目采用类似 monorepo 的结构：
+## 目录结构
 
 ```
 .
-├── app/              # Expo Router 路由和页面
-├── assets/           # 静态资源 (字体, 图片, TV 图标)
-├── components/       # React 组件
-├── constants/        # 应用常量 (颜色, 样式)
-├── hooks/            # 自定义 Hooks
-├── services/         # 服务层 (API, 存储)
-├── package.json      # 前端依赖和脚本
+├── android/        # Android 原生工程
+├── ios/            # iOS 原生工程
+├── src/            # 业务代码（组件、屏幕、数据、上下文等）
+├── App.tsx         # 应用入口
+├── package.json
 └── ...
 ```
 
-## 🚀 快速开始
+## 环境要求
 
-### 环境准备
+- Node.js 16+（建议 18 LTS）
+- npm 8+ 或 yarn
+- JDK 11（或与 Android Studio 匹配的版本）
+- Android Studio（已安装 Android SDK / NDK，并配置 ANDROID_HOME）
+- Xcode + CocoaPods（macOS，仅 iOS）
+- Watchman（可选，提升 Metro 监听效率）
 
-请确保您的开发环境中已安装以下软件：
+## 安装与运行
 
-- [Node.js](https://nodejs.org/) (LTS 版本)
-- [Yarn](https://yarnpkg.com/)
-- [Expo CLI](https://docs.expo.dev/get-started/installation/)
-- [Xcode](https://developer.apple.com/xcode/) (用于 Apple TV 开发)
-- [Android Studio](https://developer.android.com/studio) (用于 Android TV 开发)
-
-### 项目启动
-
-接下来，在项目根目录运行前端应用：
-
-```sh
-
+```bash
 # 安装依赖
-yarn
+npm install
 
-# [首次运行或依赖更新后] 生成原生项目文件
-# 这会根据 app.json 中的配置修改原生代码以支持 TV
-yarn prebuild-tv
+# iOS 额外安装 Pods（仅在 macOS）
+cd ios && pod install && cd ..
 
-# 运行在 Apple TV 模拟器或真机上
-yarn ios-tv
+# 启动 Metro
+npm run start
 
-# 运行在 Android TV 模拟器或真机上
-yarn android-tv
+# 运行到设备/模拟器
+npm run android
+npm run ios
 ```
 
-## 使用
+## 打包 APK / 归档
 
-- 1.2.x 以上版本需配合 [MoonTV](https://github.com/senshinya/MoonTV) 使用。
+- Android Release：
+  ```bash
+  cd android
+  ./gradlew assembleRelease
+  ```
+  生成的 APK 位于 `android/app/build/outputs/apk/release/`。
 
+- iOS Release：在 Xcode 打开 `ios/RNTV.xcworkspace`，选择 `Any iOS Device (arm64)` 后执行 Product > Archive。
 
-## 📜 主要脚本
+## 二进制资源
 
-- `yarn start`: 在手机模式下启动 Metro Bundler。
-- `yarn start-tv`: 在 TV 模式下启动 Metro Bundler。
-- `yarn ios-tv`: 在 Apple TV 上构建并运行应用。
-- `yarn android-tv`: 在 Android TV 上构建并运行应用。
-- `yarn prebuild-tv`: 为 TV 构建生成原生项目文件。
-- `yarn lint`: 检查代码风格
+- Gradle wrapper：`android/gradle/wrapper/gradle-wrapper.jar`（需自备，否则请使用宿主机已安装的 Gradle/Android SDK）
+- 启动图标（各分辨率）：`android/app/src/main/res/mipmap-*/ic_launcher*.png`
 
-## 📝 License
+## 功能概览
 
-本项目采用 MIT 许可证。
+- 首页：分类筛选、精选内容展示。
+- 搜索：按片名/标签即时过滤。
+- 详情：展示基础信息，支持收藏、跳转播放。
+- 播放：`react-native-video` 播放示例，收藏入口。
+- 直播：示例频道切换与播放。
+- 收藏：统一收藏列表。
+- 设置：自动播放下一集、保持常亮、清空收藏（示例）。
 
-## ⚠️ 免责声明
+## 脚本
 
-OrionTV 仅作为视频搜索工具，不存储、上传或分发任何视频内容。所有视频均来自第三方 API 接口提供的搜索结果。如有侵权内容，请联系相应的内容提供方。
+- `npm run start`：启动 Metro
+- `npm run android`：运行 Android
+- `npm run ios`：运行 iOS
+- `npm test`：运行 Jest
+- `npm run lint`：ESLint 检查
 
-本项目开发者不对使用本项目产生的任何后果负责。使用本项目时，您必须遵守当地的法律法规。
+## 容器（Podman/Docker）打包 Android APK
 
-## 🌟 Star History
+前置：目录中已放回 `gradle-wrapper.jar`（或你使用宿主机的 Gradle/SDK 并在容器内挂载）。
 
-[![Star History Chart](https://api.star-history.com/svg?repos=zimplexing/OrionTV&type=Date)](https://www.star-history.com/#zimplexing/OrionTV&Date)
+```bash
+# 拉取包含 Android SDK 的镜像（示例）
+podman pull ghcr.io/react-native-community/react-native-android:latest
 
-## 🙏 致谢
+# 在容器内运行组装（同理适用于 docker）
+podman run --rm -v "$(pwd)":/app -w /app \
+  ghcr.io/react-native-community/react-native-android:latest \
+  sh -c "yes | sdkmanager --licenses && ./gradlew assembleRelease"
 
-本项目受到以下开源项目的启发：
+# 成品位于 android/app/build/outputs/apk/release/
+```
 
-- [MoonTV](https://github.com/senshinya/MoonTV) - 一个基于 Next.js 的视频聚合应用
-- [LibreTV](https://github.com/LibreSpark/LibreTV) - 一个开源的视频流媒体应用
+## 备注
 
-感谢以下项目提供 API Key 的赞助
-
-- [gpt-load](https://github.com/tbphp/gpt-load) - 一个高性能的 OpenAI 格式 API 多密钥轮询代理服务器，支持负载均衡，使用 Go 语言开发
+- 若需启用 Gradle Wrapper，放回 `gradle-wrapper.jar` 后即可使用 `./gradlew` 相关命令。
+- 首次 iOS 运行请执行 `pod install`。
+- 本仓库仅提供示例数据与播放链接，请遵守当地法律法规。
