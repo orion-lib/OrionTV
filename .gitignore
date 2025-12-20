@@ -1,8 +1,9 @@
-node_modules/
-.expo/
-dist/
-ios/
-android/
+/node_modules/
+/.expo/
+/dist/
+/ios/
+/android/
+RNTV/node_modules/
 npm-debug.*
 *.jks
 *.p8
