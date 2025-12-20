@@ -2,6 +2,9 @@
 
 一个基于 React Native TVOS 和 Expo 构建的播放器，旨在提供流畅的视频观看体验。
 
+> 🆕 **纯 React Native 版本（无 Expo 依赖）**  
+> 仓库内新增 `RNTV/` 目录，使用社区 CLI 初始化并重写导航、播放、收藏、搜索、直播等核心体验，可直接用于原生项目集成。
+
 ## ✨ 功能特性
 
 - **框架跨平台支持**: 同时支持构建 Apple TV 和 Android TV。
@@ -45,6 +48,66 @@
 - [Expo CLI](https://docs.expo.dev/get-started/installation/)
 - [Xcode](https://developer.apple.com/xcode/) (用于 Apple TV 开发)
 - [Android Studio](https://developer.android.com/studio) (用于 Android TV 开发)
+
+### 纯 React Native 版本（`RNTV` 目录）
+
+1. 安装依赖
+
+```bash
+cd RNTV
+npm install
+```
+
+2. 启动 Metro
+
+```bash
+npm run start
+```
+
+3. 运行与构建
+
+- Android: `npm run android`
+- iOS: `npm run ios`
+- Android Release: `cd android && ./gradlew assembleRelease`
+- iOS Release: 使用 Xcode 打开 `ios/RNTV.xcworkspace` 进行归档
+
+4. 功能概览
+
+- 首页：分类筛选、精选内容。
+- 搜索：按片名/标签即时过滤。
+- 详情：基础信息、收藏、跳转播放。
+- 播放：基于 `react-native-video`，支持返回详情与收藏。
+- 直播：示例频道切换与播放。
+- 设置：自动播放下一集、保持常亮、清空收藏（示例）。
+
+5. 需手动放回的二进制文件（为便于提交已移除）：
+
+- `RNTV/android/gradle/wrapper/gradle-wrapper.jar`
+- 各分辨率启动图标：
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png`
+5. 需手动放回的二进制文件（为便于提交已移除）：
+
+- `RNTV/android/gradle/wrapper/gradle-wrapper.jar`
+- 各分辨率启动图标：
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`
+  - `RNTV/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png`
 
 ### 项目启动
 
