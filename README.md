@@ -51,22 +51,10 @@ npm run ios
 
 - iOS Release：在 Xcode 打开 `ios/RNTV.xcworkspace`，选择 `Any iOS Device (arm64)` 后执行 Product > Archive。
 
-## 需手动放回的二进制文件
+## 二进制资源
 
-为避免提交二进制，以下文件已从仓库移除，打包前请自行放回：
-
-- Gradle wrapper：`android/gradle/wrapper/gradle-wrapper.jar`
-- 启动图标（各分辨率）：
-  - `android/app/src/main/res/mipmap-mdpi/ic_launcher.png`
-  - `android/app/src/main/res/mipmap-mdpi/ic_launcher_round.png`
-  - `android/app/src/main/res/mipmap-hdpi/ic_launcher.png`
-  - `android/app/src/main/res/mipmap-hdpi/ic_launcher_round.png`
-  - `android/app/src/main/res/mipmap-xhdpi/ic_launcher.png`
-  - `android/app/src/main/res/mipmap-xhdpi/ic_launcher_round.png`
-  - `android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png`
-  - `android/app/src/main/res/mipmap-xxhdpi/ic_launcher_round.png`
-  - `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png`
-  - `android/app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png`
+- Gradle wrapper：`android/gradle/wrapper/gradle-wrapper.jar`（需自备，否则请使用宿主机已安装的 Gradle/Android SDK）
+- 启动图标（各分辨率）：`android/app/src/main/res/mipmap-*/ic_launcher*.png`
 
 ## 功能概览
 
@@ -85,6 +73,22 @@ npm run ios
 - `npm run ios`：运行 iOS
 - `npm test`：运行 Jest
 - `npm run lint`：ESLint 检查
+
+## 容器（Podman/Docker）打包 Android APK
+
+前置：目录中已放回 `gradle-wrapper.jar`（或你使用宿主机的 Gradle/SDK 并在容器内挂载）。
+
+```bash
+# 拉取包含 Android SDK 的镜像（示例）
+podman pull ghcr.io/react-native-community/react-native-android:latest
+
+# 在容器内运行组装（同理适用于 docker）
+podman run --rm -v "$(pwd)":/app -w /app \
+  ghcr.io/react-native-community/react-native-android:latest \
+  sh -c "yes | sdkmanager --licenses && ./gradlew assembleRelease"
+
+# 成品位于 android/app/build/outputs/apk/release/
+```
 
 ## 备注
 
