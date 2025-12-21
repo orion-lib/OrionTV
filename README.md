@@ -78,14 +78,15 @@ npm run ios
 
 前置：目录中已放回 `gradle-wrapper.jar`（或你使用宿主机的 Gradle/SDK 并在容器内挂载）。
 
+Podman 可直接使用官方发布的 `reactnativecommunity/react-native-android` 镜像（Docker Hub），无需额外配置。镜像内已预装 Android SDK、NDK 和构建链，适合 CI/CD 或无法直接安装 Android Studio 的环境。
+
 ```bash
-# 拉取包含 Android SDK 的镜像（示例）
-# 镜像仓库：https://github.com/react-native-community/docker-android
-podman pull ghcr.io/react-native-community/docker-android:latest
+# 拉取镜像（与 Docker 命令兼容）
+podman pull docker.io/reactnativecommunity/react-native-android:latest
 
 # 在容器内运行组装（同理适用于 docker）
 podman run --rm -v "$(pwd)":/app -w /app \
-  ghcr.io/react-native-community/docker-android:latest \
+  docker.io/reactnativecommunity/react-native-android:latest \
   sh -c "yes | sdkmanager --licenses && ./gradlew assembleRelease"
 
 # 成品位于 android/app/build/outputs/apk/release/
