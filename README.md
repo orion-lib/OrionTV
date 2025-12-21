@@ -80,11 +80,12 @@ npm run ios
 
 ```bash
 # 拉取包含 Android SDK 的镜像（示例）
-podman pull ghcr.io/react-native-community/react-native-android:latest
+# 镜像仓库：https://github.com/react-native-community/docker-android
+podman pull ghcr.io/react-native-community/docker-android:latest
 
 # 在容器内运行组装（同理适用于 docker）
 podman run --rm -v "$(pwd)":/app -w /app \
-  ghcr.io/react-native-community/react-native-android:latest \
+  ghcr.io/react-native-community/docker-android:latest \
   sh -c "yes | sdkmanager --licenses && ./gradlew assembleRelease"
 
 # 成品位于 android/app/build/outputs/apk/release/
