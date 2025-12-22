@@ -1,5 +1,12 @@
 import React, {useMemo} from 'react';
-import {FlatList, SafeAreaView, StatusBar, StyleSheet, Text, View} from 'react-native';
+import {
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useMedia} from '../context/MediaContext';

@@ -42,7 +42,7 @@ const HomeScreen: React.FC = () => {
         activeId={activeCategory}
         onChange={setActiveCategory}
       />
-      <View style={{paddingHorizontal: 16, marginTop: 12}}>
+      <View style={styles.content}>
         <SectionHeader
           title={
             activeCategory === 'featured'
@@ -57,10 +57,7 @@ const HomeScreen: React.FC = () => {
           horizontal
           showsHorizontalScrollIndicator={false}
           ListEmptyComponent={
-            <EmptyState
-              title="暂无内容"
-              description="稍后再来看看吧"
-            />
+            <EmptyState title="暂无内容" description="稍后再来看看吧" />
           }
           renderItem={({item}) => (
             <VideoCard
@@ -84,6 +81,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 12,
+  },
+  content: {
+    paddingHorizontal: 16,
+    marginTop: 12,
   },
   title: {
     fontSize: 28,

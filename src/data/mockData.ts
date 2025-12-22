@@ -15,12 +15,12 @@ export const videos: VideoItem[] = [
     year: '2024',
     poster:
       'https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?auto=format&fit=crop&w=800&q=80',
-    description:
-      '硬核科幻大片，讲述探索者号船员在未知星系遭遇危机的故事。',
+    description: '硬核科幻大片，讲述探索者号船员在未知星系遭遇危机的故事。',
     duration: '132 min',
     categoryId: 'movie',
     tags: ['科幻', '冒险'],
-    source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    source:
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
   },
   {
     id: '2',
@@ -32,7 +32,8 @@ export const videos: VideoItem[] = [
     duration: '46 min/集',
     categoryId: 'tv',
     tags: ['悬疑', '太空'],
-    source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
+    source:
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
   },
   {
     id: '3',
@@ -44,7 +45,8 @@ export const videos: VideoItem[] = [
     duration: '118 min',
     categoryId: 'movie',
     tags: ['动作', '赛博朋克'],
-    source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    source:
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
   },
   {
     id: '4',
@@ -56,7 +58,8 @@ export const videos: VideoItem[] = [
     duration: '24 min/集',
     categoryId: 'animation',
     tags: ['日常', '治愈'],
-    source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
+    source:
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4',
   },
   {
     id: '5',
@@ -68,7 +71,8 @@ export const videos: VideoItem[] = [
     duration: '52 min/集',
     categoryId: 'tv',
     tags: ['纪录', '现实'],
-    source: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
+    source:
+      'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4',
   },
 ];
 

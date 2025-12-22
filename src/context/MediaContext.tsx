@@ -1,4 +1,11 @@
-import React, {createContext, useCallback, useContext, useEffect, useMemo, useState} from 'react';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {AppPreferences, LiveChannel, VideoItem} from '../types';
 import {categories, liveChannels, videos} from '../data/mockData';
@@ -26,7 +33,9 @@ const defaultPreferences: AppPreferences = {
 
 const MediaContext = createContext<MediaContextValue | undefined>(undefined);
 
-export const MediaProvider: React.FC<React.PropsWithChildren> = ({children}) => {
+export const MediaProvider: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [preferences, setPreferences] =
     useState<AppPreferences>(defaultPreferences);
@@ -93,16 +102,21 @@ export const MediaProvider: React.FC<React.PropsWithChildren> = ({children}) => 
       preferences,
       toggleFavorite,
       isFavorite,
+      getVideoById,
       updatePreferences,
       clearFavorites,
     ],
   );
 
-  return <MediaContext.Provider value={value}>{children}</MediaContext.Provider>;
+  return (
+    <MediaContext.Provider value={value}>{children}</MediaContext.Provider>
+  );
 };
 
 export const useMedia = () => {
   const ctx = useContext(MediaContext);
-  if (!ctx) throw new Error('useMedia must be used inside MediaProvider');
+  if (!ctx) {
+    throw new Error('useMedia must be used inside MediaProvider');
+  }
   return ctx;
 };

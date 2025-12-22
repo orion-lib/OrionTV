@@ -23,7 +23,9 @@ const SearchScreen: React.FC = () => {
   const [keyword, setKeyword] = useState('');
 
   const results = useMemo(() => {
-    if (!keyword.trim()) return [];
+    if (!keyword.trim()) {
+      return [];
+    }
     const lower = keyword.toLowerCase();
     return videos.filter(
       v =>
@@ -52,15 +54,9 @@ const SearchScreen: React.FC = () => {
         keyExtractor={item => item.id}
         ListEmptyComponent={
           keyword ? (
-            <EmptyState
-              title="未找到内容"
-              description="尝试换个关键词吧"
-            />
+            <EmptyState title="未找到内容" description="尝试换个关键词吧" />
           ) : (
-            <EmptyState
-              title="开始搜索"
-              description="输入关键词即可快速检索"
-            />
+            <EmptyState title="开始搜索" description="输入关键词即可快速检索" />
           )
         }
         renderItem={({item}) => (

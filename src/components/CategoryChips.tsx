@@ -1,5 +1,11 @@
 import React from 'react';
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {Category} from '../types';
 
 interface Props {
@@ -27,7 +33,7 @@ export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
           </TouchableOpacity>
         );
       })}
-      <View style={{width: 12}} />
+      <View style={styles.spacer} />
     </ScrollView>
   );
 };
@@ -55,5 +61,8 @@ const styles = StyleSheet.create({
   },
   activeLabel: {
     color: '#5ac8fa',
+  },
+  spacer: {
+    width: 12,
   },
 });
