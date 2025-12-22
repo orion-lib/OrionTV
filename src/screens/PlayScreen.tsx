@@ -33,13 +33,15 @@ const PlayScreen: React.FC = () => {
 
   if (!video) {
     return (
-      <SafeAreaView style={{flex: 1, backgroundColor: '#0b0d14'}}>
+      <SafeAreaView style={styles.container}>
         <EmptyState title="视频不存在" />
       </SafeAreaView>
     );
   }
 
   const favorite = isFavorite(video.id);
+  const favoriteColor = favorite ? '#ff6b6b' : '#e5e7eb';
+  const favoriteTextStyle = favorite ? styles.favoriteText : styles.neutralText;
 
   const handleLoad = (_: OnLoadData) => setLoading(false);
 
@@ -76,13 +78,9 @@ const PlayScreen: React.FC = () => {
           <Icon
             name={favorite ? 'heart' : 'heart-outline'}
             size={18}
-            color={favorite ? '#ff6b6b' : '#e5e7eb'}
+            color={favoriteColor}
           />
-          <Text
-            style={[
-              styles.buttonText,
-              {color: favorite ? '#ff6b6b' : '#e5e7eb'},
-            ]}>
+          <Text style={[styles.buttonText, favoriteTextStyle]}>
             {favorite ? '已收藏' : '收藏'}
           </Text>
         </TouchableOpacity>
@@ -94,9 +92,7 @@ const PlayScreen: React.FC = () => {
             })
           }>
           <Icon name="information-circle-outline" size={18} color="#e5e7eb" />
-          <Text style={[styles.buttonText, {color: '#e5e7eb'}]}>
-            查看详情
-          </Text>
+          <Text style={[styles.buttonText, styles.neutralText]}>查看详情</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.desc} numberOfLines={3}>
@@ -146,6 +142,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontWeight: '700',
   },
+  favoriteText: {color: '#ff6b6b'},
+  neutralText: {color: '#e5e7eb'},
   desc: {
     color: '#d8dee9',
     paddingHorizontal: 16,

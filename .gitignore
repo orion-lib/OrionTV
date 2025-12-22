@@ -11,3 +11,4 @@ npm-debug.log*
 jest-cache/
 android/gradle/wrapper/gradle-wrapper.jar
 android/app/src/main/res/mipmap-*/ic_launcher*.png
+android/local.properties

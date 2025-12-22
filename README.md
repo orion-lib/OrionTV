@@ -18,8 +18,12 @@
 
 - Node.js 16+（建议 18 LTS）
 - npm 8+ 或 yarn
-- JDK 11（或与 Android Studio 匹配的版本）
-- Android Studio（已安装 Android SDK / NDK，并配置 ANDROID_HOME）
+- JDK 11（当前容器已安装）
+- Android SDK 34 + Build Tools 34.0.0（CLI 工具可通过 `sdkmanager` 安装）
+  ```bash
+  sdkmanager "platforms;android-34" "build-tools;34.0.0"
+  ```
+- ANDROID_HOME / ANDROID_SDK_ROOT 指向已安装的 SDK 路径
 - Xcode + CocoaPods（macOS，仅 iOS）
 - Watchman（可选，提升 Metro 监听效率）
 
@@ -42,12 +46,15 @@ npm run ios
 
 ## 打包 APK / 归档
 
-- Android Release：
+- Android Release（已提升到 compileSdkVersion/targetSdkVersion 34，buildToolsVersion 34.0.0）：
   ```bash
   cd android
+  # 可选：清理缓存
+  ./gradlew clean
   ./gradlew assembleRelease
   ```
   生成的 APK 位于 `android/app/build/outputs/apk/release/`。
+  > 备注：当前代码使用 `react-native-gesture-handler@2.9.0`、`react-native-screens@3.18.2`、`react-native-video@6.1.2`。在容器内尝试 `./gradlew clean assembleRelease` 时，`react-native-screens` 的 Kotlin 编译仍有错误（`compileReleaseKotlin` 失败，伴随 StackOverflowError），需进一步升级 Android Gradle Plugin/Kotlin 或对库源码做兼容性调整后方可产出 APK。
 
 - iOS Release：在 Xcode 打开 `ios/RNTV.xcworkspace`，选择 `Any iOS Device (arm64)` 后执行 Product > Archive。
 

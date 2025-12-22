@@ -52,7 +52,8 @@ const SettingsScreen: React.FC = () => {
       </View>
 
       <Text style={styles.footer}>
-        这是一个纯 React Native 构建的示例项目，移除了 Expo 依赖，提供导航、播放、收藏、搜索与直播的基本体验。
+        这是一个纯 React Native 构建的示例项目，移除了 Expo
+        依赖，提供导航、播放、收藏、搜索与直播的基本体验。
       </Text>
     </SafeAreaView>
   );
