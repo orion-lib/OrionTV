@@ -104,3 +104,47 @@ podman run --rm -v "$(pwd)":/app -w /app \
 - 若需启用 Gradle Wrapper，放回 `gradle-wrapper.jar` 后即可使用 `./gradlew` 相关命令。
 - 首次 iOS 运行请执行 `pod install`。
 - 本仓库仅提供示例数据与播放链接，请遵守当地法律法规。
+
+## React Native 0.83.1 手动迁移指引（不提交二进制）
+
+> 说明：下面步骤基于官方 0.83.1 模板整理，可在本地完成迁移并自行检入需要的文件。二进制文件（如 `gradle-wrapper.jar`、Debug keystore 等）请勿提交。
+
+1. **获取官方模板文件**
+   - 下载模板包：`npm pack @react-native-community/template@0.83.1 --registry=https://registry.npmjs.org`
+   - 解压：`tar -xzf react-native-community-template-0.83.1.tgz -C /tmp/rn831template`
+   - 模板目录位于 `/tmp/rn831template/package/template/`
+
+2. **替换原生工程骨架（保留业务代码）**
+   - 备份当前 `android/`、`ios/` 目录。
+   - 用模板覆盖原生工程：复制模板的 `android/`、`ios/` 到项目根目录。
+   - 将包名/工程名替换为当前应用：
+     - Android：`applicationId`/`namespace` 改为 `com.rntv`，`android/app/src/main/java/com/rntv` 下的包名同步。
+     - iOS：工程名、Scheme、`Info.plist` 中的显示名与 Bundle Identifier 更新为 `RNTV`/`com.rntv`。
+   - 若有自定义原生代码（如播放器组件），按需从备份中拷回对应文件夹。
+   - 启动图标 PNG 不必提交，仓库未附带 `android/app/src/main/res/mipmap-hdpi/ic_launcher.png`，如需使用请在本地放入对应的 `mipmap-*` 目录（覆盖 `ic_launcher*.png`），并在 README 中记录放置路径。
+
+3. **同步 JS 依赖与配置**
+   - `package.json` 主要版本：
+     - `react-native@0.83.1`、`react@19.2.0`
+     - CLI/工具链：`@react-native/babel-preset@0.83.1`、`@react-native/metro-config@0.83.1`、`@react-native/typescript-config@0.83.1`
+     - 导航等三方库升级：`@react-navigation/*@^7.9.0`、`react-native-gesture-handler@^2.30.0`、`react-native-screens@^4.19.0`、`react-native-reanimated@^4.2.1`、`react-native-safe-area-context@^5.5.2`、`react-native-vector-icons@^10.3.0`、`react-native-video@^6.18.0`
+   - Babel：`presets: ['module:@react-native/babel-preset']`，保留 `react-native-reanimated/plugin`。
+   - Metro：使用 `@react-native/metro-config` 默认配置。
+   - TypeScript：继承 `@react-native/typescript-config/tsconfig.json`，补充 `"types": ["jest"]`。
+   - Jest：使用单独的 `jest.config.js`（preset `react-native`，与旧版 transformIgnorePatterns 相同），`jest.setup.js` 内为 Reanimated mock 增加 `Reanimated.default.call = () => {}`。
+
+4. **Android 构建要点**
+   - 模板默认：AGP 8.7.x、Gradle 9.0、compile/target SDK 36、Kotlin 2.1.20、NDK 27.1、Hermes 开启。
+   - 若内网/代理导致 Maven Central 证书或下载失败，可在 `android/build.gradle` 和 `settings.gradle` 中增加镜像仓库，或在本地提前下载依赖后再构建。
+   - 如果不希望提交 `gradle-wrapper.jar`，可在本地安装 Gradle 9.0+，使用 `gradle assembleDebug` 指向项目。
+
+5. **iOS 构建要点**
+   - 模板使用 Swift AppDelegate 与 `ReactNativeDelegate`；`Podfile` 由 `react_native_pods.rb` 解析。
+   - 运行 `cd ios && pod install`（需 Ruby/CocoaPods 环境）。
+   - 如有测试目标需求，可在 Xcode 中重新创建测试 Target 或恢复原有测试文件。
+
+6. **验证**
+   - 依赖安装：`npm install`
+   - JS 测试：`npm test -- --runInBand`（React 19 的 act 警告属已知，需要在测试中手动包裹 `act` 或使用异步渲染方案）
+   - Android：`./gradlew assembleDebug`（或本机 Gradle），如遇代理/证书问题，先解决网络后重试。
+   - iOS：`npx pod-install ios`（或手动 `pod install`），再在 Xcode 运行。
