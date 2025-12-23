@@ -66,8 +66,7 @@ const HomeScreen: React.FC = () => {
       <LinearGradient
         colors={['#0c0f1b', '#0a0b13', '#0e1223']}
         style={styles.header}>
-        <View style={styles.brandRow}>
-          <Text style={styles.logo}>YOGURT</Text>
+        <View style={styles.chipsRow}>
           <CategoryChips
             data={categories}
             activeId={activeCategory}
@@ -135,16 +134,9 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 20,
   },
-  brandRow: {
+  chipsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  logo: {
-    fontSize: 28,
-    fontWeight: '900',
-    color: '#e9f2ff',
-    letterSpacing: 1.2,
+    justifyContent: 'flex-start',
   },
   heroArea: {
     marginTop: 16,
