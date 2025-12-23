@@ -2,7 +2,14 @@ package com.rntv;
 
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
+import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactRootView;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+
+import android.view.KeyEvent;
 
 public class MainActivity extends ReactActivity {
 
@@ -25,6 +32,27 @@ public class MainActivity extends ReactActivity {
     return new MainActivityDelegate(this, getMainComponentName());
   }
 
+  @Override
+  public boolean dispatchKeyEvent(KeyEvent event) {
+    ReactInstanceManager reactInstanceManager = getReactNativeHost().getReactInstanceManager();
+    ReactContext reactContext = reactInstanceManager.getCurrentReactContext();
+
+    if (reactContext != null) {
+      WritableMap params = Arguments.createMap();
+      params.putInt("keyCode", event.getKeyCode());
+      params.putString(
+          "action",
+          event.getAction() == KeyEvent.ACTION_DOWN ? "down" : "up");
+      params.putInt("repeatCount", event.getRepeatCount());
+
+      reactContext
+          .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+          .emit("hardwareKeyEvent", params);
+    }
+
+    return super.dispatchKeyEvent(event);
+  }
+
   public static class MainActivityDelegate extends ReactActivityDelegate {
     public MainActivityDelegate(ReactActivity activity, String mainComponentName) {
       super(activity, mainComponentName);
@@ -35,6 +63,9 @@ public class MainActivity extends ReactActivity {
       ReactRootView reactRootView = new ReactRootView(getContext());
       // If you opted-in for the New Architecture, we enable the Fabric Renderer.
       reactRootView.setIsFabric(BuildConfig.IS_NEW_ARCHITECTURE_ENABLED);
+      reactRootView.setFocusable(true);
+      reactRootView.setFocusableInTouchMode(true);
+      reactRootView.requestFocus();
       return reactRootView;
     }
 
