@@ -162,6 +162,10 @@ android {
         }
     }
 
+    buildFeatures {
+        buildConfig true
+    }
+
     if (isNewArchitectureEnabled()) {
         // We configure the NDK build only if you decide to opt-in for the New Architecture.
         externalNativeBuild {
