@@ -130,6 +130,7 @@ def reactNativeArchitectures() {
 }
 
 android {
+    namespace "com.rntv"
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion

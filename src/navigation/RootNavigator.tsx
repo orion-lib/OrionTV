@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {ComponentType} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -9,6 +9,8 @@ import SettingsScreen from '../screens/SettingsScreen';
 import DetailScreen from '../screens/DetailScreen';
 import PlayScreen from '../screens/PlayScreen';
 import LiveScreen from '../screens/LiveScreen';
+import {TopTabBar} from './TopTabBar';
+import {TAB_ITEMS, TabRouteName} from './tabConfig';
 
 export type RootStackParamList = {
   Tabs: undefined;
@@ -19,63 +21,35 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator();
 
+const TAB_COMPONENTS: Record<TabRouteName, ComponentType<any>> = {
+  Home: HomeScreen,
+  Search: SearchScreen,
+  Live: LiveScreen,
+  Favorites: FavoritesScreen,
+  Settings: SettingsScreen,
+};
+
 const TabNavigator = () => (
   <Tab.Navigator
+    tabBar={props => <TopTabBar {...props} />}
+    sceneContainerStyle={{paddingTop: 70}}
     screenOptions={{
       headerShown: false,
-      tabBarActiveTintColor: '#5ac8fa',
-      tabBarStyle: {backgroundColor: '#0f111a', borderTopColor: '#1f2430'},
+      tabBarStyle: {display: 'none'},
     }}>
-    <Tab.Screen
-      name="Home"
-      component={HomeScreen}
-      options={{
-        title: '首页',
-        tabBarIcon: ({color, size}) => (
-          <Icon name="home-outline" size={size} color={color} />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Search"
-      component={SearchScreen}
-      options={{
-        title: '搜索',
-        tabBarIcon: ({color, size}) => (
-          <Icon name="search-outline" size={size} color={color} />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Live"
-      component={LiveScreen}
-      options={{
-        title: '直播',
-        tabBarIcon: ({color, size}) => (
-          <Icon name="tv-outline" size={size} color={color} />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Favorites"
-      component={FavoritesScreen}
-      options={{
-        title: '收藏',
-        tabBarIcon: ({color, size}) => (
-          <Icon name="heart-outline" size={size} color={color} />
-        ),
-      }}
-    />
-    <Tab.Screen
-      name="Settings"
-      component={SettingsScreen}
-      options={{
-        title: '设置',
-        tabBarIcon: ({color, size}) => (
-          <Icon name="settings-outline" size={size} color={color} />
-        ),
-      }}
-    />
+    {TAB_ITEMS.map(item => (
+      <Tab.Screen
+        key={item.name}
+        name={item.name}
+        component={TAB_COMPONENTS[item.name]}
+        options={{
+          title: item.title,
+          tabBarIcon: ({color, size}) => (
+            <Icon name={item.icon as never} size={size} color={color} />
+          ),
+        }}
+      />
+    ))}
   </Tab.Navigator>
 );
 
