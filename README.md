@@ -63,6 +63,12 @@ npm run ios
 - Gradle wrapper：`android/gradle/wrapper/gradle-wrapper.jar`（需自备，否则请使用宿主机已安装的 Gradle/Android SDK）
 - 启动图标（各分辨率）：`android/app/src/main/res/mipmap-*/ic_launcher*.png`
 
+## 图标资源流程（手机 & TV）
+
+- 设计稿放置：`assets/icons/mobile/`（手机/平板等通用）与 `assets/icons/tv/`（Android TV Banner）。
+- 命名规则与尺寸：见 `assets/icons/README.md`，包含 Android `mipmap-*`、iOS `AppIcon.appiconset` 的尺寸对照以及 TV Banner 的命名（其他形态复用手机图标）。
+- 投入工程：按文档说明复制到对应原生目录后重新编译即可。
+
 ## 功能概览
 
 - 首页：分类筛选、精选内容展示。
