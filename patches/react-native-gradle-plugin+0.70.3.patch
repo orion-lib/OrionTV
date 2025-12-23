@@ -1,0 +1,20 @@
+diff --git a/node_modules/react-native-gradle-plugin/build.gradle.kts b/node_modules/react-native-gradle-plugin/build.gradle.kts
+index 1d4f7d2..5578f7d 100644
+--- a/node_modules/react-native-gradle-plugin/build.gradle.kts
++++ b/node_modules/react-native-gradle-plugin/build.gradle.kts
+@@
+-import org.gradle.api.internal.classpath.ModuleRegistry
+-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+-import org.gradle.configurationcache.extensions.serviceOf
++import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+@@
+-  testRuntimeOnly(
+-      files(
+-          serviceOf<ModuleRegistry>()
+-              .getModule("gradle-tooling-api-builders")
+-              .classpath
+-              .asFiles
+-              .first()))
++  // The original plugin dynamically fetched the tooling-api-builders module via serviceOf.
++  // That internal API was removed in newer Gradle versions, so we avoid the lookup to keep
++  // compatibility with Gradle 8.14+.
