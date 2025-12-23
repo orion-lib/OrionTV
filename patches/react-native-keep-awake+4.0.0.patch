@@ -1,0 +1,43 @@
+diff --git a/node_modules/react-native-keep-awake/android/build.gradle b/node_modules/react-native-keep-awake/android/build.gradle
+index ba4dfe7..91ce027 100644
+--- a/node_modules/react-native-keep-awake/android/build.gradle
++++ b/node_modules/react-native-keep-awake/android/build.gradle
+@@ -1,11 +1,11 @@
+ buildscript {
+     repositories {
+         google()
+-        jcenter()
++        mavenCentral()
+     }
+ 
+     dependencies {
+-        classpath 'com.android.tools.build:gradle:3.1.4'
++        classpath 'com.android.tools.build:gradle:8.7.2'
+     }
+ }
+ 
+@@ -22,6 +22,7 @@ def _targetSdkVersion = _ext.has('targetSdkVersion') ? _ext.targetSdkVersion : 2
+ android {
+     compileSdkVersion _compileSdkVersion
+     buildToolsVersion _buildToolsVersion
++    namespace "com.corbt.keepawake"
+ 
+     defaultConfig {
+         minSdkVersion _minSdkVersion
+@@ -29,6 +30,16 @@ android {
+         versionCode 1
+         versionName "1.0"
+     }
++
++    buildFeatures {
++        buildConfig true
++    }
++
++    compileOptions {
++        sourceCompatibility JavaVersion.VERSION_11
++        targetCompatibility JavaVersion.VERSION_11
++    }
++
+     lintOptions {
+         abortOnError false
+     }

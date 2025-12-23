@@ -1,13 +1,25 @@
 diff --git a/node_modules/react-native-gradle-plugin/build.gradle.kts b/node_modules/react-native-gradle-plugin/build.gradle.kts
-index 1d4f7d2..5578f7d 100644
+index 7ba884a..dd3fb81 100644
 --- a/node_modules/react-native-gradle-plugin/build.gradle.kts
 +++ b/node_modules/react-native-gradle-plugin/build.gradle.kts
-@@
+@@ -5,12 +5,10 @@
+  * LICENSE file in the root directory of this source tree.
+  */
+ 
 -import org.gradle.api.internal.classpath.ModuleRegistry
--import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 -import org.gradle.configurationcache.extensions.serviceOf
-+import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-@@
+ 
+ plugins {
+-  kotlin("jvm") version "1.6.10"
++  kotlin("jvm") version "1.9.24"
+   id("java-gradle-plugin")
+ }
+ 
+@@ -39,18 +37,14 @@ dependencies {
+ 
+   testImplementation("junit:junit:4.13.2")
+ 
 -  testRuntimeOnly(
 -      files(
 -          serviceOf<ModuleRegistry>()
@@ -18,3 +30,13 @@ index 1d4f7d2..5578f7d 100644
 +  // The original plugin dynamically fetched the tooling-api-builders module via serviceOf.
 +  // That internal API was removed in newer Gradle versions, so we avoid the lookup to keep
 +  // compatibility with Gradle 8.14+.
+ }
+ 
+ java {
+-  sourceCompatibility = JavaVersion.VERSION_1_8
+-  targetCompatibility = JavaVersion.VERSION_1_8
++  sourceCompatibility = JavaVersion.VERSION_11
++  targetCompatibility = JavaVersion.VERSION_11
+ }
+ 
+ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

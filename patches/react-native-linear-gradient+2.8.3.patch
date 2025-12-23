@@ -1,0 +1,32 @@
+diff --git a/node_modules/react-native-linear-gradient/android/build.gradle b/node_modules/react-native-linear-gradient/android/build.gradle
+index e3aacde..a25e927 100644
+--- a/node_modules/react-native-linear-gradient/android/build.gradle
++++ b/node_modules/react-native-linear-gradient/android/build.gradle
+@@ -12,7 +12,7 @@ buildscript {
+             mavenCentral()
+         }
+         dependencies {
+-            classpath 'com.android.tools.build:gradle:7.2.1'
++            classpath 'com.android.tools.build:gradle:8.7.2'
+         }
+     }
+ }
+@@ -21,10 +21,18 @@ apply plugin: 'com.android.library'
+ 
+ android {
+     compileSdkVersion safeExtGet('compileSdkVersion', 31).toInteger()
++    namespace "com.BV.LinearGradient"
+     defaultConfig {
+         minSdkVersion safeExtGet('minSdkVersion', 21)
+         targetSdkVersion safeExtGet('targetSdkVersion', 31)
+     }
++    buildFeatures {
++        buildConfig true
++    }
++    compileOptions {
++        sourceCompatibility JavaVersion.VERSION_11
++        targetCompatibility JavaVersion.VERSION_11
++    }
+     lintOptions {
+         abortOnError false
+     }
