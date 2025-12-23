@@ -1,5 +1,6 @@
 import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import React, {useState} from 'react';
+import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {VideoItem} from '../types';
@@ -11,8 +12,18 @@ interface Props {
 }
 
 export const VideoCard: React.FC<Props> = ({item, onPress, isFavorite}) => {
+  const [focused, setFocused] = useState(false);
+
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress}>
+    <Pressable
+      focusable
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      style={({pressed}) => [
+        styles.card,
+        (focused || pressed) && styles.focused,
+      ]}
+      onPress={onPress}>
       <Image source={{uri: item.poster}} style={styles.poster} />
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.75)']}
@@ -34,7 +45,7 @@ export const VideoCard: React.FC<Props> = ({item, onPress, isFavorite}) => {
           {item.description}
         </Text>
       </View>
-    </TouchableOpacity>
+    </Pressable>
   );
 };
 
@@ -83,5 +94,14 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginLeft: 6,
+  },
+  focused: {
+    borderColor: '#6ac2ff',
+    borderWidth: 2,
+    transform: [{scale: 1.03}],
+    shadowColor: '#6ac2ff',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 0},
   },
 });

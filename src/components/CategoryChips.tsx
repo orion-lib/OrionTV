@@ -1,11 +1,5 @@
-import React from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import React, {useState} from 'react';
+import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Category} from '../types';
 
 interface Props {
@@ -15,6 +9,8 @@ interface Props {
 }
 
 export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+
   return (
     <ScrollView
       horizontal
@@ -22,15 +18,27 @@ export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
       contentContainerStyle={styles.container}>
       {data.map(item => {
         const active = item.id === activeId;
+        const focused = item.id === focusedId;
         return (
-          <TouchableOpacity
+          <Pressable
             key={item.id}
             onPress={() => onChange(item.id)}
-            style={[styles.chip, active && styles.active]}>
-            <Text style={[styles.label, active && styles.activeLabel]}>
+            focusable
+            onFocus={() => setFocusedId(item.id)}
+            onBlur={() => setFocusedId(null)}
+            style={({pressed}) => [
+              styles.chip,
+              (active || focused) && styles.active,
+              pressed && styles.pressed,
+            ]}>
+            <Text
+              style={[
+                styles.label,
+                (active || focused) && styles.activeLabel,
+              ]}>
               {item.title}
             </Text>
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
       <View style={styles.spacer} />
@@ -61,6 +69,9 @@ const styles = StyleSheet.create({
   },
   activeLabel: {
     color: '#5ac8fa',
+  },
+  pressed: {
+    opacity: 0.9,
   },
   spacer: {
     width: 12,
