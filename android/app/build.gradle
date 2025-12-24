@@ -97,6 +97,9 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            def metroHost = project.findProperty("metroHost") ?: "10.0.2.2"
+            resValue "string", "react_native_dev_server_ip", "${metroHost}"
+            manifestPlaceholders.usesCleartextTraffic = true
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
