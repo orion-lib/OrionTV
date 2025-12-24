@@ -24,6 +24,7 @@ export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
             key={item.id}
             onPress={() => onChange(item.id)}
             focusable
+            hasTVPreferredFocus={active}
             onFocus={() => setFocusedId(item.id)}
             onBlur={() => setFocusedId(null)}
             style={({pressed}) => [
@@ -38,6 +39,7 @@ export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
               ]}>
               {item.title}
             </Text>
+            {(active || focused) && <View style={styles.underline} />}
           </Pressable>
         );
       })}
@@ -48,30 +50,32 @@ export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
   },
   chip: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: '#3b4252',
-    marginRight: 8,
-    backgroundColor: '#1f2430',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 10,
   },
   active: {
-    borderColor: '#5ac8fa',
-    backgroundColor: '#2e3440',
+    transform: [{scale: 1.05}],
   },
   label: {
     color: '#e5e7eb',
-    fontWeight: '600',
+    fontWeight: '700',
+    fontSize: 16,
   },
   activeLabel: {
     color: '#5ac8fa',
   },
   pressed: {
     opacity: 0.9,
+  },
+  underline: {
+    marginTop: 6,
+    height: 3,
+    borderRadius: 2,
+    backgroundColor: '#5ac8fa',
   },
   spacer: {
     width: 12,
