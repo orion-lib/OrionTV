@@ -7,6 +7,7 @@ import {
   Pressable,
   View,
 } from 'react-native';
+import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useMedia} from '../context/MediaContext';
 
@@ -106,6 +107,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({label, onPress}) => {
 
 const SettingsScreen: React.FC = () => {
   const {preferences, updatePreferences, clearFavorites} = useMedia();
+  const navigation = useNavigation();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -149,6 +151,10 @@ const SettingsScreen: React.FC = () => {
       </View>
 
       <View style={styles.card}>
+        <ActionButton
+          label="播放器测试（本地文件）"
+          onPress={() => navigation.navigate('PlayerTest' as never)}
+        />
         <ActionButton label="清空全部收藏" onPress={clearFavorites} />
         <ActionButton label="检查更新（示例）" onPress={() => {}} />
       </View>

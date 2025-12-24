@@ -9,12 +9,14 @@ import SettingsScreen from '../screens/SettingsScreen';
 import DetailScreen from '../screens/DetailScreen';
 import PlayScreen from '../screens/PlayScreen';
 import LiveScreen from '../screens/LiveScreen';
+import PlayerTestScreen from '../screens/PlayerTestScreen';
 import {TAB_ITEMS, TabRouteName} from './tabConfig';
 
 export type RootStackParamList = {
   Tabs: undefined;
   Detail: {id: string};
   Play: {id: string};
+  PlayerTest: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -59,5 +61,6 @@ export const RootNavigator = () => (
     <Stack.Screen name="Tabs" component={TabNavigator} />
     <Stack.Screen name="Detail" component={DetailScreen} />
     <Stack.Screen name="Play" component={PlayScreen} />
+    <Stack.Screen name="PlayerTest" component={PlayerTestScreen} />
   </Stack.Navigator>
 );
