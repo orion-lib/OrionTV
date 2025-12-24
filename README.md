@@ -68,6 +68,9 @@ npm run ios
 - 设计稿放置：`assets/icons/mobile/`（手机/平板等通用）与 `assets/icons/tv/`（Android TV Banner）。
 - 命名规则与尺寸：见 `assets/icons/README.md`，包含 Android `mipmap-*`、iOS `AppIcon.appiconset` 的尺寸对照以及 TV Banner 的命名（其他形态复用手机图标）。
 - 投入工程：按文档说明复制到对应原生目录后重新编译即可。
+- Android TV 显示在 Apps 列表需确保：
+  - `android/app/src/main/AndroidManifest.xml` 的入口 Activity 包含 `android.intent.category.LEANBACK_LAUNCHER`。
+  - 配置 TV Banner：`android:banner="@drawable/banner"` 并在 `android/app/src/main/res/drawable-*/banner.png` 放置 320x180（或更高分辨率）Banner。
 
 ## 功能概览
 
@@ -110,6 +113,11 @@ podman run --rm -v "$(pwd)":/app -w /app \
 - 若需启用 Gradle Wrapper，放回 `gradle-wrapper.jar` 后即可使用 `./gradlew` 相关命令。
 - 首次 iOS 运行请执行 `pod install`。
 - 本仓库仅提供示例数据与播放链接，请遵守当地法律法规。
+
+## 模拟数据位置
+
+- `src/data/mockData.json`：模拟分类、影片与直播频道数据。
+- `src/data/mockData.ts`：从 JSON 读取并导出给业务层使用。
 
 ## React Native 0.83.1 手动迁移指引（不提交二进制）
 

@@ -1,0 +1,199 @@
+{
+  "categories": [
+    {"id": "featured", "title": "推荐"},
+    {"id": "zone", "title": "专区"},
+    {"id": "commentary", "title": "解说"},
+    {"id": "movie", "title": "电影"},
+    {"id": "tv", "title": "电视剧"},
+    {"id": "variety", "title": "综艺"},
+    {"id": "documentary", "title": "纪录片"},
+    {"id": "kids", "title": "少儿"},
+    {"id": "animation", "title": "动漫"},
+    {"id": "short", "title": "短剧"}
+  ],
+  "videos": [
+    {
+      "id": "1",
+      "title": "排风检察",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=900&q=80",
+      "description": "高能悬疑追踪大片，穿梭城市暗影追查真相。",
+      "duration": "128 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "动作"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    },
+    {
+      "id": "2",
+      "title": "罗小黑战记2",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80",
+      "description": "热血冒险动画续作，伙伴集结再启征程。",
+      "duration": "108 min",
+      "categoryId": "animation",
+      "tags": ["蓝光", "冒险"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4"
+    },
+    {
+      "id": "3",
+      "title": "噬梦粤语版",
+      "year": "2023",
+      "poster": "https://images.unsplash.com/photo-1497032205916-ac775f0649ae?auto=format&fit=crop&w=900&q=80",
+      "description": "夜色都市中的惊悚故事，步步紧逼的追逐。",
+      "duration": "92 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "惊悚"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
+    },
+    {
+      "id": "4",
+      "title": "吉祥照相馆",
+      "year": "2023",
+      "poster": "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?auto=format&fit=crop&w=900&q=80",
+      "description": "老街照相馆里的暖心故事，笑泪交织。",
+      "duration": "116 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "剧情"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+    },
+    {
+      "id": "5",
+      "title": "聊斋：兰若寺",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=900&q=80",
+      "description": "古风奇幻志怪故事，神秘山寺再现。",
+      "duration": "104 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "奇幻"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
+    },
+    {
+      "id": "6",
+      "title": "金银决",
+      "year": "2022",
+      "poster": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+      "description": "江湖恩怨交织，双雄对决一触即发。",
+      "duration": "98 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "动作"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+    },
+    {
+      "id": "7",
+      "title": "东极大营救",
+      "year": "2023",
+      "poster": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=900&q=80",
+      "description": "海上营救行动，紧张刺激的生死时速。",
+      "duration": "110 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "冒险"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4"
+    },
+    {
+      "id": "8",
+      "title": "坏蛋联盟2",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+      "description": "搞笑反派联盟再度出击，爆笑升级。",
+      "duration": "101 min",
+      "categoryId": "animation",
+      "tags": ["蓝光", "喜剧"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    },
+    {
+      "id": "9",
+      "title": "戏台",
+      "year": "2022",
+      "poster": "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80",
+      "description": "民国戏班群像，台上台下风云变幻。",
+      "duration": "109 min",
+      "categoryId": "movie",
+      "tags": ["蓝光", "历史"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
+    },
+    {
+      "id": "10",
+      "title": "超人：更多",
+      "year": "2021",
+      "poster": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "description": "英雄集结特辑，回顾经典瞬间。",
+      "duration": "88 min",
+      "categoryId": "zone",
+      "tags": ["特辑", "热播"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4"
+    },
+    {
+      "id": "11",
+      "title": "星域解说",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&w=900&q=80",
+      "description": "热门影片深度解说，幕后花絮全解析。",
+      "duration": "45 min",
+      "categoryId": "commentary",
+      "tags": ["解说", "热度"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreetAndDirt.mp4"
+    },
+    {
+      "id": "12",
+      "title": "海岛乐园",
+      "year": "2023",
+      "poster": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+      "description": "亲子冒险动画，童趣满满的岛屿之旅。",
+      "duration": "24 min/集",
+      "categoryId": "kids",
+      "tags": ["少儿", "冒险"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+    },
+    {
+      "id": "13",
+      "title": "光影纪实",
+      "year": "2023",
+      "poster": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=900&q=80",
+      "description": "记录城市变迁的纪录片系列。",
+      "duration": "48 min/集",
+      "categoryId": "documentary",
+      "tags": ["纪录", "真实"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4"
+    },
+    {
+      "id": "14",
+      "title": "闪耀综艺季",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=900&q=80",
+      "description": "明星同台竞技，舞台魅力升级。",
+      "duration": "90 min",
+      "categoryId": "variety",
+      "tags": ["综艺", "舞台"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    },
+    {
+      "id": "15",
+      "title": "极速短剧",
+      "year": "2023",
+      "poster": "https://images.unsplash.com/photo-1517602302552-471fe67acf66?auto=format&fit=crop&w=900&q=80",
+      "description": "高能短剧连播，节奏紧凑爽感十足。",
+      "duration": "15 min/集",
+      "categoryId": "short",
+      "tags": ["短剧", "快节奏"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
+    }
+  ],
+  "liveChannels": [
+    {
+      "id": "live-1",
+      "title": "探索地球 HD",
+      "category": "纪录",
+      "poster": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+      "description": "全天候自然与地理探索频道。"
+    },
+    {
+      "id": "live-2",
+      "title": "科幻频道 4K",
+      "category": "电影",
+      "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+      "description": "连续播出经典与新番科幻影片。"
+    }
+  ]
+}

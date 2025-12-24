@@ -22,7 +22,7 @@ interface Props {
 const variantStyles: Record<Variant, {height: number; flex: number}> = {
   hero: {height: 220, flex: 1},
   wide: {height: 120, flex: 1},
-  tile: {height: 120, flex: 1},
+  tile: {height: 110, flex: 1},
 };
 
 export const ShowcaseCard: React.FC<Props> = ({
@@ -94,6 +94,7 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: {width: 0, height: 0},
     transform: [{scale: 1.03}],
+    elevation: 6,
   },
   pressed: {
     opacity: 0.9,
