@@ -111,6 +111,23 @@ const HomeScreen: React.FC = () => {
               ))}
             </View>
           </View>
+          <View style={styles.quickActions}>
+            {TAB_ITEMS.filter(item => item.name !== 'Home').map(item => (
+              <Pressable
+                key={item.name}
+                focusable
+                onFocus={() => setFocusedAction(item.name)}
+                onBlur={() => setFocusedAction(null)}
+                onPress={() => navigation.navigate(item.name)}
+                style={[
+                  styles.quickActionItem,
+                  focusedAction === item.name && styles.quickActionFocused,
+                ]}>
+                <Icon name={item.icon as never} size={16} color="#e2e8f0" />
+                <Text style={styles.quickActionText}>{item.title}</Text>
+              </Pressable>
+            ))}
+          </View>
           <View style={styles.heroArea}>
             <View style={styles.heroRow}>
               {heroItems.slice(0, 2).map((item, idx) => (
