@@ -29,6 +29,7 @@ interface MediaContextValue {
 const defaultPreferences: AppPreferences = {
   autoplayNext: true,
   keepScreenOn: true,
+  player: 'media3',
 };
 
 const MediaContext = createContext<MediaContextValue | undefined>(undefined);

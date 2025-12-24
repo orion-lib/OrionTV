@@ -30,4 +30,5 @@ export interface LiveChannel {
 export interface AppPreferences {
   autoplayNext: boolean;
   keepScreenOn: boolean;
+  player: 'media3' | 'legacy';
 }
