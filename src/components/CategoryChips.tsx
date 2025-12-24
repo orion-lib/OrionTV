@@ -1,5 +1,13 @@
-import React, {useRef, useState} from 'react';
-import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useCallback, useRef, useState} from 'react';
+import {
+  findNodeHandle,
+  LayoutChangeEvent,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import {Category} from '../types';
 
 interface Props {
@@ -17,28 +25,68 @@ export const CategoryChips: React.FC<Props> = ({
 }) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const preferredFocusId = useRef(activeId);
+  const scrollRef = useRef<ScrollView>(null);
+  const layoutMap = useRef<Record<string, {x: number; width: number}>>({});
+  const focusHandles = useRef<Record<string, number | null>>({});
+
+  const registerLayout = useCallback(
+    (id: string) => (event: LayoutChangeEvent) => {
+      layoutMap.current[id] = event.nativeEvent.layout;
+    },
+    [],
+  );
+
+  const registerFocusHandle = useCallback((id: string, ref: Pressable | null) => {
+    focusHandles.current[id] = ref ? findNodeHandle(ref) : null;
+  }, []);
+
+  const scrollToChip = useCallback((id: string) => {
+    const layout = layoutMap.current[id];
+    if (!layout) {
+      return;
+    }
+    scrollRef.current?.scrollTo({
+      x: Math.max(layout.x - 12, 0),
+      animated: true,
+    });
+  }, []);
+
+  const getFocusHandle = useCallback((id?: string) => {
+    if (!id) {
+      return undefined;
+    }
+    return focusHandles.current[id] ?? undefined;
+  }, []);
 
   return (
     <ScrollView
+      ref={scrollRef}
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.container}>
-      {data.map(item => {
+      {data.map((item, index) => {
         const active = item.id === activeId;
         const focused = item.id === focusedId;
+        const leftId = data[index - 1]?.id;
+        const rightId = data[index + 1]?.id;
         return (
           <Pressable
             key={item.id}
+            ref={ref => registerFocusHandle(item.id, ref)}
             onPress={() => onChange(item.id)}
             focusable
             hasTVPreferredFocus={item.id === preferredFocusId.current}
             onFocus={() => {
               setFocusedId(item.id);
               onFocusChange?.(item.id);
+              scrollToChip(item.id);
             }}
             onBlur={() =>
               setFocusedId(current => (current === item.id ? null : current))
             }
+            onLayout={registerLayout(item.id)}
+            nextFocusLeft={getFocusHandle(leftId)}
+            nextFocusRight={getFocusHandle(rightId)}
             style={({pressed}) => [
               styles.chip,
               (active || focused) && styles.active,
