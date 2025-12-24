@@ -6,9 +6,15 @@ interface Props {
   data: Category[];
   activeId: string;
   onChange: (id: string) => void;
+  onFocusChange?: (id: string) => void;
 }
 
-export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
+export const CategoryChips: React.FC<Props> = ({
+  data,
+  activeId,
+  onChange,
+  onFocusChange,
+}) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
 
   return (
@@ -25,7 +31,10 @@ export const CategoryChips: React.FC<Props> = ({data, activeId, onChange}) => {
             onPress={() => onChange(item.id)}
             focusable
             hasTVPreferredFocus={active}
-            onFocus={() => setFocusedId(item.id)}
+            onFocus={() => {
+              setFocusedId(item.id);
+              onFocusChange?.(item.id);
+            }}
             onBlur={() => setFocusedId(null)}
             style={({pressed}) => [
               styles.chip,

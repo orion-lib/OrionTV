@@ -23,7 +23,11 @@ export const VideoCard: React.FC<Props> = ({item, onPress, isFavorite}) => {
         (focused || pressed) && styles.focused,
       ]}
       onPress={onPress}>
-      <Image source={{uri: item.poster}} style={styles.poster} />
+      <Image
+        source={{uri: item.poster}}
+        style={styles.poster}
+        resizeMode="cover"
+      />
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,0.75)']}
         style={StyleSheet.absoluteFill}
