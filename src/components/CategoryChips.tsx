@@ -36,7 +36,9 @@ export const CategoryChips: React.FC<Props> = ({
               setFocusedId(item.id);
               onFocusChange?.(item.id);
             }}
-            onBlur={() => setFocusedId(null)}
+            onBlur={() =>
+              setFocusedId(current => (current === item.id ? null : current))
+            }
             style={({pressed}) => [
               styles.chip,
               (active || focused) && styles.active,

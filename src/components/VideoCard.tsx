@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
+import {
+  Image,
+  ImageStyle,
+  Pressable,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {VideoItem} from '../types';
@@ -8,9 +17,17 @@ interface Props {
   item: VideoItem;
   onPress: () => void;
   isFavorite: boolean;
+  cardStyle?: StyleProp<ViewStyle>;
+  posterStyle?: StyleProp<ImageStyle>;
 }
 
-export const VideoCard: React.FC<Props> = ({item, onPress, isFavorite}) => {
+export const VideoCard: React.FC<Props> = ({
+  item,
+  onPress,
+  isFavorite,
+  cardStyle,
+  posterStyle,
+}) => {
   const [focused, setFocused] = useState(false);
 
   return (
@@ -20,12 +37,13 @@ export const VideoCard: React.FC<Props> = ({item, onPress, isFavorite}) => {
       onBlur={() => setFocused(false)}
       style={({pressed}) => [
         styles.card,
+        cardStyle,
         (focused || pressed) && styles.focused,
       ]}
       onPress={onPress}>
       <Image
         source={{uri: item.poster}}
-        style={styles.poster}
+        style={[styles.poster, posterStyle]}
         resizeMode="cover"
       />
       <LinearGradient

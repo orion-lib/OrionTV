@@ -90,12 +90,18 @@ const PlayerTestScreen: React.FC = () => {
       setLoading(true);
       const result = await DocumentPicker.pickSingle({
         type: [DocumentPicker.types.video],
-        copyTo: 'cachesDirectory',
       });
       const resolvedUri = result.fileCopyUri ?? result.uri;
+      if (!resolvedUri) {
+        Alert.alert('选择失败', '未能读取视频文件，请重试。');
+        return;
+      }
       setFile({uri: resolvedUri, name: result.name, size: result.size});
     } catch (error) {
-      if (!DocumentPicker.isCancel(error)) {
+      if (
+        !DocumentPicker.isCancel(error) &&
+        !DocumentPicker.isInProgress(error)
+      ) {
         Alert.alert('选择失败', '未能读取视频文件，请重试。');
       }
     } finally {
