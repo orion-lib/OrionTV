@@ -14,6 +14,7 @@ import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import {CategoryChips} from '../components/CategoryChips';
 import {ShowcaseCard} from '../components/ShowcaseCard';
+import {SectionHeader} from '../components/SectionHeader';
 import {useMedia} from '../context/MediaContext';
 import {RootStackParamList} from '../navigation/RootNavigator';
 import {EmptyState} from '../components/EmptyState';
