@@ -32,7 +32,7 @@ const TAB_COMPONENTS: Record<TabRouteName, ComponentType<any>> = {
 const TabNavigator = () => (
   <Tab.Navigator
     tabBar={props => <TopTabBar {...props} />}
-    sceneContainerStyle={{paddingTop: 70}}
+    sceneContainerStyle={{paddingTop: 110}}
     screenOptions={{
       headerShown: false,
       tabBarStyle: {display: 'none'},
