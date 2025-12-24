@@ -19,6 +19,11 @@ export const LiveChannelCard: React.FC<Props> = ({item, active, onPress}) => {
           {item.title}
         </Text>
         <Text style={styles.meta}>{item.category}</Text>
+        {item.nowPlaying ? (
+          <Text style={styles.nowPlaying} numberOfLines={1}>
+            正在播出：{item.nowPlaying}
+          </Text>
+        ) : null}
         {item.description ? (
           <Text style={styles.desc} numberOfLines={2}>
             {item.description}
@@ -60,6 +65,11 @@ const styles = StyleSheet.create({
   meta: {
     color: '#9aa0aa',
     marginTop: 2,
+  },
+  nowPlaying: {
+    color: '#d1d5db',
+    marginTop: 4,
+    fontSize: 12,
   },
   desc: {
     color: '#cfd3dc',

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Pressable, ScrollView, StyleSheet, Text, View} from 'react-native';
 import {Category} from '../types';
 
@@ -16,6 +16,7 @@ export const CategoryChips: React.FC<Props> = ({
   onFocusChange,
 }) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
+  const preferredFocusId = useRef(activeId);
 
   return (
     <ScrollView
@@ -30,7 +31,7 @@ export const CategoryChips: React.FC<Props> = ({
             key={item.id}
             onPress={() => onChange(item.id)}
             focusable
-            hasTVPreferredFocus={active}
+            hasTVPreferredFocus={item.id === preferredFocusId.current}
             onFocus={() => {
               setFocusedId(item.id);
               onFocusChange?.(item.id);
@@ -59,7 +60,7 @@ export const CategoryChips: React.FC<Props> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 12,
+    paddingHorizontal: 0,
   },
   chip: {
     paddingHorizontal: 12,
