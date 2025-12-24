@@ -8,16 +8,18 @@ import {
   ScrollView,
   Pressable,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import {CategoryChips} from '../components/CategoryChips';
-import {VideoCard} from '../components/VideoCard';
 import {SectionHeader} from '../components/SectionHeader';
 import {ShowcaseCard} from '../components/ShowcaseCard';
 import {useMedia} from '../context/MediaContext';
 import {RootStackParamList} from '../navigation/RootNavigator';
 import {EmptyState} from '../components/EmptyState';
+import {NewReleaseCard} from '../components/NewReleaseCard';
+import {TAB_ITEMS} from '../navigation/tabConfig';
 
 const GRID_COLUMNS = 4;
 
@@ -41,6 +43,7 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
+  const [focusedAction, setFocusedAction] = useState<string | null>(null);
 
   const filteredVideos = useMemo(() => {
     if (activeCategory === 'featured') {
@@ -83,6 +86,23 @@ const HomeScreen: React.FC = () => {
               activeId={activeCategory}
               onChange={setActiveCategory}
             />
+          </View>
+          <View style={styles.quickActions}>
+            {TAB_ITEMS.filter(item => item.name !== 'Home').map(item => (
+              <Pressable
+                key={item.name}
+                focusable
+                onFocus={() => setFocusedAction(item.name)}
+                onBlur={() => setFocusedAction(null)}
+                onPress={() => navigation.navigate(item.name)}
+                style={[
+                  styles.quickActionItem,
+                  focusedAction === item.name && styles.quickActionFocused,
+                ]}>
+                <Icon name={item.icon as never} size={16} color="#e2e8f0" />
+                <Text style={styles.quickActionText}>{item.title}</Text>
+              </Pressable>
+            ))}
           </View>
           <View style={styles.heroArea}>
             <View style={styles.heroRow}>
@@ -130,7 +150,7 @@ const HomeScreen: React.FC = () => {
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.horizontalList}>
               {videos.map(item => (
-                <VideoCard
+                <NewReleaseCard
                   key={`new-${item.id}`}
                   item={item}
                   isFavorite={isFavorite(item.id)}
@@ -167,6 +187,37 @@ const styles = StyleSheet.create({
   },
   heroRow: {
     flexDirection: 'row',
+  },
+  quickActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 12,
+  },
+  quickActionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    marginRight: 10,
+    marginBottom: 8,
+    backgroundColor: '#151a2b',
+    borderWidth: 1,
+    borderColor: '#1f2430',
+  },
+  quickActionText: {
+    marginLeft: 6,
+    color: '#e2e8f0',
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  quickActionFocused: {
+    borderColor: '#7cc0ff',
+    shadowColor: '#7cc0ff',
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 0},
+    elevation: 6,
   },
   content: {
     paddingHorizontal: 16,
