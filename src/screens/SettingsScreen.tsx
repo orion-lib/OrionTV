@@ -1,15 +1,108 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   SafeAreaView,
   StatusBar,
   StyleSheet,
-  Switch,
   Text,
-  TouchableOpacity,
+  Pressable,
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useMedia} from '../context/MediaContext';
+
+interface OptionProps {
+  title: string;
+  description: string;
+  active: boolean;
+  onPress: () => void;
+}
+
+const PreferenceOption: React.FC<OptionProps> = ({
+  title,
+  description,
+  active,
+  onPress,
+}) => {
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <Pressable
+      focusable
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onPress={onPress}
+      style={[
+        styles.option,
+        active && styles.optionActive,
+        focused && styles.optionFocused,
+      ]}>
+      <View style={styles.optionBody}>
+        <Text style={styles.label}>{title}</Text>
+        <Text style={styles.desc}>{description}</Text>
+      </View>
+      {active ? (
+        <Icon name="checkmark-circle" size={20} color="#5ac8fa" />
+      ) : (
+        <Icon name="ellipse-outline" size={20} color="#475569" />
+      )}
+    </Pressable>
+  );
+};
+
+interface ToggleProps {
+  title: string;
+  description: string;
+  value: boolean;
+  onToggle: () => void;
+}
+
+const ToggleRow: React.FC<ToggleProps> = ({
+  title,
+  description,
+  value,
+  onToggle,
+}) => {
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <Pressable
+      focusable
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onPress={onToggle}
+      style={[styles.toggleRow, focused && styles.optionFocused]}>
+      <View>
+        <Text style={styles.label}>{title}</Text>
+        <Text style={styles.desc}>{description}</Text>
+      </View>
+      <View style={[styles.togglePill, value && styles.togglePillActive]}>
+        <Text style={[styles.toggleText, value && styles.toggleTextActive]}>
+          {value ? '开' : '关'}
+        </Text>
+      </View>
+    </Pressable>
+  );
+};
+
+interface ActionButtonProps {
+  label: string;
+  onPress: () => void;
+}
+
+const ActionButton: React.FC<ActionButtonProps> = ({label, onPress}) => {
+  const [focused, setFocused] = useState(false);
+
+  return (
+    <Pressable
+      focusable
+      onFocus={() => setFocused(true)}
+      onBlur={() => setFocused(false)}
+      onPress={onPress}
+      style={[styles.button, focused && styles.optionFocused]}>
+      <Text style={styles.buttonText}>{label}</Text>
+    </Pressable>
+  );
+};
 
 const SettingsScreen: React.FC = () => {
   const {preferences, updatePreferences, clearFavorites} = useMedia();
@@ -21,71 +114,43 @@ const SettingsScreen: React.FC = () => {
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>播放器</Text>
-        <TouchableOpacity
-          style={[
-            styles.option,
-            preferences.player === 'media3' && styles.optionActive,
-          ]}
-          onPress={() => updatePreferences({player: 'media3'})}>
-          <View style={styles.optionBody}>
-            <Text style={styles.label}>AndroidX Media3（默认）</Text>
-            <Text style={styles.desc}>仅 Android 使用 androidx/media 播放</Text>
-          </View>
-          {preferences.player === 'media3' ? (
-            <Icon name="checkmark-circle" size={20} color="#5ac8fa" />
-          ) : (
-            <Icon name="ellipse-outline" size={20} color="#475569" />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[
-            styles.option,
-            preferences.player === 'legacy' && styles.optionActive,
-          ]}
-          onPress={() => updatePreferences({player: 'legacy'})}>
-          <View style={styles.optionBody}>
-            <Text style={styles.label}>内置播放器（可选）</Text>
-            <Text style={styles.desc}>继续使用当前 React Native 播放器</Text>
-          </View>
-          {preferences.player === 'legacy' ? (
-            <Icon name="checkmark-circle" size={20} color="#5ac8fa" />
-          ) : (
-            <Icon name="ellipse-outline" size={20} color="#475569" />
-          )}
-        </TouchableOpacity>
+        <PreferenceOption
+          title="AndroidX Media3（默认）"
+          description="仅 Android 使用 androidx/media 播放"
+          active={preferences.player === 'media3'}
+          onPress={() => updatePreferences({player: 'media3'})}
+        />
+        <PreferenceOption
+          title="内置播放器（可选）"
+          description="继续使用当前 React Native 播放器"
+          active={preferences.player === 'legacy'}
+          onPress={() => updatePreferences({player: 'legacy'})}
+        />
       </View>
 
       <View style={styles.card}>
-        <View style={styles.row}>
-          <View>
-            <Text style={styles.label}>自动播放下一集</Text>
-            <Text style={styles.desc}>播放完成后自动进入下一条视频</Text>
-          </View>
-          <Switch
-            value={preferences.autoplayNext}
-            onValueChange={value => updatePreferences({autoplayNext: value})}
-          />
-        </View>
+        <ToggleRow
+          title="自动播放下一集"
+          description="播放完成后自动进入下一条视频"
+          value={preferences.autoplayNext}
+          onToggle={() =>
+            updatePreferences({autoplayNext: !preferences.autoplayNext})
+          }
+        />
         <View style={styles.separator} />
-        <View style={styles.row}>
-          <View>
-            <Text style={styles.label}>保持屏幕常亮</Text>
-            <Text style={styles.desc}>播放时阻止设备休眠</Text>
-          </View>
-          <Switch
-            value={preferences.keepScreenOn}
-            onValueChange={value => updatePreferences({keepScreenOn: value})}
-          />
-        </View>
+        <ToggleRow
+          title="保持屏幕常亮"
+          description="播放时阻止设备休眠"
+          value={preferences.keepScreenOn}
+          onToggle={() =>
+            updatePreferences({keepScreenOn: !preferences.keepScreenOn})
+          }
+        />
       </View>
 
       <View style={styles.card}>
-        <TouchableOpacity style={styles.button} onPress={clearFavorites}>
-          <Text style={styles.buttonText}>清空全部收藏</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => {}}>
-          <Text style={styles.buttonText}>检查更新（示例）</Text>
-        </TouchableOpacity>
+        <ActionButton label="清空全部收藏" onPress={clearFavorites} />
+        <ActionButton label="检查更新（示例）" onPress={() => {}} />
       </View>
 
       <Text style={styles.footer}>
@@ -123,11 +188,20 @@ const styles = StyleSheet.create({
     borderColor: '#5ac8fa',
     backgroundColor: '#111c2d',
   },
+  optionFocused: {
+    borderColor: '#7cc0ff',
+    shadowColor: '#7cc0ff',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 0},
+    elevation: 6,
+  },
   optionBody: {flex: 1, marginRight: 8},
-  row: {
+  toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingVertical: 12,
   },
   label: {color: '#fff', fontWeight: '700', fontSize: 16},
   desc: {color: '#9ca3af', marginTop: 4},
@@ -143,6 +217,26 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonText: {color: '#e5e7eb', fontWeight: '700', textAlign: 'center'},
+  togglePill: {
+    minWidth: 46,
+    paddingVertical: 6,
+    borderRadius: 999,
+    alignItems: 'center',
+    backgroundColor: '#1f2430',
+  },
+  togglePillActive: {
+    backgroundColor: '#1a2638',
+    borderWidth: 1,
+    borderColor: '#5ac8fa',
+  },
+  toggleText: {
+    color: '#94a3b8',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  toggleTextActive: {
+    color: '#5ac8fa',
+  },
   footer: {color: '#9ca3af', marginTop: 8, lineHeight: 20},
 });
 

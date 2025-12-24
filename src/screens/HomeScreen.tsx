@@ -13,7 +13,6 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useNavigation} from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
 import {CategoryChips} from '../components/CategoryChips';
-import {SectionHeader} from '../components/SectionHeader';
 import {ShowcaseCard} from '../components/ShowcaseCard';
 import {useMedia} from '../context/MediaContext';
 import {RootStackParamList} from '../navigation/RootNavigator';
@@ -44,6 +43,7 @@ const HomeScreen: React.FC = () => {
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
   const [focusedAction, setFocusedAction] = useState<string | null>(null);
+  const [focusedLive, setFocusedLive] = useState(false);
 
   const filteredVideos = useMemo(() => {
     if (activeCategory === 'featured') {
@@ -80,12 +80,36 @@ const HomeScreen: React.FC = () => {
         <LinearGradient
           colors={['#0c0f1b', '#0a0b13', '#0e1223']}
           style={styles.header}>
-          <View style={styles.chipsRow}>
-            <CategoryChips
-              data={categories}
-              activeId={activeCategory}
-              onChange={setActiveCategory}
-            />
+          <View style={styles.headerTopRow}>
+            <View style={styles.chipsRow}>
+              <CategoryChips
+                data={categories}
+                activeId={activeCategory}
+                onChange={setActiveCategory}
+              />
+            </View>
+            <View style={styles.quickActions}>
+              {TAB_ITEMS.filter(
+                item =>
+                  item.name === 'Search' ||
+                  item.name === 'Favorites' ||
+                  item.name === 'Settings',
+              ).map(item => (
+                <Pressable
+                  key={item.name}
+                  focusable
+                  onFocus={() => setFocusedAction(item.name)}
+                  onBlur={() => setFocusedAction(null)}
+                  onPress={() => navigation.navigate(item.name)}
+                  style={[
+                    styles.quickActionItem,
+                    focusedAction === item.name && styles.quickActionFocused,
+                  ]}>
+                  <Icon name={item.icon as never} size={14} color="#e2e8f0" />
+                  <Text style={styles.quickActionText}>{item.title}</Text>
+                </Pressable>
+              ))}
+            </View>
           </View>
           <View style={styles.quickActions}>
             {TAB_ITEMS.filter(item => item.name !== 'Home').map(item => (
@@ -119,10 +143,24 @@ const HomeScreen: React.FC = () => {
           </View>
         </LinearGradient>
         <View style={styles.content}>
-          <SectionHeader
-            title="为你推荐"
-            description="最新热门内容与精选片单"
-          />
+          <View style={styles.recommendHeader}>
+            <View>
+              <Text style={styles.recommendTitle}>为你推荐</Text>
+              <Text style={styles.recommendDesc}>最新热门内容与精选片单</Text>
+            </View>
+            <Pressable
+              focusable
+              onFocus={() => setFocusedLive(true)}
+              onBlur={() => setFocusedLive(false)}
+              onPress={() => navigation.navigate('Live')}
+              style={[
+                styles.liveShortcut,
+                focusedLive && styles.liveShortcutFocused,
+              ]}>
+              <Icon name="tv-outline" size={16} color="#e2e8f0" />
+              <Text style={styles.liveShortcutText}>直播</Text>
+            </Pressable>
+          </View>
           {filteredVideos.length === 0 ? (
             <EmptyState title="暂无内容" description="稍后再来看看吧" />
           ) : (
@@ -178,9 +216,15 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     paddingBottom: 20,
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   chipsRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
+    flex: 1,
+    paddingRight: 12,
   },
   heroArea: {
     marginTop: 16,
@@ -190,31 +234,68 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginTop: 12,
+    alignItems: 'center',
   },
   quickActionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 10,
-    marginBottom: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+    marginLeft: 8,
     backgroundColor: '#151a2b',
     borderWidth: 1,
     borderColor: '#1f2430',
   },
   quickActionText: {
-    marginLeft: 6,
+    marginLeft: 4,
     color: '#e2e8f0',
     fontWeight: '600',
-    fontSize: 13,
+    fontSize: 12,
   },
   quickActionFocused: {
     borderColor: '#7cc0ff',
     shadowColor: '#7cc0ff',
     shadowOpacity: 0.4,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 0},
+    elevation: 6,
+  },
+  recommendHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  recommendTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  recommendDesc: {
+    marginTop: 4,
+    color: '#cfd3dc',
+  },
+  liveShortcut: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 16,
+    backgroundColor: '#151a2b',
+    borderWidth: 1,
+    borderColor: '#1f2430',
+  },
+  liveShortcutText: {
+    color: '#e2e8f0',
+    fontWeight: '700',
+    marginLeft: 6,
+    fontSize: 13,
+  },
+  liveShortcutFocused: {
+    borderColor: '#7cc0ff',
+    shadowColor: '#7cc0ff',
+    shadowOpacity: 0.35,
     shadowRadius: 10,
     shadowOffset: {width: 0, height: 0},
     elevation: 6,
