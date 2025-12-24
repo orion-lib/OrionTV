@@ -7,10 +7,10 @@ import {
   View,
   FlatList,
 } from 'react-native';
-import Video from 'react-native-video';
 import {useMedia} from '../context/MediaContext';
 import {LiveChannelCard} from '../components/LiveChannelCard';
 import {EmptyState} from '../components/EmptyState';
+import {MediaPlayer} from '../components/MediaPlayer';
 
 const LiveScreen: React.FC = () => {
   const {liveChannels} = useMedia();
@@ -29,7 +29,7 @@ const LiveScreen: React.FC = () => {
       <Text style={styles.title}>直播</Text>
       {activeChannel ? (
         <View style={styles.player}>
-          <Video
+          <MediaPlayer
             source={{uri: activeChannel.url}}
             style={styles.video}
             resizeMode="contain"

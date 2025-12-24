@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import {useMedia} from '../context/MediaContext';
 
 const SettingsScreen: React.FC = () => {
@@ -17,6 +18,42 @@ const SettingsScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <Text style={styles.title}>设置</Text>
+
+      <View style={styles.card}>
+        <Text style={styles.cardTitle}>播放器</Text>
+        <TouchableOpacity
+          style={[
+            styles.option,
+            preferences.player === 'media3' && styles.optionActive,
+          ]}
+          onPress={() => updatePreferences({player: 'media3'})}>
+          <View style={styles.optionBody}>
+            <Text style={styles.label}>AndroidX Media3（默认）</Text>
+            <Text style={styles.desc}>仅 Android 使用 androidx/media 播放</Text>
+          </View>
+          {preferences.player === 'media3' ? (
+            <Icon name="checkmark-circle" size={20} color="#5ac8fa" />
+          ) : (
+            <Icon name="ellipse-outline" size={20} color="#475569" />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.option,
+            preferences.player === 'legacy' && styles.optionActive,
+          ]}
+          onPress={() => updatePreferences({player: 'legacy'})}>
+          <View style={styles.optionBody}>
+            <Text style={styles.label}>内置播放器（可选）</Text>
+            <Text style={styles.desc}>继续使用当前 React Native 播放器</Text>
+          </View>
+          {preferences.player === 'legacy' ? (
+            <Icon name="checkmark-circle" size={20} color="#5ac8fa" />
+          ) : (
+            <Icon name="ellipse-outline" size={20} color="#475569" />
+          )}
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.card}>
         <View style={styles.row}>
@@ -70,6 +107,23 @@ const styles = StyleSheet.create({
     borderColor: '#1f2430',
     marginBottom: 12,
   },
+  cardTitle: {color: '#e5e7eb', fontWeight: '700', marginBottom: 8},
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: '#0f172a',
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  optionActive: {
+    borderColor: '#5ac8fa',
+    backgroundColor: '#111c2d',
+  },
+  optionBody: {flex: 1, marginRight: 8},
   row: {
     flexDirection: 'row',
     alignItems: 'center',

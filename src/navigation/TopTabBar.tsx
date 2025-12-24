@@ -10,37 +10,47 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({state, navigation}) => {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>YOGURT</Text>
-      <View style={styles.tabs}>
-        {TAB_ITEMS.map(item => {
-          const tabIndex = state.routes.findIndex(route => route.name === item.name);
-          const focused = state.index === tabIndex;
-          const isFocused = focusedName === item.name;
+      <View style={styles.rightSection}>
+        <View style={styles.tabs}>
+          {TAB_ITEMS.map(item => {
+            const tabIndex = state.routes.findIndex(route => route.name === item.name);
+            const focused = state.index === tabIndex;
+            const isFocused = focusedName === item.name;
 
-          return (
-            <Pressable
-              key={item.name}
-              accessibilityRole="button"
-              focusable
-              onFocus={() => setFocusedName(item.name)}
-              onBlur={() => setFocusedName(null)}
-              onPress={() => navigation.navigate(item.name)}
-              style={({pressed}) => [
-                styles.tab,
-                (focused || isFocused || pressed) && styles.tabActive,
-              ]}>
-              <Text style={[styles.label, (focused || isFocused) && styles.labelActive]}>
-                {item.title}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
-      <View style={styles.status}>
-        <Icon name="notifications-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
-        <Icon name="star-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
-        <Icon name="search-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
-        <Icon name="wifi-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
-        <Text style={styles.time}>12:24</Text>
+            return (
+              <Pressable
+                key={item.name}
+                accessibilityRole="button"
+                accessibilityLabel={item.title}
+                focusable
+                onFocus={() => setFocusedName(item.name)}
+                onBlur={() => setFocusedName(null)}
+                onPress={() => navigation.navigate(item.name)}
+                style={({pressed}) => [
+                  styles.tab,
+                  (focused || isFocused || pressed) && styles.tabActive,
+                ]}>
+                <Icon
+                  name={item.icon}
+                  size={18}
+                  color={focused || isFocused ? '#5ac8fa' : '#cbd5e1'}
+                />
+              </Pressable>
+            );
+          })}
+        </View>
+        <View style={styles.status}>
+          <Icon
+            name="notifications-outline"
+            size={16}
+            color="#cbd5e1"
+            style={styles.statusIcon}
+          />
+          <Icon name="star-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
+          <Icon name="search-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
+          <Icon name="wifi-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
+          <Text style={styles.time}>12:24</Text>
+        </View>
       </View>
     </View>
   );
@@ -69,31 +79,25 @@ const styles = StyleSheet.create({
     color: '#e9f2ff',
     letterSpacing: 1.1,
   },
+  rightSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   tabs: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
+    marginRight: 8,
   },
   tab: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginHorizontal: 4,
-    borderRadius: 16,
+    padding: 6,
+    marginHorizontal: 2,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: 'transparent',
   },
   tabActive: {
     borderColor: '#5ac8fa',
     backgroundColor: '#131a27',
-  },
-  label: {
-    color: '#cbd5e1',
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  labelActive: {
-    color: '#5ac8fa',
   },
   status: {
     flexDirection: 'row',

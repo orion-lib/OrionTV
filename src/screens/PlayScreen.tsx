@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   ActivityIndicator,
   SafeAreaView,
@@ -8,13 +8,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Video, {OnLoadData} from 'react-native-video';
+import {OnLoadData} from 'react-native-video';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
 import {useKeepAwake} from 'react-native-keep-awake';
 import {useMedia} from '../context/MediaContext';
 import {RootStackParamList} from '../navigation/RootNavigator';
 import {EmptyState} from '../components/EmptyState';
+import {MediaPlayer} from '../components/MediaPlayer';
 
 type PlayRoute = RouteProp<RootStackParamList, 'Play'>;
 
@@ -26,7 +27,6 @@ const PlayScreen: React.FC = () => {
     () => getVideoById(route.params.id),
     [getVideoById, route.params.id],
   );
-  const playerRef = useRef<Video>(null);
   const [loading, setLoading] = useState(true);
 
   useKeepAwake(preferences.keepScreenOn);
@@ -55,8 +55,7 @@ const PlayScreen: React.FC = () => {
             <Text style={styles.loaderText}>加载中...</Text>
           </View>
         ) : null}
-        <Video
-          ref={playerRef}
+        <MediaPlayer
           style={styles.video}
           source={{uri: video.source}}
           resizeMode="contain"
