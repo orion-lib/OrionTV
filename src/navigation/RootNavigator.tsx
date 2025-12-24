@@ -9,7 +9,6 @@ import SettingsScreen from '../screens/SettingsScreen';
 import DetailScreen from '../screens/DetailScreen';
 import PlayScreen from '../screens/PlayScreen';
 import LiveScreen from '../screens/LiveScreen';
-import {TopTabBar} from './TopTabBar';
 import {TAB_ITEMS, TabRouteName} from './tabConfig';
 
 export type RootStackParamList = {
@@ -31,8 +30,6 @@ const TAB_COMPONENTS: Record<TabRouteName, ComponentType<any>> = {
 
 const TabNavigator = () => (
   <Tab.Navigator
-    tabBar={props => <TopTabBar {...props} />}
-    sceneContainerStyle={{paddingTop: 110}}
     screenOptions={{
       headerShown: false,
       tabBarStyle: {display: 'none'},
