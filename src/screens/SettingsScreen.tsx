@@ -1,5 +1,6 @@
 import React, {useCallback, useRef, useState} from 'react';
 import {
+  NativeSyntheticEvent,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -12,12 +13,30 @@ import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useMedia} from '../context/MediaContext';
 
+type KeyEvent = NativeSyntheticEvent<{keyCode?: number; key?: string}>;
+
+const isSelectKey = (event: KeyEvent) => {
+  const keyCode = event.nativeEvent.keyCode;
+  const key = event.nativeEvent.key;
+  return (
+    keyCode === 23 ||
+    keyCode === 66 ||
+    key === 'Enter' ||
+    key === ' ' ||
+    key === 'Select'
+  );
+};
+
+const isLeftKey = (event: KeyEvent) => event.nativeEvent.keyCode === 21;
+const isRightKey = (event: KeyEvent) => event.nativeEvent.keyCode === 22;
+
 interface OptionProps {
   title: string;
   description: string;
   active: boolean;
   onPress: () => void;
   onFocus?: () => void;
+  hasPreferredFocus?: boolean;
 }
 
 const PreferenceOption: React.FC<OptionProps> = ({
@@ -26,18 +45,25 @@ const PreferenceOption: React.FC<OptionProps> = ({
   active,
   onPress,
   onFocus,
+  hasPreferredFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
+      hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
         setFocused(true);
         onFocus?.();
       }}
       onBlur={() => setFocused(false)}
       onPress={onPress}
+      onKeyDown={event => {
+        if (isSelectKey(event)) {
+          onPress();
+        }
+      }}
       style={[
         styles.option,
         active && styles.optionActive,
@@ -62,6 +88,7 @@ interface ToggleProps {
   value: boolean;
   onToggle: () => void;
   onFocus?: () => void;
+  hasPreferredFocus?: boolean;
 }
 
 const ToggleRow: React.FC<ToggleProps> = ({
@@ -70,18 +97,25 @@ const ToggleRow: React.FC<ToggleProps> = ({
   value,
   onToggle,
   onFocus,
+  hasPreferredFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
+      hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
         setFocused(true);
         onFocus?.();
       }}
       onBlur={() => setFocused(false)}
       onPress={onToggle}
+      onKeyDown={event => {
+        if (isSelectKey(event) || isLeftKey(event) || isRightKey(event)) {
+          onToggle();
+        }
+      }}
       style={[styles.toggleRow, focused && styles.optionFocused]}>
       <View>
         <Text style={styles.label}>{title}</Text>
@@ -100,24 +134,32 @@ interface ActionButtonProps {
   label: string;
   onPress: () => void;
   onFocus?: () => void;
+  hasPreferredFocus?: boolean;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   label,
   onPress,
   onFocus,
+  hasPreferredFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
+      hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
         setFocused(true);
         onFocus?.();
       }}
       onBlur={() => setFocused(false)}
       onPress={onPress}
+      onKeyDown={event => {
+        if (isSelectKey(event)) {
+          onPress();
+        }
+      }}
       style={[styles.button, focused && styles.optionFocused]}>
       <Text style={styles.buttonText}>{label}</Text>
     </Pressable>
@@ -161,6 +203,7 @@ const SettingsScreen: React.FC = () => {
             active={preferences.player === 'media3'}
             onPress={() => updatePreferences({player: 'media3'})}
             onFocus={() => scrollToSection('player')}
+            hasPreferredFocus
           />
           <PreferenceOption
             title="内置播放器（可选）"
