@@ -236,6 +236,7 @@ const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: -5,
   },
   quickActionItem: {
     flexDirection: 'row',

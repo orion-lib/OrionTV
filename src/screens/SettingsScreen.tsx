@@ -1,5 +1,6 @@
 import React, {useCallback, useRef, useState} from 'react';
 import {
+  NativeSyntheticEvent,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -11,6 +12,23 @@ import {
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useMedia} from '../context/MediaContext';
+
+type KeyEvent = NativeSyntheticEvent<{keyCode?: number; key?: string}>;
+
+const isSelectKey = (event: KeyEvent) => {
+  const keyCode = event.nativeEvent.keyCode;
+  const key = event.nativeEvent.key;
+  return (
+    keyCode === 23 ||
+    keyCode === 66 ||
+    key === 'Enter' ||
+    key === ' ' ||
+    key === 'Select'
+  );
+};
+
+const isLeftKey = (event: KeyEvent) => event.nativeEvent.keyCode === 21;
+const isRightKey = (event: KeyEvent) => event.nativeEvent.keyCode === 22;
 
 interface OptionProps {
   title: string;
@@ -38,6 +56,11 @@ const PreferenceOption: React.FC<OptionProps> = ({
       }}
       onBlur={() => setFocused(false)}
       onPress={onPress}
+      onKeyDown={event => {
+        if (isSelectKey(event)) {
+          onPress();
+        }
+      }}
       style={[
         styles.option,
         active && styles.optionActive,
@@ -82,6 +105,11 @@ const ToggleRow: React.FC<ToggleProps> = ({
       }}
       onBlur={() => setFocused(false)}
       onPress={onToggle}
+      onKeyDown={event => {
+        if (isSelectKey(event) || isLeftKey(event) || isRightKey(event)) {
+          onToggle();
+        }
+      }}
       style={[styles.toggleRow, focused && styles.optionFocused]}>
       <View>
         <Text style={styles.label}>{title}</Text>
@@ -118,6 +146,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       }}
       onBlur={() => setFocused(false)}
       onPress={onPress}
+      onKeyDown={event => {
+        if (isSelectKey(event)) {
+          onPress();
+        }
+      }}
       style={[styles.button, focused && styles.optionFocused]}>
       <Text style={styles.buttonText}>{label}</Text>
     </Pressable>

@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {
   Alert,
+  NativeModules,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
@@ -81,6 +82,13 @@ const PlayerTestScreen: React.FC = () => {
   }, [file]);
 
   const pickVideo = useCallback(async () => {
+    if (!NativeModules.RNDocumentPicker) {
+      Alert.alert(
+        '不可用',
+        '当前应用未集成文件选择模块，无法选择本地视频文件。',
+      );
+      return;
+    }
     const hasPermission = await requestStoragePermissions();
     if (!hasPermission) {
       return;
