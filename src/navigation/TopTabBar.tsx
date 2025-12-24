@@ -1,44 +1,13 @@
-import React, {useState} from 'react';
-import {Pressable, StyleSheet, Text, View} from 'react-native';
+import React from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
-import {TAB_ITEMS} from './tabConfig';
 
-export const TopTabBar: React.FC<BottomTabBarProps> = ({state, navigation}) => {
-  const [focusedName, setFocusedName] = useState<string | null>(null);
-
+export const TopTabBar: React.FC<BottomTabBarProps> = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.logo}>YOGURT</Text>
       <View style={styles.rightSection}>
-        <View style={styles.tabs}>
-          {TAB_ITEMS.map(item => {
-            const tabIndex = state.routes.findIndex(route => route.name === item.name);
-            const focused = state.index === tabIndex;
-            const isFocused = focusedName === item.name;
-
-            return (
-              <Pressable
-                key={item.name}
-                accessibilityRole="button"
-                accessibilityLabel={item.title}
-                focusable
-                onFocus={() => setFocusedName(item.name)}
-                onBlur={() => setFocusedName(null)}
-                onPress={() => navigation.navigate(item.name)}
-                style={({pressed}) => [
-                  styles.tab,
-                  (focused || isFocused || pressed) && styles.tabActive,
-                ]}>
-                <Icon
-                  name={item.icon}
-                  size={18}
-                  color={focused || isFocused ? '#5ac8fa' : '#cbd5e1'}
-                />
-              </Pressable>
-            );
-          })}
-        </View>
         <View style={styles.status}>
           <Icon
             name="notifications-outline"
@@ -82,22 +51,6 @@ const styles = StyleSheet.create({
   rightSection: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  tabs: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 8,
-  },
-  tab: {
-    padding: 6,
-    marginHorizontal: 2,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  tabActive: {
-    borderColor: '#5ac8fa',
-    backgroundColor: '#131a27',
   },
   status: {
     flexDirection: 'row',
