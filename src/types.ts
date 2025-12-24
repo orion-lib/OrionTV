@@ -25,6 +25,8 @@ export interface LiveChannel {
   url: string;
   category: string;
   description?: string;
+  nowPlaying?: string;
+  nextUp?: string;
 }
 
 export interface AppPreferences {

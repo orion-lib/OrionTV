@@ -66,6 +66,13 @@ const HomeScreen: React.FC = () => {
     setActiveCategory(id);
   };
 
+  const handleCategoryFocus = (id: string) => {
+    if (id === 'live') {
+      return;
+    }
+    setActiveCategory(id);
+  };
+
   const filteredVideos = useMemo(() => {
     if (activeCategory === 'featured') {
       return videos;
@@ -107,7 +114,7 @@ const HomeScreen: React.FC = () => {
                 data={categoryTabs}
                 activeId={activeCategory}
                 onChange={handleCategorySelect}
-                onFocusChange={handleCategorySelect}
+                onFocusChange={handleCategoryFocus}
               />
             </View>
             <View style={styles.quickActions}>
@@ -218,6 +225,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     flex: 1,
     paddingRight: 12,
+    paddingLeft: 0,
   },
   heroArea: {
     marginTop: 16,
@@ -233,18 +241,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 14,
+    height: 30,
+    borderRadius: 15,
     marginLeft: 8,
     backgroundColor: '#151a2b',
     borderWidth: 1,
     borderColor: '#1f2430',
+    justifyContent: 'center',
   },
   quickActionText: {
     marginLeft: 4,
     color: '#e2e8f0',
     fontWeight: '600',
     fontSize: 12,
+    lineHeight: 16,
   },
   quickActionFocused: {
     borderColor: '#7cc0ff',

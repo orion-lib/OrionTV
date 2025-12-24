@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useRef, useState} from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -6,6 +6,7 @@ import {
   Text,
   Pressable,
   View,
+  ScrollView,
 } from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,6 +17,7 @@ interface OptionProps {
   description: string;
   active: boolean;
   onPress: () => void;
+  onFocus?: () => void;
 }
 
 const PreferenceOption: React.FC<OptionProps> = ({
@@ -23,13 +25,17 @@ const PreferenceOption: React.FC<OptionProps> = ({
   description,
   active,
   onPress,
+  onFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
-      onFocus={() => setFocused(true)}
+      onFocus={() => {
+        setFocused(true);
+        onFocus?.();
+      }}
       onBlur={() => setFocused(false)}
       onPress={onPress}
       style={[
@@ -55,6 +61,7 @@ interface ToggleProps {
   description: string;
   value: boolean;
   onToggle: () => void;
+  onFocus?: () => void;
 }
 
 const ToggleRow: React.FC<ToggleProps> = ({
@@ -62,13 +69,17 @@ const ToggleRow: React.FC<ToggleProps> = ({
   description,
   value,
   onToggle,
+  onFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
-      onFocus={() => setFocused(true)}
+      onFocus={() => {
+        setFocused(true);
+        onFocus?.();
+      }}
       onBlur={() => setFocused(false)}
       onPress={onToggle}
       style={[styles.toggleRow, focused && styles.optionFocused]}>
@@ -88,15 +99,23 @@ const ToggleRow: React.FC<ToggleProps> = ({
 interface ActionButtonProps {
   label: string;
   onPress: () => void;
+  onFocus?: () => void;
 }
 
-const ActionButton: React.FC<ActionButtonProps> = ({label, onPress}) => {
+const ActionButton: React.FC<ActionButtonProps> = ({
+  label,
+  onPress,
+  onFocus,
+}) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
-      onFocus={() => setFocused(true)}
+      onFocus={() => {
+        setFocused(true);
+        onFocus?.();
+      }}
       onBlur={() => setFocused(false)}
       onPress={onPress}
       style={[styles.button, focused && styles.optionFocused]}>
@@ -108,67 +127,102 @@ const ActionButton: React.FC<ActionButtonProps> = ({label, onPress}) => {
 const SettingsScreen: React.FC = () => {
   const {preferences, updatePreferences, clearFavorites} = useMedia();
   const navigation = useNavigation();
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionOffsets = useRef<Record<string, number>>({});
+
+  const registerOffset = useCallback((key: string) => {
+    return (event: {nativeEvent: {layout: {y: number}}}) => {
+      sectionOffsets.current[key] = event.nativeEvent.layout.y;
+    };
+  }, []);
+
+  const scrollToSection = useCallback((key: string) => {
+    const y = sectionOffsets.current[key];
+    if (y === undefined) {
+      return;
+    }
+    scrollRef.current?.scrollTo({y: Math.max(y - 24, 0), animated: true});
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <Text style={styles.title}>设置</Text>
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <Text style={styles.title}>设置</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>播放器</Text>
-        <PreferenceOption
-          title="AndroidX Media3（默认）"
-          description="仅 Android 使用 androidx/media 播放"
-          active={preferences.player === 'media3'}
-          onPress={() => updatePreferences({player: 'media3'})}
-        />
-        <PreferenceOption
-          title="内置播放器（可选）"
-          description="继续使用当前 React Native 播放器"
-          active={preferences.player === 'legacy'}
-          onPress={() => updatePreferences({player: 'legacy'})}
-        />
-      </View>
+        <View style={styles.card} onLayout={registerOffset('player')}>
+          <Text style={styles.cardTitle}>播放器</Text>
+          <PreferenceOption
+            title="AndroidX Media3（默认）"
+            description="仅 Android 使用 androidx/media 播放"
+            active={preferences.player === 'media3'}
+            onPress={() => updatePreferences({player: 'media3'})}
+            onFocus={() => scrollToSection('player')}
+          />
+          <PreferenceOption
+            title="内置播放器（可选）"
+            description="继续使用当前 React Native 播放器"
+            active={preferences.player === 'legacy'}
+            onPress={() => updatePreferences({player: 'legacy'})}
+            onFocus={() => scrollToSection('player')}
+          />
+        </View>
 
-      <View style={styles.card}>
-        <ToggleRow
-          title="自动播放下一集"
-          description="播放完成后自动进入下一条视频"
-          value={preferences.autoplayNext}
-          onToggle={() =>
-            updatePreferences({autoplayNext: !preferences.autoplayNext})
-          }
-        />
-        <View style={styles.separator} />
-        <ToggleRow
-          title="保持屏幕常亮"
-          description="播放时阻止设备休眠"
-          value={preferences.keepScreenOn}
-          onToggle={() =>
-            updatePreferences({keepScreenOn: !preferences.keepScreenOn})
-          }
-        />
-      </View>
+        <View style={styles.card} onLayout={registerOffset('playback')}>
+          <ToggleRow
+            title="自动播放下一集"
+            description="播放完成后自动进入下一条视频"
+            value={preferences.autoplayNext}
+            onToggle={() =>
+              updatePreferences({autoplayNext: !preferences.autoplayNext})
+            }
+            onFocus={() => scrollToSection('playback')}
+          />
+          <View style={styles.separator} />
+          <ToggleRow
+            title="保持屏幕常亮"
+            description="播放时阻止设备休眠"
+            value={preferences.keepScreenOn}
+            onToggle={() =>
+              updatePreferences({keepScreenOn: !preferences.keepScreenOn})
+            }
+            onFocus={() => scrollToSection('playback')}
+          />
+        </View>
 
-      <View style={styles.card}>
-        <ActionButton
-          label="播放器测试（本地文件）"
-          onPress={() => navigation.navigate('PlayerTest' as never)}
-        />
-        <ActionButton label="清空全部收藏" onPress={clearFavorites} />
-        <ActionButton label="检查更新（示例）" onPress={() => {}} />
-      </View>
+        <View style={styles.card} onLayout={registerOffset('actions')}>
+          <ActionButton
+            label="播放器测试（本地文件）"
+            onPress={() => navigation.navigate('PlayerTest' as never)}
+            onFocus={() => scrollToSection('actions')}
+          />
+          <ActionButton
+            label="清空全部收藏"
+            onPress={clearFavorites}
+            onFocus={() => scrollToSection('actions')}
+          />
+          <ActionButton
+            label="检查更新（示例）"
+            onPress={() => {}}
+            onFocus={() => scrollToSection('actions')}
+          />
+        </View>
 
-      <Text style={styles.footer}>
-        这是一个纯 React Native 构建的示例项目，移除了 Expo
-        依赖，提供导航、播放、收藏、搜索与直播的基本体验。
-      </Text>
+        <Text style={styles.footer}>
+          这是一个纯 React Native 构建的示例项目，移除了 Expo
+          依赖，提供导航、播放、收藏、搜索与直播的基本体验。
+        </Text>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#0b0d14', padding: 16},
+  container: {flex: 1, backgroundColor: '#0b0d14'},
+  scrollContent: {padding: 16, paddingBottom: 28},
   title: {color: '#fff', fontSize: 24, fontWeight: '800', marginBottom: 12},
   card: {
     backgroundColor: '#111625',

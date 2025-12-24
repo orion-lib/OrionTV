@@ -185,7 +185,9 @@
       "category": "纪录",
       "poster": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
       "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
-      "description": "全天候自然与地理探索频道。"
+      "description": "全天候自然与地理探索频道。",
+      "nowPlaying": "地球脉动：极地秘境",
+      "nextUp": "秘境雨林巡礼"
     },
     {
       "id": "live-2",
@@ -193,7 +195,49 @@
       "category": "电影",
       "poster": "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80",
       "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
-      "description": "连续播出经典与新番科幻影片。"
+      "description": "连续播出经典与新番科幻影片。",
+      "nowPlaying": "星际远航计划",
+      "nextUp": "未来城市档案"
+    },
+    {
+      "id": "live-3",
+      "title": "综艺音乐台",
+      "category": "综艺",
+      "poster": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=800&q=80",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+      "description": "持续更新的音乐舞台与真人秀。",
+      "nowPlaying": "Live舞台：闪耀之夜",
+      "nextUp": "新歌首发榜"
+    },
+    {
+      "id": "live-4",
+      "title": "亲子乐园",
+      "category": "少儿",
+      "poster": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=800&q=80",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      "description": "陪伴小朋友的益智动画与亲子节目。",
+      "nowPlaying": "奇趣岛冒险记",
+      "nextUp": "绘本故事时光"
+    },
+    {
+      "id": "live-5",
+      "title": "新闻资讯",
+      "category": "资讯",
+      "poster": "https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      "description": "24小时新闻直播，实时追踪热点。",
+      "nowPlaying": "早间快报",
+      "nextUp": "深度访谈"
+    },
+    {
+      "id": "live-6",
+      "title": "体育世界",
+      "category": "体育",
+      "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=800&q=80",
+      "url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+      "description": "热门赛事与精彩回放不间断。",
+      "nowPlaying": "巅峰对决：赛季焦点",
+      "nextUp": "经典赛事回放"
     }
   ]
 }
