@@ -29,7 +29,7 @@ const SettingsScreen: React.FC = () => {
           onPress={() => updatePreferences({player: 'media3'})}>
           <View style={styles.optionBody}>
             <Text style={styles.label}>AndroidX Media3（默认）</Text>
-            <Text style={styles.desc}>使用 androidx/media 进行硬件解码</Text>
+            <Text style={styles.desc}>仅 Android 使用 androidx/media 播放</Text>
           </View>
           {preferences.player === 'media3' ? (
             <Icon name="checkmark-circle" size={20} color="#5ac8fa" />
