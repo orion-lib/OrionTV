@@ -24,6 +24,7 @@ export const CategoryChips: React.FC<Props> = ({
   onFocusChange,
 }) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [, forceRender] = useState(0);
   const preferredFocusId = useRef(activeId);
   const scrollRef = useRef<ScrollView>(null);
   const layoutMap = useRef<Record<string, {x: number; width: number}>>({});
@@ -37,7 +38,11 @@ export const CategoryChips: React.FC<Props> = ({
   );
 
   const registerFocusHandle = useCallback((id: string, ref: Pressable | null) => {
-    focusHandles.current[id] = ref ? findNodeHandle(ref) : null;
+    const handle = ref ? findNodeHandle(ref) : null;
+    if (focusHandles.current[id] !== handle) {
+      focusHandles.current[id] = handle;
+      forceRender(value => value + 1);
+    }
   }, []);
 
   const scrollToChip = useCallback((id: string) => {
@@ -69,6 +74,8 @@ export const CategoryChips: React.FC<Props> = ({
         const focused = item.id === focusedId;
         const leftId = data[index - 1]?.id;
         const rightId = data[index + 1]?.id;
+        const isFirst = index === 0;
+        const isLast = index === data.length - 1;
         return (
           <Pressable
             key={item.id}
@@ -85,8 +92,8 @@ export const CategoryChips: React.FC<Props> = ({
               setFocusedId(current => (current === item.id ? null : current))
             }
             onLayout={registerLayout(item.id)}
-            nextFocusLeft={getFocusHandle(leftId)}
-            nextFocusRight={getFocusHandle(rightId)}
+            nextFocusLeft={getFocusHandle(isFirst ? item.id : leftId)}
+            nextFocusRight={getFocusHandle(isLast ? item.id : rightId)}
             style={({pressed}) => [
               styles.chip,
               (active || focused) && styles.active,

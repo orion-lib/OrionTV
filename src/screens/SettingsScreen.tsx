@@ -36,6 +36,7 @@ interface OptionProps {
   active: boolean;
   onPress: () => void;
   onFocus?: () => void;
+  hasPreferredFocus?: boolean;
 }
 
 const PreferenceOption: React.FC<OptionProps> = ({
@@ -44,12 +45,14 @@ const PreferenceOption: React.FC<OptionProps> = ({
   active,
   onPress,
   onFocus,
+  hasPreferredFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
+      hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
         setFocused(true);
         onFocus?.();
@@ -85,6 +88,7 @@ interface ToggleProps {
   value: boolean;
   onToggle: () => void;
   onFocus?: () => void;
+  hasPreferredFocus?: boolean;
 }
 
 const ToggleRow: React.FC<ToggleProps> = ({
@@ -93,12 +97,14 @@ const ToggleRow: React.FC<ToggleProps> = ({
   value,
   onToggle,
   onFocus,
+  hasPreferredFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
+      hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
         setFocused(true);
         onFocus?.();
@@ -128,18 +134,21 @@ interface ActionButtonProps {
   label: string;
   onPress: () => void;
   onFocus?: () => void;
+  hasPreferredFocus?: boolean;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   label,
   onPress,
   onFocus,
+  hasPreferredFocus,
 }) => {
   const [focused, setFocused] = useState(false);
 
   return (
     <Pressable
       focusable
+      hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
         setFocused(true);
         onFocus?.();
@@ -194,6 +203,7 @@ const SettingsScreen: React.FC = () => {
             active={preferences.player === 'media3'}
             onPress={() => updatePreferences({player: 'media3'})}
             onFocus={() => scrollToSection('player')}
+            hasPreferredFocus
           />
           <PreferenceOption
             title="内置播放器（可选）"
