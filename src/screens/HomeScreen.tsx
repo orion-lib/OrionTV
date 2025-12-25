@@ -204,17 +204,19 @@ const HomeScreen: React.FC = () => {
             <EmptyState title="暂无内容" description="稍后再来看看吧" />
           ) : (
             <>
-              {gridRows.map((row, rowIndex) => (
-                <View key={`row-${rowIndex}`} style={styles.gridRow}>
-                  {row.map(item => (
-                    <ShowcaseCard
-                      key={item.id}
-                      item={item}
-                      variant="tile"
-                      nextFocusUp={focusedCategoryHandle}
-                      onPress={() => navigation.navigate('Detail', {id: item.id})}
-                    />
-                  ))}
+                {gridRows.map((row, rowIndex) => (
+                  <View key={`row-${rowIndex}`} style={styles.gridRow}>
+                    {row.map(item => (
+                      <ShowcaseCard
+                        key={item.id}
+                        item={item}
+                        variant="tile"
+                        nextFocusUp={
+                          rowIndex === 0 ? focusedCategoryHandle : undefined
+                        }
+                        onPress={() => navigation.navigate('Detail', {id: item.id})}
+                      />
+                    ))}
                   {rowIndex === 0 && row.length < GRID_COLUMNS ? (
                     <MoreCard />
                   ) : null}
@@ -232,7 +234,6 @@ const HomeScreen: React.FC = () => {
                   key={`new-${item.id}`}
                   item={item}
                   isFavorite={isFavorite(item.id)}
-                  nextFocusUp={focusedCategoryHandle}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
