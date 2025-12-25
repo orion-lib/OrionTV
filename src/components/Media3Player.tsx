@@ -18,10 +18,25 @@ export const isMedia3Available = () =>
   Platform.OS === 'android' &&
   !!UIManager.getViewManagerConfig('Media3PlayerView');
 
+let cachedNativeView:
+  | ReturnType<typeof requireNativeComponent<Media3PlayerProps>>
+  | null = null;
+
+const getNativeMedia3Player = () => {
+  if (!isMedia3Available()) {
+    return null;
+  }
+
+  if (!cachedNativeView) {
+    cachedNativeView =
+      requireNativeComponent<Media3PlayerProps>('Media3PlayerView');
+  }
+
+  return cachedNativeView;
+};
+
 export const Media3Player: React.FC<Media3PlayerProps> = props => {
-  const NativeMedia3Player = isMedia3Available()
-    ? requireNativeComponent<Media3PlayerProps>('Media3PlayerView')
-    : null;
+  const NativeMedia3Player = getNativeMedia3Player();
 
   if (!NativeMedia3Player) {
     return null;
