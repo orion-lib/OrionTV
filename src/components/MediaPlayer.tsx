@@ -20,7 +20,7 @@ export const MediaPlayer: React.FC<VideoProperties & {playerType?: PlayerType}> 
   if (
     resolvedPlayer === 'legacy' ||
     Platform.OS !== 'android' ||
-    !isMedia3Available
+    !isMedia3Available()
   ) {
     return <LegacyPlayer {...props} />;
   }

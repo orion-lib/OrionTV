@@ -14,15 +14,15 @@ type Media3PlayerProps = Omit<VideoProperties, 'source'> & {
   controls?: boolean;
 };
 
-export const isMedia3Available =
+export const isMedia3Available = () =>
   Platform.OS === 'android' &&
   !!UIManager.getViewManagerConfig('Media3PlayerView');
 
-const NativeMedia3Player = isMedia3Available
-  ? requireNativeComponent<Media3PlayerProps>('Media3PlayerView')
-  : null;
-
 export const Media3Player: React.FC<Media3PlayerProps> = props => {
+  const NativeMedia3Player = isMedia3Available()
+    ? requireNativeComponent<Media3PlayerProps>('Media3PlayerView')
+    : null;
+
   if (!NativeMedia3Player) {
     return null;
   }
