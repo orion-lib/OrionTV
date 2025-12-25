@@ -29,10 +29,11 @@ type Nav = NativeStackNavigationProp<RootStackParamList>;
 
 type PressableHandle = React.ElementRef<typeof Pressable>;
 
-const MoreCard: React.FC<{lockLeft?: boolean; lockRight?: boolean}> = ({
-  lockLeft,
-  lockRight,
-}) => {
+const MoreCard: React.FC<{
+  lockLeft?: boolean;
+  lockRight?: boolean;
+  nextFocusUp?: number;
+}> = ({lockLeft, lockRight, nextFocusUp}) => {
   const [selfHandle, setSelfHandle] = useState<number | undefined>();
   const pressableRef = React.useRef<PressableHandle>(null);
 
@@ -50,6 +51,7 @@ const MoreCard: React.FC<{lockLeft?: boolean; lockRight?: boolean}> = ({
       focusable
       nextFocusLeft={lockLeft ? selfHandle : undefined}
       nextFocusRight={lockRight ? selfHandle : undefined}
+      nextFocusUp={nextFocusUp}
       onPress={() => {}}
       style={({focused}) => [styles.moreWrapper, focused && styles.moreFocused]}>
       <Text style={styles.moreLabel}>更多</Text>
@@ -64,6 +66,9 @@ const HomeScreen: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>(
     formatTime24(new Date()),
   );
+  const [categoryFocusHandle, setCategoryFocusHandle] = useState<
+    number | undefined
+  >();
 
   useEffect(() => {
     const updateTime = () => {
@@ -191,6 +196,7 @@ const HomeScreen: React.FC = () => {
               activeId={activeCategory}
               onChange={handleCategorySelect}
               onFocusChange={handleCategoryFocus}
+              onFocusHandleChange={setCategoryFocusHandle}
             />
           </View>
           <View style={styles.heroArea}>
@@ -202,6 +208,7 @@ const HomeScreen: React.FC = () => {
                   variant="hero"
                   lockLeft={index === 0}
                   lockRight={index === items.length - 1}
+                  nextFocusUp={categoryFocusHandle}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -232,7 +239,10 @@ const HomeScreen: React.FC = () => {
                     />
                   ))}
                   {rowIndex === 0 && row.length < GRID_COLUMNS ? (
-                    <MoreCard lockRight />
+                    <MoreCard
+                      lockRight
+                      nextFocusUp={categoryFocusHandle}
+                    />
                   ) : null}
                 </View>
               ))}
@@ -332,8 +342,8 @@ const styles = StyleSheet.create({
   quickActionTime: {
     color: '#cbd5e1',
     fontWeight: '600',
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 14,
+    lineHeight: 18,
   },
   quickActionTimeFocused: {
     color: '#e9f2ff',

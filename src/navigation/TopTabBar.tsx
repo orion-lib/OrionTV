@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   time: {
     color: '#e2e8f0',
     fontWeight: '600',
-    fontSize: 12,
+    fontSize: 14,
   },
   tabsRow: {
     flexDirection: 'row',
