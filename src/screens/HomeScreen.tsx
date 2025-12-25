@@ -50,11 +50,12 @@ const HomeScreen: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const formatTime = (date: Date) => formatter.format(date);
     const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 60 * 1000);

@@ -31,11 +31,12 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
   };
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
+    const formatter = new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+    const formatTime = (date: Date) => formatter.format(date);
     const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 1000);
