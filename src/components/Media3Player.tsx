@@ -1,5 +1,5 @@
 import React from 'react';
-import {Platform, StyleProp, ViewStyle} from 'react-native';
+import {Platform, StyleProp, UIManager, ViewStyle} from 'react-native';
 import {requireNativeComponent} from 'react-native';
 import {VideoProperties} from 'react-native-video';
 
@@ -14,10 +14,13 @@ type Media3PlayerProps = Omit<VideoProperties, 'source'> & {
   controls?: boolean;
 };
 
-const NativeMedia3Player =
-  Platform.OS === 'android'
-    ? requireNativeComponent<Media3PlayerProps>('Media3PlayerView')
-    : null;
+export const isMedia3Available =
+  Platform.OS === 'android' &&
+  !!UIManager.getViewManagerConfig('Media3PlayerView');
+
+const NativeMedia3Player = isMedia3Available
+  ? requireNativeComponent<Media3PlayerProps>('Media3PlayerView')
+  : null;
 
 export const Media3Player: React.FC<Media3PlayerProps> = props => {
   if (!NativeMedia3Player) {
