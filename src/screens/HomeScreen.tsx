@@ -107,52 +107,61 @@ const HomeScreen: React.FC = () => {
           colors={['#0c0f1b', '#0a0b13', '#0e1223']}
           style={styles.header}>
           <View style={styles.headerTopRow}>
-            <View style={styles.chipsRow}>
-              <CategoryChips
-                data={categoryTabs}
-                activeId={activeCategory}
-                onChange={handleCategorySelect}
-                onFocusChange={handleCategoryFocus}
-                onFocusHandleChange={setFocusedCategoryHandle}
-              />
-            </View>
+            <Text style={styles.brand}>YOGURT</Text>
             <View style={styles.quickActions}>
               {TAB_ITEMS.filter(
                 item =>
                   item.name === 'Search' ||
                   item.name === 'Favorites' ||
                   item.name === 'Settings',
-              ).map(item => (
-                <Pressable
-                  key={item.name}
-                  focusable
-                  onFocus={() => setFocusedAction(item.name)}
-                  onBlur={() => setFocusedAction(null)}
-                  onPress={() => navigation.navigate(item.name)}
-                  style={[
-                    styles.quickActionItem,
-                    focusedAction === item.name && styles.quickActionFocused,
-                  ]}>
-                  <View style={styles.quickActionContent}>
-                    <Icon
-                      name={item.icon as never}
-                      size={16}
-                      color={focusedAction === item.name ? '#e9f2ff' : '#e2e8f0'}
-                    />
-                    {item.name === 'Settings' ? (
-                      <Text
-                        style={[
-                          styles.quickActionTime,
-                          focusedAction === item.name &&
-                            styles.quickActionTimeFocused,
-                        ]}>
-                        {currentTime}
-                      </Text>
-                    ) : null}
-                  </View>
-                </Pressable>
-              ))}
+              ).map(item => {
+                const isSettings = item.name === 'Settings';
+                return (
+                  <Pressable
+                    key={item.name}
+                    focusable
+                    onFocus={() => setFocusedAction(item.name)}
+                    onBlur={() => setFocusedAction(null)}
+                    onPress={() => navigation.navigate(item.name)}
+                    style={[
+                      styles.quickActionItem,
+                      isSettings
+                        ? styles.quickActionWide
+                        : styles.quickActionIcon,
+                      focusedAction === item.name && styles.quickActionFocused,
+                    ]}>
+                    <View style={styles.quickActionContent}>
+                      <Icon
+                        name={item.icon as never}
+                        size={16}
+                        color={
+                          focusedAction === item.name ? '#e9f2ff' : '#e2e8f0'
+                        }
+                      />
+                      {isSettings ? (
+                        <Text
+                          style={[
+                            styles.quickActionTime,
+                            focusedAction === item.name &&
+                              styles.quickActionTimeFocused,
+                          ]}>
+                          {currentTime}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </Pressable>
+                );
+              })}
             </View>
+          </View>
+          <View style={styles.chipsRow}>
+            <CategoryChips
+              data={categoryTabs}
+              activeId={activeCategory}
+              onChange={handleCategorySelect}
+              onFocusChange={handleCategoryFocus}
+              onFocusHandleChange={setFocusedCategoryHandle}
+            />
           </View>
           <View style={styles.heroArea}>
             <View style={styles.heroRow}>
@@ -229,18 +238,24 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 12,
+    paddingTop: 16,
     paddingBottom: 20,
   },
   headerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  brand: {
+    color: '#f8fafc',
+    fontSize: 18,
+    fontWeight: '700',
+    letterSpacing: 2,
   },
   chipsRow: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    flex: 1,
-    paddingRight: 12,
+    marginTop: 12,
     paddingLeft: 0,
   },
   heroArea: {
@@ -252,19 +267,25 @@ const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: -20,
   },
   quickActionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    height: 30,
-    borderRadius: 15,
-    marginLeft: 8,
     backgroundColor: '#151a2b',
     borderWidth: 1,
     borderColor: '#1f2430',
     justifyContent: 'center',
+    marginLeft: 8,
+  },
+  quickActionIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+  },
+  quickActionWide: {
+    height: 30,
+    paddingHorizontal: 10,
+    borderRadius: 15,
   },
   quickActionContent: {
     flexDirection: 'row',
