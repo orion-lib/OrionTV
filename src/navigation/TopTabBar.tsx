@@ -3,6 +3,7 @@ import {Pressable, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {TAB_ITEMS} from './tabConfig';
+import {formatTime24} from '../utils/time';
 
 export const TopTabBar: React.FC<BottomTabBarProps> = ({
   state,
@@ -31,13 +32,7 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
   };
 
   useEffect(() => {
-    const formatter = new Intl.DateTimeFormat('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-    const formatTime = (date: Date) => formatter.format(date);
-    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    const updateTime = () => setCurrentTime(formatTime24(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);

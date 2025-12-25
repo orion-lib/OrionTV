@@ -65,19 +65,27 @@ export const CategoryChips: React.FC<Props> = ({
     if (!onFocusHandleChange) {
       return;
     }
+    preferredFocusId.current = activeId;
     const targetId = preferredFocusId.current ?? activeId;
-    const handle = getHandle(targetId);
-    if (handle) {
-      onFocusHandleChange(handle);
-      return;
-    }
-    const frame = requestAnimationFrame(() => {
-      const retryHandle = getHandle(targetId);
-      if (retryHandle) {
-        onFocusHandleChange(retryHandle);
+    let attempts = 0;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const trySetHandle = () => {
+      const handle = getHandle(targetId);
+      if (handle) {
+        onFocusHandleChange(handle);
+        return;
       }
-    });
-    return () => cancelAnimationFrame(frame);
+      if (attempts < 10) {
+        attempts += 1;
+        timeoutId = setTimeout(trySetHandle, 50);
+      }
+    };
+    trySetHandle();
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
   }, [activeId, getHandle, onFocusHandleChange]);
 
   return (
