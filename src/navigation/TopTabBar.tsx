@@ -3,6 +3,7 @@ import {Pressable, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {TAB_ITEMS} from './tabConfig';
+import {formatTime24} from '../utils/time';
 
 export const TopTabBar: React.FC<BottomTabBarProps> = ({
   state,

@@ -21,6 +21,7 @@ import {RootStackParamList} from '../navigation/RootNavigator';
 import {EmptyState} from '../components/EmptyState';
 import {NewReleaseCard} from '../components/NewReleaseCard';
 import {TAB_ITEMS} from '../navigation/tabConfig';
+import {formatTime24} from '../utils/time';
 
 const GRID_COLUMNS = 4;
 
@@ -67,12 +68,7 @@ const HomeScreen: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
-    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    const updateTime = () => setCurrentTime(formatTime24(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 60 * 1000);
     return () => clearInterval(interval);
