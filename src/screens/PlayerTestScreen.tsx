@@ -1,10 +1,11 @@
-import React, {useCallback, useMemo, useState} from 'react';
+import React, {useCallback, useMemo, useRef, useState, useEffect} from 'react';
 import {
   Alert,
   NativeSyntheticEvent,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   StyleSheet,
   Text,
@@ -14,7 +15,9 @@ import {
 import DocumentPicker from 'react-native-document-picker';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import {useMedia} from '../context/MediaContext';
 import {MediaPlayer} from '../components/MediaPlayer';
+import {isMedia3Available} from '../components/Media3Player';
 
 const PLAYER_OPTIONS = [
   {
@@ -81,16 +84,18 @@ const requestStoragePermissions = async () => {
   return true;
 };
 
-const isDocumentPickerReady = () => Boolean(NativeModules.RNDocumentPicker);
-
 const PlayerTestScreen: React.FC = () => {
   const navigation = useNavigation();
+  const {preferences} = useMedia();
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerType>('media3');
   const [file, setFile] = useState<SelectedFile | null>(null);
   const [loading, setLoading] = useState(false);
   const [focusedOption, setFocusedOption] = useState<PlayerType | null>(null);
   const [focusedPicker, setFocusedPicker] = useState(false);
   const [focusedBack, setFocusedBack] = useState(false);
+  const [focusedPreview, setFocusedPreview] = useState(false);
+  const scrollRef = useRef<ScrollView>(null);
+  const sectionOffsets = useRef<Record<string, number>>({});
 
   const fileLabel = useMemo(() => {
     if (!file) {
@@ -99,6 +104,28 @@ const PlayerTestScreen: React.FC = () => {
 
     return file.name ? `${file.name}` : file.uri;
   }, [file]);
+
+  useEffect(() => {
+    setSelectedPlayer(
+      preferences.player === 'media3' && !isMedia3Available()
+        ? 'legacy'
+        : preferences.player,
+    );
+  }, [preferences.player]);
+
+  const registerOffset = useCallback((key: string) => {
+    return (event: {nativeEvent: {layout: {y: number}}}) => {
+      sectionOffsets.current[key] = event.nativeEvent.layout.y;
+    };
+  }, []);
+
+  const scrollToSection = useCallback((key: string) => {
+    const y = sectionOffsets.current[key];
+    if (y === undefined) {
+      return;
+    }
+    scrollRef.current?.scrollTo({y: Math.max(y - 24, 0), animated: true});
+  }, []);
 
   const pickVideo = useCallback(async () => {
     const hasPermission = await requestStoragePermissions();
@@ -132,122 +159,162 @@ const PlayerTestScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      <View style={styles.header}>
-        <Pressable
-          focusable
-          hasTVPreferredFocus
-          onFocus={() => setFocusedBack(true)}
-          onBlur={() => setFocusedBack(false)}
-          onPress={() => navigation.goBack()}
-          onKeyDown={event => {
-            if (isSelectKey(event)) {
-              navigation.goBack();
-            }
-          }}
-          style={[styles.backButton, focusedBack && styles.focusedOutline]}>
-          <Icon name="chevron-back" size={24} color="#e5e7eb" />
-        </Pressable>
-        <Text style={styles.title}>播放器测试</Text>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>选择播放器</Text>
-        {PLAYER_OPTIONS.map(option => (
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}>
+        <View style={styles.header} onLayout={registerOffset('top')}>
           <Pressable
-            key={option.key}
             focusable
-            onFocus={() => setFocusedOption(option.key)}
-            onBlur={() =>
-              setFocusedOption(current =>
-                current === option.key ? null : current,
-              )
-            }
-            onPress={() => setSelectedPlayer(option.key)}
+            hasTVPreferredFocus
+            onFocus={() => {
+              setFocusedBack(true);
+              scrollToSection('top');
+            }}
+            onBlur={() => setFocusedBack(false)}
+            onPress={() => navigation.goBack()}
             onKeyDown={event => {
               if (isSelectKey(event)) {
-                setSelectedPlayer(option.key);
+                navigation.goBack();
+              }
+            }}
+            style={[styles.backButton, focusedBack && styles.focusedOutline]}>
+            <Icon name="chevron-back" size={24} color="#e5e7eb" />
+          </Pressable>
+          <Text style={styles.title}>播放器测试</Text>
+        </View>
+
+        <View style={styles.card} onLayout={registerOffset('player')}>
+          <Text style={styles.cardTitle}>选择播放器</Text>
+          {PLAYER_OPTIONS.map(option => {
+            const isDisabled = option.key === 'media3' && !isMedia3Available();
+            return (
+              <Pressable
+                key={option.key}
+                focusable={!isDisabled}
+                onFocus={() => {
+                  setFocusedOption(option.key);
+                  scrollToSection('player');
+                }}
+                onBlur={() =>
+                  setFocusedOption(current =>
+                    current === option.key ? null : current,
+                  )
+                }
+                onPress={() => {
+                  if (!isDisabled) {
+                    setSelectedPlayer(option.key);
+                  }
+                }}
+                onKeyDown={event => {
+                  if (isSelectKey(event) && !isDisabled) {
+                    setSelectedPlayer(option.key);
+                  }
+                }}
+                style={[
+                  styles.option,
+                  selectedPlayer === option.key && styles.optionActive,
+                  focusedOption === option.key && styles.focusedOutline,
+                  isDisabled && styles.optionDisabled,
+                ]}>
+                <View style={styles.optionBody}>
+                  <Text style={styles.label}>{option.title}</Text>
+                  <Text style={styles.desc}>{option.description}</Text>
+                </View>
+                <Icon
+                  name={
+                    selectedPlayer === option.key
+                      ? 'checkmark-circle'
+                      : 'ellipse-outline'
+                  }
+                  size={20}
+                  color={
+                    selectedPlayer === option.key ? '#5ac8fa' : '#475569'
+                  }
+                />
+              </Pressable>
+            );
+          })}
+          {!isMedia3Available() ? (
+            <Text style={styles.helperText}>
+              当前设备未注册 Media3 播放器组件，将自动使用内置播放器。
+            </Text>
+          ) : null}
+        </View>
+
+        <View style={styles.card} onLayout={registerOffset('file')}>
+          <Text style={styles.cardTitle}>本地视频</Text>
+          <Text style={styles.fileLabel}>{fileLabel}</Text>
+          <Pressable
+            focusable
+            onFocus={() => {
+              setFocusedPicker(true);
+              scrollToSection('file');
+            }}
+            onBlur={() => setFocusedPicker(false)}
+            onPress={pickVideo}
+            onKeyDown={event => {
+              if (isSelectKey(event)) {
+                pickVideo();
               }
             }}
             style={[
-              styles.option,
-              selectedPlayer === option.key && styles.optionActive,
-              focusedOption === option.key && styles.focusedOutline,
+              styles.button,
+              loading && styles.buttonDisabled,
+              focusedPicker && styles.focusedOutline,
             ]}>
-            <View style={styles.optionBody}>
-              <Text style={styles.label}>{option.title}</Text>
-              <Text style={styles.desc}>{option.description}</Text>
-            </View>
-            <Icon
-              name={
-                selectedPlayer === option.key
-                  ? 'checkmark-circle'
-                  : 'ellipse-outline'
-              }
-              size={20}
-              color={
-                selectedPlayer === option.key ? '#5ac8fa' : '#475569'
-              }
-            />
+            <Text style={styles.buttonText}>
+              {loading ? '读取中...' : '选择视频文件'}
+            </Text>
           </Pressable>
-        ))}
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>本地视频</Text>
-        <Text style={styles.fileLabel}>{fileLabel}</Text>
-        <Pressable
-          focusable
-          onFocus={() => setFocusedPicker(true)}
-          onBlur={() => setFocusedPicker(false)}
-          onPress={pickVideo}
-          onKeyDown={event => {
-            if (isSelectKey(event)) {
-              pickVideo();
-            }
-          }}
-          style={[
-            styles.button,
-            loading && styles.buttonDisabled,
-            focusedPicker && styles.focusedOutline,
-          ]}>
-          <Text style={styles.buttonText}>
-            {loading ? '读取中...' : '选择视频文件'}
-          </Text>
-        </Pressable>
-        {file ? (
-          <Text style={styles.fileMeta}>
-            {file.size ? `大小：${(file.size / 1024 / 1024).toFixed(2)} MB` : ''}
-          </Text>
-        ) : null}
-      </View>
-
-      <View style={styles.playerCard}>
-        <Text style={styles.cardTitle}>播放预览</Text>
-        <View style={styles.playerWrapper}>
           {file ? (
-            <MediaPlayer
-              playerType={selectedPlayer}
-              style={styles.video}
-              source={{uri: file.uri}}
-              resizeMode="contain"
-              controls
-            />
-          ) : (
-            <Text style={styles.emptyText}>请先选择本地视频文件</Text>
-          )}
+            <Text style={styles.fileMeta}>
+              {file.size
+                ? `大小：${(file.size / 1024 / 1024).toFixed(2)} MB`
+                : ''}
+            </Text>
+          ) : null}
         </View>
-      </View>
 
-      <Text style={styles.footer}>
-        播放器测试仅用于验证本地文件播放能力。首次选择文件时会申请
-        读取权限。
-      </Text>
+        <View style={styles.playerCard} onLayout={registerOffset('preview')}>
+          <Text style={styles.cardTitle}>播放预览</Text>
+          <Pressable
+            focusable
+            onFocus={() => {
+              setFocusedPreview(true);
+              scrollToSection('preview');
+            }}
+            onBlur={() => setFocusedPreview(false)}
+            style={[
+              styles.playerWrapper,
+              focusedPreview && styles.focusedOutline,
+            ]}>
+            {file ? (
+              <MediaPlayer
+                playerType={selectedPlayer}
+                style={styles.video}
+                source={{uri: file.uri}}
+                resizeMode="contain"
+                controls
+              />
+            ) : (
+              <Text style={styles.emptyText}>请先选择本地视频文件</Text>
+            )}
+          </Pressable>
+        </View>
+
+        <Text style={styles.footer}>
+          播放器测试仅用于验证本地文件播放能力。首次选择文件时会申请
+          读取权限。
+        </Text>
+      </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {flex: 1, backgroundColor: '#0b0d14', padding: 16},
+  container: {flex: 1, backgroundColor: '#0b0d14'},
+  scrollContent: {padding: 16},
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -298,6 +365,9 @@ const styles = StyleSheet.create({
     borderColor: '#5ac8fa',
     backgroundColor: '#111c2d',
   },
+  optionDisabled: {
+    opacity: 0.5,
+  },
   focusedOutline: {
     borderColor: '#7cc0ff',
     shadowColor: '#7cc0ff',
@@ -309,6 +379,7 @@ const styles = StyleSheet.create({
   optionBody: {flex: 1, marginRight: 8},
   label: {color: '#fff', fontWeight: '700', fontSize: 16},
   desc: {color: '#9ca3af', marginTop: 4},
+  helperText: {color: '#94a3b8', marginTop: 6},
   fileLabel: {color: '#cbd5f5', marginBottom: 10},
   fileMeta: {color: '#9ca3af', marginTop: 8},
   button: {
@@ -324,7 +395,9 @@ const styles = StyleSheet.create({
   playerWrapper: {
     backgroundColor: '#0f172a',
     borderRadius: 12,
-    height: 240,
+    width: '100%',
+    minHeight: 220,
+    aspectRatio: 16 / 9,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
