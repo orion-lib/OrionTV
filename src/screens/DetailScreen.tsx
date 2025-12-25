@@ -1,12 +1,12 @@
-import React, {useMemo} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
   Image,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native';
 import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
@@ -21,6 +21,9 @@ const DetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<DetailRoute>();
   const {getVideoById, toggleFavorite, isFavorite} = useMedia();
+  const [focusedAction, setFocusedAction] = useState<'play' | 'favorite' | null>(
+    null,
+  );
 
   const video = useMemo(
     () => getVideoById(route.params.id),
@@ -58,16 +61,31 @@ const DetailScreen: React.FC = () => {
           </View>
           <Text style={styles.desc}>{video.description}</Text>
           <View style={styles.actions}>
-            <TouchableOpacity
-              style={[styles.button, styles.primary]}
+            <Pressable
+              focusable
+              onFocus={() => setFocusedAction('play')}
+              onBlur={() => setFocusedAction(null)}
+              style={({pressed}) => [
+                styles.button,
+                styles.primary,
+                (pressed || focusedAction === 'play') && styles.buttonFocused,
+              ]}
               onPress={() => navigation.navigate('Play', {id: video.id})}>
               <Icon name="play" size={18} color="#0b0d14" />
               <Text style={[styles.buttonText, styles.primaryText]}>
                 立即播放
               </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.button, styles.outline]}
+            </Pressable>
+            <Pressable
+              focusable
+              onFocus={() => setFocusedAction('favorite')}
+              onBlur={() => setFocusedAction(null)}
+              style={({pressed}) => [
+                styles.button,
+                styles.outline,
+                (pressed || focusedAction === 'favorite') &&
+                  styles.buttonFocused,
+              ]}
               onPress={() => toggleFavorite(video.id)}>
               <Icon
                 name={favorite ? 'heart' : 'heart-outline'}
@@ -77,7 +95,7 @@ const DetailScreen: React.FC = () => {
               <Text style={[styles.buttonText, favoriteTextStyle]}>
                 {favorite ? '已收藏' : '收藏'}
               </Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </ScrollView>
@@ -110,6 +128,14 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     marginRight: 10,
+  },
+  buttonFocused: {
+    borderWidth: 2,
+    borderColor: '#7dd3fc',
+    shadowColor: '#38bdf8',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    elevation: 4,
   },
   primary: {backgroundColor: '#5ac8fa'},
   primaryText: {color: '#0b0d14'},
