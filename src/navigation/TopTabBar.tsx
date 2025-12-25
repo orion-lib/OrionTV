@@ -32,8 +32,8 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
 
   useEffect(() => {
     const formatTime = (date: Date) => {
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
       return `${hours}:${minutes}`;
     };
     const updateTime = () => setCurrentTime(formatTime(new Date()));
@@ -148,7 +148,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+    backgroundColor: 'transparent',
   },
   time: {
     color: '#e2e8f0',
