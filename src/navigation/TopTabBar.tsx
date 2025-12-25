@@ -32,9 +32,11 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
 
   useEffect(() => {
     const formatTime = (date: Date) => {
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
+      return date.toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
     };
     const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
@@ -47,20 +49,22 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
       <View style={styles.topRow}>
         <Text style={styles.logo}>YOGURT</Text>
         <View style={styles.rightSection}>
-          <View style={styles.status}>
-            {statusTabs.map(item => (
-              <Pressable
-                key={item.name}
-                onPress={() => handleNavigate(item.name)}
-                style={({pressed}) => [
-                  styles.statusButton,
-                  pressed && styles.statusButtonPressed,
-                ]}>
-                <Icon name={item.icon as never} size={12} color="#e2e8f0" />
-              </Pressable>
-            ))}
+          <View style={styles.statusGroup}>
+            <View style={styles.status}>
+              {statusTabs.map(item => (
+                <Pressable
+                  key={item.name}
+                  onPress={() => handleNavigate(item.name)}
+                  style={({pressed}) => [
+                    styles.statusButton,
+                    pressed && styles.statusButtonPressed,
+                  ]}>
+                  <Icon name={item.icon as never} size={12} color="#e2e8f0" />
+                </Pressable>
+              ))}
+            </View>
           </View>
-          <View style={styles.timePill}>
+          <View style={styles.timePill} focusable={false}>
             <Text style={styles.time}>{currentTime}</Text>
           </View>
         </View>
@@ -116,6 +120,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  statusGroup: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 14,
+    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+  },
   status: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -130,7 +140,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(226, 232, 240, 0.2)',
   },
   timePill: {
-    marginLeft: 16,
+    marginLeft: 24,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
