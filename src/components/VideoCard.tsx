@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Image,
   ImageStyle,
@@ -28,14 +28,10 @@ export const VideoCard: React.FC<Props> = ({
   cardStyle,
   posterStyle,
 }) => {
-  const [focused, setFocused] = useState(false);
-
   return (
     <Pressable
       focusable
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
-      style={({pressed}) => [
+      style={({pressed, focused}) => [
         styles.card,
         cardStyle,
         (focused || pressed) && styles.focused,

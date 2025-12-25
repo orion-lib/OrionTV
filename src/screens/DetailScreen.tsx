@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useMemo} from 'react';
 import {
   Image,
   Pressable,
@@ -21,10 +21,6 @@ const DetailScreen: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute<DetailRoute>();
   const {getVideoById, toggleFavorite, isFavorite} = useMedia();
-  const [focusedAction, setFocusedAction] = useState<'play' | 'favorite' | null>(
-    null,
-  );
-
   const video = useMemo(
     () => getVideoById(route.params.id),
     [getVideoById, route.params.id],
@@ -63,12 +59,10 @@ const DetailScreen: React.FC = () => {
           <View style={styles.actions}>
             <Pressable
               focusable
-              onFocus={() => setFocusedAction('play')}
-              onBlur={() => setFocusedAction(null)}
-              style={({pressed}) => [
+              style={({pressed, focused}) => [
                 styles.button,
                 styles.primary,
-                (pressed || focusedAction === 'play') && styles.buttonFocused,
+                (pressed || focused) && styles.buttonFocused,
               ]}
               onPress={() => navigation.navigate('Play', {id: video.id})}>
               <Icon name="play" size={18} color="#0b0d14" />
@@ -78,13 +72,10 @@ const DetailScreen: React.FC = () => {
             </Pressable>
             <Pressable
               focusable
-              onFocus={() => setFocusedAction('favorite')}
-              onBlur={() => setFocusedAction(null)}
-              style={({pressed}) => [
+              style={({pressed, focused}) => [
                 styles.button,
                 styles.outline,
-                (pressed || focusedAction === 'favorite') &&
-                  styles.buttonFocused,
+                (pressed || focused) && styles.buttonFocused,
               ]}
               onPress={() => toggleFavorite(video.id)}>
               <Icon
