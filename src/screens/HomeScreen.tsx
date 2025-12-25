@@ -64,10 +64,7 @@ const HomeScreen: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      return date.toTimeString().slice(0, 5);
-    };
-    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    const updateTime = () => setCurrentTime(formatTime24(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 60 * 1000);
     return () => clearInterval(interval);
@@ -130,34 +127,31 @@ const HomeScreen: React.FC = () => {
                 const isSettings = item.name === 'Settings';
                 if (isSettings) {
                   return (
-                    <Pressable
-                      key={item.name}
-                      focusable
-                      onPress={() => navigation.navigate(item.name)}
-                      style={({focused}) => [
-                        styles.quickActionItem,
-                        styles.quickActionTimeWrapper,
-                        focused && styles.quickActionFocused,
-                      ]}>
-                      {({focused}) => (
-                        <View style={styles.quickActionContent}>
-                          <Icon
-                            name={item.icon as never}
-                            size={16}
-                            color={focused ? '#e9f2ff' : '#e2e8f0'}
-                          />
-                          <View style={styles.quickActionTimePill}>
-                            <Text
-                              style={[
-                                styles.quickActionTime,
-                                focused && styles.quickActionTimeFocused,
-                              ]}>
-                              {currentTime}
-                            </Text>
+                    <React.Fragment key={item.name}>
+                      <Pressable
+                        focusable
+                        onPress={() => navigation.navigate(item.name)}
+                        style={({focused}) => [
+                          styles.quickActionItem,
+                          styles.quickActionIcon,
+                          focused && styles.quickActionFocused,
+                        ]}>
+                        {({focused}) => (
+                          <View style={styles.quickActionContent}>
+                            <Icon
+                              name={item.icon as never}
+                              size={16}
+                              color={focused ? '#e9f2ff' : '#e2e8f0'}
+                            />
                           </View>
-                        </View>
-                      )}
-                    </Pressable>
+                        )}
+                      </Pressable>
+                      <View style={styles.quickActionTimePill} focusable={false}>
+                        <Text style={styles.quickActionTime}>
+                          {currentTime}
+                        </Text>
+                      </View>
+                    </React.Fragment>
                   );
                 }
                 return (
@@ -314,11 +308,6 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
   },
-  quickActionTimeWrapper: {
-    height: 30,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-  },
   quickActionContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -328,10 +317,12 @@ const styles = StyleSheet.create({
     height: 30,
     paddingHorizontal: 12,
     borderRadius: 15,
-    backgroundColor: 'transparent',
+    backgroundColor: '#0c0f1b',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: 10,
+    borderWidth: 1,
+    borderColor: '#1f2430',
   },
   quickActionTime: {
     color: '#cbd5e1',
