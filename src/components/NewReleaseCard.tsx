@@ -7,9 +7,15 @@ interface Props {
   item: VideoItem;
   isFavorite: boolean;
   onPress: () => void;
+  nextFocusUp?: number;
 }
 
-export const NewReleaseCard: React.FC<Props> = ({item, isFavorite, onPress}) => {
+export const NewReleaseCard: React.FC<Props> = ({
+  item,
+  isFavorite,
+  onPress,
+  nextFocusUp,
+}) => {
   const [focused, setFocused] = useState(false);
 
   const computedStyle = ({pressed}: PressableStateCallbackType) => [
@@ -21,6 +27,7 @@ export const NewReleaseCard: React.FC<Props> = ({item, isFavorite, onPress}) => 
   return (
     <Pressable
       focusable
+      nextFocusUp={nextFocusUp}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={computedStyle}

@@ -44,6 +44,9 @@ const HomeScreen: React.FC = () => {
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
   const [focusedAction, setFocusedAction] = useState<string | null>(null);
+  const [focusedCategoryHandle, setFocusedCategoryHandle] = useState<
+    number | undefined
+  >(undefined);
 
   const categoryTabs = useMemo(() => categories, [categories]);
 
@@ -97,6 +100,7 @@ const HomeScreen: React.FC = () => {
                 activeId={activeCategory}
                 onChange={handleCategorySelect}
                 onFocusChange={handleCategoryFocus}
+                onFocusHandleChange={setFocusedCategoryHandle}
               />
             </View>
             <View style={styles.quickActions}>
@@ -124,12 +128,12 @@ const HomeScreen: React.FC = () => {
           </View>
           <View style={styles.heroArea}>
             <View style={styles.heroRow}>
-              {heroItems.slice(0, 2).map((item, idx) => (
+              {heroItems.slice(0, 2).map(item => (
                 <ShowcaseCard
-                  key={item.id + idx}
+                  key={item.id}
                   item={item}
                   variant="hero"
-                  hasTVPreferredFocus={idx === 0}
+                  nextFocusUp={focusedCategoryHandle}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -154,6 +158,7 @@ const HomeScreen: React.FC = () => {
                       key={item.id}
                       item={item}
                       variant="tile"
+                      nextFocusUp={focusedCategoryHandle}
                       onPress={() => navigation.navigate('Detail', {id: item.id})}
                     />
                   ))}
@@ -174,6 +179,7 @@ const HomeScreen: React.FC = () => {
                   key={`new-${item.id}`}
                   item={item}
                   isFavorite={isFavorite(item.id)}
+                  nextFocusUp={focusedCategoryHandle}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -218,7 +224,7 @@ const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: -5,
+    marginTop: -20,
   },
   quickActionItem: {
     flexDirection: 'row',

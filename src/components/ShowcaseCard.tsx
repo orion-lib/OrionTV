@@ -17,6 +17,7 @@ interface Props {
   variant?: Variant;
   onPress: () => void;
   hasTVPreferredFocus?: boolean;
+  nextFocusUp?: number;
 }
 
 const variantStyles: Record<Variant, {height: number; flex: number}> = {
@@ -30,6 +31,7 @@ export const ShowcaseCard: React.FC<Props> = ({
   onPress,
   variant = 'wide',
   hasTVPreferredFocus,
+  nextFocusUp,
 }) => {
   const [focused, setFocused] = useState(false);
 
@@ -44,6 +46,7 @@ export const ShowcaseCard: React.FC<Props> = ({
     <Pressable
       focusable
       hasTVPreferredFocus={hasTVPreferredFocus}
+      nextFocusUp={nextFocusUp}
       onPress={onPress}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

@@ -2,7 +2,6 @@ import React, {useCallback, useMemo, useState} from 'react';
 import {
   Alert,
   NativeSyntheticEvent,
-  NativeModules,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
@@ -102,14 +101,6 @@ const PlayerTestScreen: React.FC = () => {
   }, [file]);
 
   const pickVideo = useCallback(async () => {
-    if (!isDocumentPickerReady()) {
-      Alert.alert(
-        '功能不可用',
-        '当前构建未集成本地文件选择组件，请联系开发确认集成状态。',
-      );
-      return;
-    }
-
     const hasPermission = await requestStoragePermissions();
     if (!hasPermission) {
       return;
