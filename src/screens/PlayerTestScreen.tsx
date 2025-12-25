@@ -91,10 +91,6 @@ const PlayerTestScreen: React.FC = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerType>('media3');
   const [file, setFile] = useState<SelectedFile | null>(null);
   const [loading, setLoading] = useState(false);
-  const [focusedOption, setFocusedOption] = useState<PlayerType | null>(null);
-  const [focusedPicker, setFocusedPicker] = useState(false);
-  const [focusedBack, setFocusedBack] = useState(false);
-  const [focusedPreview, setFocusedPreview] = useState(false);
   const [fullscreenVisible, setFullscreenVisible] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<Record<string, number>>({});
@@ -170,17 +166,18 @@ const PlayerTestScreen: React.FC = () => {
             focusable
             hasTVPreferredFocus
             onFocus={() => {
-              setFocusedBack(true);
               scrollToSection('top');
             }}
-            onBlur={() => setFocusedBack(false)}
             onPress={() => navigation.goBack()}
             onKeyDown={event => {
               if (isSelectKey(event)) {
                 navigation.goBack();
               }
             }}
-            style={[styles.backButton, focusedBack && styles.focusedOutline]}>
+            style={({focused}) => [
+              styles.backButton,
+              focused && styles.focusedOutline,
+            ]}>
             <Icon name="chevron-back" size={24} color="#e5e7eb" />
           </Pressable>
           <Text style={styles.title}>播放器测试</Text>
@@ -195,14 +192,8 @@ const PlayerTestScreen: React.FC = () => {
                 key={option.key}
                 focusable={!isDisabled}
                 onFocus={() => {
-                  setFocusedOption(option.key);
                   scrollToSection('player');
                 }}
-                onBlur={() =>
-                  setFocusedOption(current =>
-                    current === option.key ? null : current,
-                  )
-                }
                 onPress={() => {
                   if (!isDisabled) {
                     setSelectedPlayer(option.key);
@@ -213,10 +204,10 @@ const PlayerTestScreen: React.FC = () => {
                     setSelectedPlayer(option.key);
                   }
                 }}
-                style={[
+                style={({focused}) => [
                   styles.option,
                   selectedPlayer === option.key && styles.optionActive,
-                  focusedOption === option.key && styles.focusedOutline,
+                  focused && styles.focusedOutline,
                   isDisabled && styles.optionDisabled,
                 ]}>
                 <View style={styles.optionBody}>
@@ -250,20 +241,18 @@ const PlayerTestScreen: React.FC = () => {
           <Pressable
             focusable
             onFocus={() => {
-              setFocusedPicker(true);
               scrollToSection('file');
             }}
-            onBlur={() => setFocusedPicker(false)}
             onPress={pickVideo}
             onKeyDown={event => {
               if (isSelectKey(event)) {
                 pickVideo();
               }
             }}
-            style={[
+            style={({focused}) => [
               styles.button,
               loading && styles.buttonDisabled,
-              focusedPicker && styles.focusedOutline,
+              focused && styles.focusedOutline,
             ]}>
             <Text style={styles.buttonText}>
               {loading ? '读取中...' : '选择视频文件'}
@@ -308,13 +297,11 @@ const PlayerTestScreen: React.FC = () => {
           <Pressable
             focusable
             onFocus={() => {
-              setFocusedPreview(true);
               scrollToSection('preview');
             }}
-            onBlur={() => setFocusedPreview(false)}
-            style={[
+            style={({focused}) => [
               styles.playerWrapper,
-              focusedPreview && styles.focusedOutline,
+              focused && styles.focusedOutline,
             ]}>
             {file ? (
               <MediaPlayer

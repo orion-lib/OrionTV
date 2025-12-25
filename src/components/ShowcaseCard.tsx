@@ -44,7 +44,6 @@ export const ShowcaseCard: React.FC<Props> = ({
   lockLeft,
   lockRight,
 }) => {
-  const [focused, setFocused] = useState(false);
   const [selfHandle, setSelfHandle] = useState<number | undefined>();
   const pressableRef = useRef<PressableHandle>(null);
 
@@ -57,7 +56,10 @@ export const ShowcaseCard: React.FC<Props> = ({
     }
   }, []);
 
-  const computedStyle = ({pressed}: PressableStateCallbackType) => [
+  const computedStyle = ({
+    pressed,
+    focused,
+  }: PressableStateCallbackType) => [
     styles.card,
     variantStyles[variant],
     focused && styles.focused,
@@ -73,8 +75,6 @@ export const ShowcaseCard: React.FC<Props> = ({
       nextFocusLeft={lockLeft ? selfHandle : nextFocusLeft}
       nextFocusRight={lockRight ? selfHandle : nextFocusRight}
       onPress={onPress}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
       style={computedStyle}>
       <ImageBackground
         source={{uri: item.poster}}
