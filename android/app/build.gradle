@@ -2,6 +2,12 @@ apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
+def projectRoot = rootDir.parentFile
+def applyPatchPackage = tasks.register("applyPatchPackage", Exec) {
+    workingDir projectRoot
+    commandLine("npx", "patch-package")
+}
+
 /**
  * This is the configuration block to customize your React Native Android app.
  * By default you don't need to apply any configuration, just uncomment the lines you need.
@@ -119,6 +125,8 @@ android {
         jvmTarget = "17"
     }
 }
+
+preBuild.dependsOn(applyPatchPackage)
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
