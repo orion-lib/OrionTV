@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -47,6 +47,19 @@ const HomeScreen: React.FC = () => {
   const [focusedCategoryHandle, setFocusedCategoryHandle] = useState<
     number | undefined
   >(undefined);
+  const [currentTime, setCurrentTime] = useState<string>('');
+
+  useEffect(() => {
+    const formatTime = (date: Date) => {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    updateTime();
+    const interval = setInterval(updateTime, 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const categoryTabs = useMemo(() => categories, [categories]);
 
@@ -120,8 +133,23 @@ const HomeScreen: React.FC = () => {
                     styles.quickActionItem,
                     focusedAction === item.name && styles.quickActionFocused,
                   ]}>
-                  <Icon name={item.icon as never} size={14} color="#e2e8f0" />
-                  <Text style={styles.quickActionText}>{item.title}</Text>
+                  <View style={styles.quickActionContent}>
+                    <Icon
+                      name={item.icon as never}
+                      size={16}
+                      color={focusedAction === item.name ? '#e9f2ff' : '#e2e8f0'}
+                    />
+                    {item.name === 'Settings' ? (
+                      <Text
+                        style={[
+                          styles.quickActionTime,
+                          focusedAction === item.name &&
+                            styles.quickActionTimeFocused,
+                        ]}>
+                        {currentTime}
+                      </Text>
+                    ) : null}
+                  </View>
                 </Pressable>
               ))}
             </View>
@@ -238,12 +266,19 @@ const styles = StyleSheet.create({
     borderColor: '#1f2430',
     justifyContent: 'center',
   },
-  quickActionText: {
-    marginLeft: 4,
-    color: '#e2e8f0',
+  quickActionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  quickActionTime: {
+    color: '#cbd5e1',
     fontWeight: '600',
     fontSize: 12,
     lineHeight: 16,
+  },
+  quickActionTimeFocused: {
+    color: '#e9f2ff',
   },
   quickActionFocused: {
     borderColor: '#7cc0ff',
