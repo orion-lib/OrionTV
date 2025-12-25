@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo, useState} from 'react';
 import {
   Alert,
-  NativeModules,
+  NativeSyntheticEvent,
   PermissionsAndroid,
   Platform,
   SafeAreaView,
@@ -35,6 +35,20 @@ type SelectedFile = {
   uri: string;
   name?: string | null;
   size?: number | null;
+};
+
+type KeyEvent = NativeSyntheticEvent<{keyCode?: number; key?: string}>;
+
+const isSelectKey = (event: KeyEvent) => {
+  const keyCode = event.nativeEvent.keyCode;
+  const key = event.nativeEvent.key;
+  return (
+    keyCode === 23 ||
+    keyCode === 66 ||
+    key === 'Enter' ||
+    key === ' ' ||
+    key === 'Select'
+  );
 };
 
 const requestStoragePermissions = async () => {
@@ -72,6 +86,9 @@ const PlayerTestScreen: React.FC = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerType>('media3');
   const [file, setFile] = useState<SelectedFile | null>(null);
   const [loading, setLoading] = useState(false);
+  const [focusedOption, setFocusedOption] = useState<PlayerType | null>(null);
+  const [focusedPicker, setFocusedPicker] = useState(false);
+  const [focusedBack, setFocusedBack] = useState(false);
 
   const fileLabel = useMemo(() => {
     if (!file) {
@@ -82,13 +99,6 @@ const PlayerTestScreen: React.FC = () => {
   }, [file]);
 
   const pickVideo = useCallback(async () => {
-    if (!NativeModules.RNDocumentPicker) {
-      Alert.alert(
-        '不可用',
-        '当前应用未集成文件选择模块，无法选择本地视频文件。',
-      );
-      return;
-    }
     const hasPermission = await requestStoragePermissions();
     if (!hasPermission) {
       return;
@@ -121,7 +131,18 @@ const PlayerTestScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Pressable
+          focusable
+          hasTVPreferredFocus
+          onFocus={() => setFocusedBack(true)}
+          onBlur={() => setFocusedBack(false)}
+          onPress={() => navigation.goBack()}
+          onKeyDown={event => {
+            if (isSelectKey(event)) {
+              navigation.goBack();
+            }
+          }}
+          style={[styles.backButton, focusedBack && styles.focusedOutline]}>
           <Icon name="chevron-back" size={24} color="#e5e7eb" />
         </Pressable>
         <Text style={styles.title}>播放器测试</Text>
@@ -132,10 +153,23 @@ const PlayerTestScreen: React.FC = () => {
         {PLAYER_OPTIONS.map(option => (
           <Pressable
             key={option.key}
+            focusable
+            onFocus={() => setFocusedOption(option.key)}
+            onBlur={() =>
+              setFocusedOption(current =>
+                current === option.key ? null : current,
+              )
+            }
             onPress={() => setSelectedPlayer(option.key)}
+            onKeyDown={event => {
+              if (isSelectKey(event)) {
+                setSelectedPlayer(option.key);
+              }
+            }}
             style={[
               styles.option,
               selectedPlayer === option.key && styles.optionActive,
+              focusedOption === option.key && styles.focusedOutline,
             ]}>
             <View style={styles.optionBody}>
               <Text style={styles.label}>{option.title}</Text>
@@ -160,8 +194,20 @@ const PlayerTestScreen: React.FC = () => {
         <Text style={styles.cardTitle}>本地视频</Text>
         <Text style={styles.fileLabel}>{fileLabel}</Text>
         <Pressable
+          focusable
+          onFocus={() => setFocusedPicker(true)}
+          onBlur={() => setFocusedPicker(false)}
           onPress={pickVideo}
-          style={[styles.button, loading && styles.buttonDisabled]}>
+          onKeyDown={event => {
+            if (isSelectKey(event)) {
+              pickVideo();
+            }
+          }}
+          style={[
+            styles.button,
+            loading && styles.buttonDisabled,
+            focusedPicker && styles.focusedOutline,
+          ]}>
           <Text style={styles.buttonText}>
             {loading ? '读取中...' : '选择视频文件'}
           </Text>
@@ -213,6 +259,8 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     backgroundColor: '#111625',
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   title: {color: '#fff', fontSize: 24, fontWeight: '800'},
   card: {
@@ -248,6 +296,14 @@ const styles = StyleSheet.create({
     borderColor: '#5ac8fa',
     backgroundColor: '#111c2d',
   },
+  focusedOutline: {
+    borderColor: '#7cc0ff',
+    shadowColor: '#7cc0ff',
+    shadowOpacity: 0.35,
+    shadowRadius: 10,
+    shadowOffset: {width: 0, height: 0},
+    elevation: 6,
+  },
   optionBody: {flex: 1, marginRight: 8},
   label: {color: '#fff', fontWeight: '700', fontSize: 16},
   desc: {color: '#9ca3af', marginTop: 4},
@@ -258,6 +314,8 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 10,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: 'transparent',
   },
   buttonDisabled: {opacity: 0.6},
   buttonText: {color: '#e5e7eb', fontWeight: '700'},
