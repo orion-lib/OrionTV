@@ -32,7 +32,12 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
   };
 
   useEffect(() => {
-    const updateTime = () => setCurrentTime(formatTime24(new Date()));
+    const formatTime = (date: Date) => {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
