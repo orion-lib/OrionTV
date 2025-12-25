@@ -59,6 +59,8 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
                 <Icon name={item.icon as never} size={12} color="#e2e8f0" />
               </Pressable>
             ))}
+          </View>
+          <View style={styles.timePill}>
             <Text style={styles.time}>{currentTime}</Text>
           </View>
         </View>
@@ -127,11 +129,17 @@ const styles = StyleSheet.create({
   statusButtonPressed: {
     backgroundColor: 'rgba(226, 232, 240, 0.2)',
   },
+  timePill: {
+    marginLeft: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+  },
   time: {
     color: '#e2e8f0',
     fontWeight: '600',
     fontSize: 12,
-    marginLeft: 12,
   },
   tabsRow: {
     flexDirection: 'row',
