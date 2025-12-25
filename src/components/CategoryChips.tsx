@@ -1,7 +1,8 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   findNodeHandle,
   LayoutChangeEvent,
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -18,6 +19,19 @@ interface Props {
 }
 
 type PressableHandle = React.ElementRef<typeof Pressable>;
+type KeyEvent = NativeSyntheticEvent<{keyCode?: number; key?: string}>;
+
+const isLeftKey = (event: KeyEvent) => {
+  const keyCode = event.nativeEvent.keyCode;
+  const key = event.nativeEvent.key;
+  return keyCode === 21 || key === 'ArrowLeft' || key === 'Left';
+};
+
+const isRightKey = (event: KeyEvent) => {
+  const keyCode = event.nativeEvent.keyCode;
+  const key = event.nativeEvent.key;
+  return keyCode === 22 || key === 'ArrowRight' || key === 'Right';
+};
 
 export const CategoryChips: React.FC<Props> = ({
   data,
@@ -30,6 +44,10 @@ export const CategoryChips: React.FC<Props> = ({
   const scrollRef = useRef<ScrollView>(null);
   const layoutMap = useRef<Record<string, {x: number; width: number}>>({});
   const chipRefs = useRef<Record<string, PressableHandle | null>>({});
+
+  useEffect(() => {
+    preferredFocusId.current = activeId;
+  }, [activeId]);
 
   const registerLayout = useCallback(
     (id: string) => (event: LayoutChangeEvent) => {
@@ -56,6 +74,13 @@ export const CategoryChips: React.FC<Props> = ({
     const node = chipRefs.current[id];
     const handle = node ? findNodeHandle(node) : null;
     return handle ?? undefined;
+  }, []);
+
+  const focusChip = useCallback((id: string) => {
+    const node = chipRefs.current[id];
+    if (node && typeof node.focus === 'function') {
+      node.focus();
+    }
   }, []);
 
   return (
@@ -85,12 +110,30 @@ export const CategoryChips: React.FC<Props> = ({
             nextFocusRight={rightHandle}
             onFocus={() => {
               setFocusedId(item.id);
+              preferredFocusId.current = item.id;
               onFocusChange?.(item.id);
               scrollToChip(item.id);
             }}
             onBlur={() =>
               setFocusedId(current => (current === item.id ? null : current))
             }
+            onKeyDown={event => {
+              if (isLeftKey(event)) {
+                event.preventDefault?.();
+                const nextId = data[index - 1]?.id;
+                if (nextId) {
+                  focusChip(nextId);
+                }
+                return;
+              }
+              if (isRightKey(event)) {
+                event.preventDefault?.();
+                const nextId = data[index + 1]?.id;
+                if (nextId) {
+                  focusChip(nextId);
+                }
+              }
+            }}
             onLayout={registerLayout(item.id)}
             style={({pressed}) => [
               styles.chip,
