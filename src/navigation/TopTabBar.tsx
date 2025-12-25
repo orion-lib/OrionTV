@@ -32,11 +32,9 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
 
   useEffect(() => {
     const formatTime = (date: Date) => {
-      return date.toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      });
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
     };
     const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
@@ -64,6 +62,7 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
               ))}
             </View>
           </View>
+          <View style={styles.statusDivider} />
           <View style={styles.timePill} focusable={false}>
             <Text style={styles.time}>{currentTime}</Text>
           </View>
@@ -126,6 +125,12 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: 'rgba(148, 163, 184, 0.12)',
   },
+  statusDivider: {
+    width: 1,
+    height: 16,
+    backgroundColor: 'rgba(148, 163, 184, 0.35)',
+    marginHorizontal: 16,
+  },
   status: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -140,7 +145,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(226, 232, 240, 0.2)',
   },
   timePill: {
-    marginLeft: 24,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
