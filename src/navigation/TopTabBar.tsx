@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
@@ -8,6 +8,20 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
   state,
   navigation,
 }) => {
+  const [currentTime, setCurrentTime] = useState<string>('');
+
+  useEffect(() => {
+    const formatTime = (date: Date) => {
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return `${hours}:${minutes}`;
+    };
+    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    updateTime();
+    const interval = setInterval(updateTime, 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.topRow}>
@@ -32,8 +46,13 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
               color="#cbd5e1"
               style={styles.statusIcon}
             />
-            <Icon name="wifi-outline" size={16} color="#cbd5e1" style={styles.statusIcon} />
-            <Text style={styles.time}>12:24</Text>
+            <Icon
+              name="wifi-outline"
+              size={16}
+              color="#cbd5e1"
+              style={styles.statusIcon}
+            />
+            <Text style={styles.time}>{currentTime}</Text>
           </View>
         </View>
       </View>
@@ -55,9 +74,30 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
                 }
               }}
               style={[styles.tabItem, isFocused && styles.tabItemActive]}>
-              <Text style={[styles.tabText, isFocused && styles.tabTextActive]}>
-                {item.title}
-              </Text>
+              {item.name === 'Search' ||
+              item.name === 'Favorites' ||
+              item.name === 'Settings' ? (
+                <View style={styles.iconTab}>
+                  <Icon
+                    name={item.icon as never}
+                    size={18}
+                    color={isFocused ? '#eef4ff' : '#cbd5e1'}
+                  />
+                  {item.name === 'Settings' ? (
+                    <Text
+                      style={[
+                        styles.settingsTime,
+                        isFocused && styles.settingsTimeActive,
+                      ]}>
+                      {currentTime}
+                    </Text>
+                  ) : null}
+                </View>
+              ) : (
+                <Text style={[styles.tabText, isFocused && styles.tabTextActive]}>
+                  {item.title}
+                </Text>
+              )}
             </Pressable>
           );
         })}
@@ -130,5 +170,18 @@ const styles = StyleSheet.create({
     textShadowColor: 'rgba(118, 190, 255, 0.6)',
     textShadowOffset: {width: 0, height: 0},
     textShadowRadius: 8,
+  },
+  iconTab: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  settingsTime: {
+    color: '#94a3b8',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  settingsTimeActive: {
+    color: '#eef4ff',
   },
 });
