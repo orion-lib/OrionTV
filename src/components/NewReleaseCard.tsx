@@ -34,7 +34,6 @@ export const NewReleaseCard: React.FC<Props> = ({
   lockLeft,
   lockRight,
 }) => {
-  const [focused, setFocused] = useState(false);
   const [selfHandle, setSelfHandle] = useState<number | undefined>();
   const pressableRef = useRef<PressableHandle>(null);
 
@@ -47,7 +46,10 @@ export const NewReleaseCard: React.FC<Props> = ({
     }
   }, []);
 
-  const computedStyle = ({pressed}: PressableStateCallbackType) => [
+  const computedStyle = ({
+    pressed,
+    focused,
+  }: PressableStateCallbackType) => [
     styles.card,
     focused && styles.focused,
     pressed && styles.pressed,
@@ -60,8 +62,6 @@ export const NewReleaseCard: React.FC<Props> = ({
       nextFocusUp={nextFocusUp}
       nextFocusLeft={lockLeft ? selfHandle : nextFocusLeft}
       nextFocusRight={lockRight ? selfHandle : nextFocusRight}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
       style={computedStyle}
       onPress={onPress}>
       <Image source={{uri: item.poster}} style={styles.poster} />
