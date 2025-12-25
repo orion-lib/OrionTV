@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {
+  findNodeHandle,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -20,16 +21,36 @@ import {RootStackParamList} from '../navigation/RootNavigator';
 import {EmptyState} from '../components/EmptyState';
 import {NewReleaseCard} from '../components/NewReleaseCard';
 import {TAB_ITEMS} from '../navigation/tabConfig';
+import {formatTime24} from '../utils/time';
 
 const GRID_COLUMNS = 4;
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const MoreCard: React.FC = () => {
+type PressableHandle = React.ElementRef<typeof Pressable>;
+
+const MoreCard: React.FC<{lockLeft?: boolean; lockRight?: boolean}> = ({
+  lockLeft,
+  lockRight,
+}) => {
   const [focused, setFocused] = useState(false);
+  const [selfHandle, setSelfHandle] = useState<number | undefined>();
+  const pressableRef = React.useRef<PressableHandle>(null);
+
+  React.useEffect(() => {
+    const handle = pressableRef.current
+      ? findNodeHandle(pressableRef.current)
+      : null;
+    if (handle) {
+      setSelfHandle(handle);
+    }
+  }, []);
   return (
     <Pressable
+      ref={pressableRef}
       focusable
+      nextFocusLeft={lockLeft ? selfHandle : undefined}
+      nextFocusRight={lockRight ? selfHandle : undefined}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       onPress={() => {}}
@@ -44,18 +65,10 @@ const HomeScreen: React.FC = () => {
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
   const [focusedAction, setFocusedAction] = useState<string | null>(null);
-  const [focusedCategoryHandle, setFocusedCategoryHandle] = useState<
-    number | undefined
-  >(undefined);
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
-    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    const updateTime = () => setCurrentTime(formatTime24(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 60 * 1000);
     return () => clearInterval(interval);
@@ -116,6 +129,40 @@ const HomeScreen: React.FC = () => {
                   item.name === 'Settings',
               ).map(item => {
                 const isSettings = item.name === 'Settings';
+                const isFocused = focusedAction === item.name;
+                if (isSettings) {
+                  return (
+                    <React.Fragment key={item.name}>
+                      <Pressable
+                        focusable
+                        onFocus={() => setFocusedAction(item.name)}
+                        onBlur={() => setFocusedAction(null)}
+                        onPress={() => navigation.navigate(item.name)}
+                        style={[
+                          styles.quickActionItem,
+                          styles.quickActionIcon,
+                          isFocused && styles.quickActionFocused,
+                        ]}>
+                        <View style={styles.quickActionContent}>
+                          <Icon
+                            name={item.icon as never}
+                            size={16}
+                            color={isFocused ? '#e9f2ff' : '#e2e8f0'}
+                          />
+                        </View>
+                      </Pressable>
+                      <View style={styles.quickActionTimePill} focusable={false}>
+                        <Text
+                          style={[
+                            styles.quickActionTime,
+                            isFocused && styles.quickActionTimeFocused,
+                          ]}>
+                          {currentTime}
+                        </Text>
+                      </View>
+                    </React.Fragment>
+                  );
+                }
                 return (
                   <Pressable
                     key={item.name}
@@ -125,29 +172,15 @@ const HomeScreen: React.FC = () => {
                     onPress={() => navigation.navigate(item.name)}
                     style={[
                       styles.quickActionItem,
-                      isSettings
-                        ? styles.quickActionWide
-                        : styles.quickActionIcon,
-                      focusedAction === item.name && styles.quickActionFocused,
+                      styles.quickActionIcon,
+                      isFocused && styles.quickActionFocused,
                     ]}>
                     <View style={styles.quickActionContent}>
                       <Icon
                         name={item.icon as never}
                         size={16}
-                        color={
-                          focusedAction === item.name ? '#e9f2ff' : '#e2e8f0'
-                        }
+                        color={isFocused ? '#e9f2ff' : '#e2e8f0'}
                       />
-                      {isSettings ? (
-                        <Text
-                          style={[
-                            styles.quickActionTime,
-                            focusedAction === item.name &&
-                              styles.quickActionTimeFocused,
-                          ]}>
-                          {currentTime}
-                        </Text>
-                      ) : null}
                     </View>
                   </Pressable>
                 );
@@ -160,17 +193,17 @@ const HomeScreen: React.FC = () => {
               activeId={activeCategory}
               onChange={handleCategorySelect}
               onFocusChange={handleCategoryFocus}
-              onFocusHandleChange={setFocusedCategoryHandle}
             />
           </View>
           <View style={styles.heroArea}>
             <View style={styles.heroRow}>
-              {heroItems.slice(0, 2).map(item => (
+              {heroItems.slice(0, 2).map((item, index, items) => (
                 <ShowcaseCard
                   key={item.id}
                   item={item}
                   variant="hero"
-                  nextFocusUp={focusedCategoryHandle}
+                  lockLeft={index === 0}
+                  lockRight={index === items.length - 1}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -190,17 +223,18 @@ const HomeScreen: React.FC = () => {
             <>
               {gridRows.map((row, rowIndex) => (
                 <View key={`row-${rowIndex}`} style={styles.gridRow}>
-                  {row.map(item => (
+                  {row.map((item, index) => (
                     <ShowcaseCard
                       key={item.id}
                       item={item}
                       variant="tile"
-                      nextFocusUp={focusedCategoryHandle}
+                      lockLeft={index === 0}
+                      lockRight={index === row.length - 1}
                       onPress={() => navigation.navigate('Detail', {id: item.id})}
                     />
                   ))}
                   {rowIndex === 0 && row.length < GRID_COLUMNS ? (
-                    <MoreCard />
+                    <MoreCard lockRight />
                   ) : null}
                 </View>
               ))}
@@ -211,12 +245,13 @@ const HomeScreen: React.FC = () => {
           <SectionHeader title="新上映" description="上新电影与剧集" />
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.horizontalList}>
-              {videos.map(item => (
+              {videos.map((item, index) => (
                 <NewReleaseCard
                   key={`new-${item.id}`}
                   item={item}
                   isFavorite={isFavorite(item.id)}
-                  nextFocusUp={focusedCategoryHandle}
+                  lockLeft={index === 0}
+                  lockRight={index === videos.length - 1}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -282,15 +317,19 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
   },
-  quickActionWide: {
-    height: 30,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-  },
   quickActionContent: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  quickActionTimePill: {
+    height: 30,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
   },
   quickActionTime: {
     color: '#cbd5e1',

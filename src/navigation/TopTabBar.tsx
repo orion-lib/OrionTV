@@ -3,6 +3,7 @@ import {Pressable, StyleSheet, Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {BottomTabBarProps} from '@react-navigation/bottom-tabs';
 import {TAB_ITEMS} from './tabConfig';
+import {formatTime24} from '../utils/time';
 
 export const TopTabBar: React.FC<BottomTabBarProps> = ({
   state,
@@ -31,12 +32,7 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
   };
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
-    const updateTime = () => setCurrentTime(formatTime(new Date()));
+    const updateTime = () => setCurrentTime(formatTime24(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
@@ -148,7 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+    backgroundColor: 'transparent',
   },
   time: {
     color: '#e2e8f0',
