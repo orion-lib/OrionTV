@@ -321,8 +321,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
-    borderWidth: 1,
-    borderColor: '#1f2430',
   },
   quickActionTime: {
     color: '#cbd5e1',
