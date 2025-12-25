@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     width: 1,
     height: 16,
     backgroundColor: 'rgba(148, 163, 184, 0.35)',
-    marginHorizontal: 16,
+    marginHorizontal: 20,
   },
   status: {
     flexDirection: 'row',
@@ -147,7 +147,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: 'transparent',
+    backgroundColor: '#0b0f1a',
+    marginLeft: 4,
   },
   time: {
     color: '#e2e8f0',
