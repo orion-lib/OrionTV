@@ -61,15 +61,19 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
-  const [currentTime, setCurrentTime] = useState<string>('');
+  const [currentTime, setCurrentTime] = useState<string>(
+    formatTime24(new Date()),
+  );
 
   useEffect(() => {
-    const formatTime = (date: Date) => {
-      return date.toTimeString().slice(0, 5);
+    const updateTime = () => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      setCurrentTime(`${hours}:${minutes}`);
     };
-    const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
-    const interval = setInterval(updateTime, 60 * 1000);
+    const interval = setInterval(updateTime, 30 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -130,34 +134,31 @@ const HomeScreen: React.FC = () => {
                 const isSettings = item.name === 'Settings';
                 if (isSettings) {
                   return (
-                    <Pressable
-                      key={item.name}
-                      focusable
-                      onPress={() => navigation.navigate(item.name)}
-                      style={({focused}) => [
-                        styles.quickActionItem,
-                        styles.quickActionTimeWrapper,
-                        focused && styles.quickActionFocused,
-                      ]}>
-                      {({focused}) => (
-                        <View style={styles.quickActionContent}>
-                          <Icon
-                            name={item.icon as never}
-                            size={16}
-                            color={focused ? '#e9f2ff' : '#e2e8f0'}
-                          />
-                          <View style={styles.quickActionTimePill}>
-                            <Text
-                              style={[
-                                styles.quickActionTime,
-                                focused && styles.quickActionTimeFocused,
-                              ]}>
-                              {currentTime}
-                            </Text>
+                    <React.Fragment key={item.name}>
+                      <Pressable
+                        focusable
+                        onPress={() => navigation.navigate(item.name)}
+                        style={({focused}) => [
+                          styles.quickActionItem,
+                          styles.quickActionIcon,
+                          focused && styles.quickActionFocused,
+                        ]}>
+                        {({focused}) => (
+                          <View style={styles.quickActionContent}>
+                            <Icon
+                              name={item.icon as never}
+                              size={16}
+                              color={focused ? '#e9f2ff' : '#e2e8f0'}
+                            />
                           </View>
-                        </View>
-                      )}
-                    </Pressable>
+                        )}
+                      </Pressable>
+                      <View style={styles.quickActionTimePill} focusable={false}>
+                        <Text style={styles.quickActionTime}>
+                          {currentTime}
+                        </Text>
+                      </View>
+                    </React.Fragment>
                   );
                 }
                 return (
@@ -314,11 +315,6 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
   },
-  quickActionTimeWrapper: {
-    height: 30,
-    borderRadius: 15,
-    paddingHorizontal: 10,
-  },
   quickActionContent: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -328,10 +324,10 @@ const styles = StyleSheet.create({
     height: 30,
     paddingHorizontal: 12,
     borderRadius: 15,
-    backgroundColor: 'transparent',
+    backgroundColor: '#0b0d14',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 8,
+    marginLeft: 10,
   },
   quickActionTime: {
     color: '#cbd5e1',
