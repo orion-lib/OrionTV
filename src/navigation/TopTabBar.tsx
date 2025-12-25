@@ -18,7 +18,7 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
     };
     const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
-    const interval = setInterval(updateTime, 60 * 1000);
+    const interval = setInterval(updateTime, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -29,26 +29,20 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
         <View style={styles.rightSection}>
           <View style={styles.status}>
             <Icon
-              name="notifications-outline"
-              size={16}
-              color="#cbd5e1"
-              style={styles.statusIcon}
-            />
-            <Icon
-              name="star-outline"
-              size={16}
-              color="#cbd5e1"
-              style={styles.statusIcon}
-            />
-            <Icon
               name="search-outline"
-              size={16}
+              size={11}
               color="#cbd5e1"
               style={styles.statusIcon}
             />
             <Icon
-              name="wifi-outline"
-              size={16}
+              name="heart-outline"
+              size={11}
+              color="#cbd5e1"
+              style={styles.statusIcon}
+            />
+            <Icon
+              name="settings-outline"
+              size={11}
               color="#cbd5e1"
               style={styles.statusIcon}
             />
@@ -80,7 +74,7 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
                 <View style={styles.iconTab}>
                   <Icon
                     name={item.icon as never}
-                    size={18}
+                    size={12}
                     color={isFocused ? '#eef4ff' : '#cbd5e1'}
                   />
                   {item.name === 'Settings' ? (
@@ -145,7 +139,8 @@ const styles = StyleSheet.create({
   time: {
     color: '#cbd5e1',
     fontWeight: '700',
-    marginLeft: 4,
+    fontSize: 10,
+    marginLeft: 10,
   },
   tabsRow: {
     flexDirection: 'row',
@@ -174,11 +169,11 @@ const styles = StyleSheet.create({
   iconTab: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 8,
   },
   settingsTime: {
     color: '#94a3b8',
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: '600',
   },
   settingsTimeActive: {
