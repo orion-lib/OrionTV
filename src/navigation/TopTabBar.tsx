@@ -9,6 +9,26 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const [currentTime, setCurrentTime] = useState<string>('');
+  const statusTabs = TAB_ITEMS.filter(item =>
+    ['Search', 'Favorites', 'Settings'].includes(item.name),
+  );
+  const categoryTabs = TAB_ITEMS.filter(
+    item => !['Search', 'Favorites', 'Settings'].includes(item.name),
+  );
+
+  const handleNavigate = (routeName: string) => {
+    const routeIndex = state.routes.findIndex(route => route.name === routeName);
+    const isFocused = routeIndex === state.index;
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: state.routes[routeIndex]?.key,
+      canPreventDefault: true,
+    });
+
+    if (!isFocused && !event.defaultPrevented) {
+      navigation.navigate(routeName as never);
+    }
+  };
 
   useEffect(() => {
     const formatTime = (date: Date) => {
@@ -28,70 +48,37 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
         <Text style={styles.logo}>YOGURT</Text>
         <View style={styles.rightSection}>
           <View style={styles.status}>
-            <Icon
-              name="search-outline"
-              size={11}
-              color="#cbd5e1"
-              style={styles.statusIcon}
-            />
-            <Icon
-              name="heart-outline"
-              size={11}
-              color="#cbd5e1"
-              style={styles.statusIcon}
-            />
-            <Icon
-              name="settings-outline"
-              size={11}
-              color="#cbd5e1"
-              style={styles.statusIcon}
-            />
+            {statusTabs.map(item => (
+              <Pressable
+                key={item.name}
+                onPress={() => handleNavigate(item.name)}
+                style={({pressed}) => [
+                  styles.statusButton,
+                  pressed && styles.statusButtonPressed,
+                ]}>
+                <Icon name={item.icon as never} size={12} color="#e2e8f0" />
+              </Pressable>
+            ))}
             <Text style={styles.time}>{currentTime}</Text>
           </View>
         </View>
       </View>
       <View style={styles.tabsRow}>
-        {TAB_ITEMS.map(item => {
-          const routeIndex = state.routes.findIndex(route => route.name === item.name);
+        {categoryTabs.map(item => {
+          const routeIndex = state.routes.findIndex(
+            route => route.name === item.name,
+          );
           const isFocused = routeIndex === state.index;
           return (
             <Pressable
               key={item.name}
               onPress={() => {
-                const event = navigation.emit({
-                  type: 'tabPress',
-                  target: state.routes[routeIndex]?.key,
-                  canPreventDefault: true,
-                });
-                if (!isFocused && !event.defaultPrevented) {
-                  navigation.navigate(item.name);
-                }
+                handleNavigate(item.name);
               }}
               style={[styles.tabItem, isFocused && styles.tabItemActive]}>
-              {item.name === 'Search' ||
-              item.name === 'Favorites' ||
-              item.name === 'Settings' ? (
-                <View style={styles.iconTab}>
-                  <Icon
-                    name={item.icon as never}
-                    size={12}
-                    color={isFocused ? '#eef4ff' : '#cbd5e1'}
-                  />
-                  {item.name === 'Settings' ? (
-                    <Text
-                      style={[
-                        styles.settingsTime,
-                        isFocused && styles.settingsTimeActive,
-                      ]}>
-                      {currentTime}
-                    </Text>
-                  ) : null}
-                </View>
-              ) : (
-                <Text style={[styles.tabText, isFocused && styles.tabTextActive]}>
-                  {item.title}
-                </Text>
-              )}
+              <Text style={[styles.tabText, isFocused && styles.tabTextActive]}>
+                {item.title}
+              </Text>
             </Pressable>
           );
         })}
@@ -107,12 +94,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 20,
-    backgroundColor: '#0b0d14',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#1f2430',
+    backgroundColor: '#0b0f1a',
+    paddingHorizontal: 24,
+    paddingTop: 10,
+    paddingBottom: 14,
   },
   topRow: {
     flexDirection: 'row',
@@ -120,10 +105,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   logo: {
-    fontSize: 22,
-    fontWeight: '900',
-    color: '#e9f2ff',
-    letterSpacing: 1.1,
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#f8fafc',
+    letterSpacing: 1.4,
   },
   rightSection: {
     flexDirection: 'row',
@@ -133,50 +118,44 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  statusIcon: {
+  statusButton: {
     marginLeft: 10,
+    padding: 4,
+    borderRadius: 12,
+    backgroundColor: 'rgba(148, 163, 184, 0.12)',
+  },
+  statusButtonPressed: {
+    backgroundColor: 'rgba(226, 232, 240, 0.2)',
   },
   time: {
-    color: '#cbd5e1',
-    fontWeight: '700',
-    fontSize: 10,
-    marginLeft: 10,
+    color: '#e2e8f0',
+    fontWeight: '600',
+    fontSize: 12,
+    marginLeft: 12,
   },
   tabsRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 12,
   },
   tabItem: {
-    marginRight: 18,
-    paddingBottom: 6,
+    marginRight: 22,
+    paddingVertical: 2,
   },
   tabItemActive: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#7cc0ff',
+    transform: [{scale: 1.04}],
   },
   tabText: {
     color: '#cbd5e1',
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '500',
+    letterSpacing: 0.6,
   },
   tabTextActive: {
-    color: '#eef4ff',
-    textShadowColor: 'rgba(118, 190, 255, 0.6)',
+    color: '#f8fafc',
+    fontWeight: '700',
+    textShadowColor: 'rgba(148, 197, 255, 0.75)',
     textShadowOffset: {width: 0, height: 0},
-    textShadowRadius: 8,
-  },
-  iconTab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  settingsTime: {
-    color: '#94a3b8',
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  settingsTimeActive: {
-    color: '#eef4ff',
+    textShadowRadius: 10,
   },
 });
