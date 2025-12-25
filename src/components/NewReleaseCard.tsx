@@ -1,5 +1,13 @@
-import React, {useState} from 'react';
-import {Image, Pressable, PressableStateCallbackType, StyleSheet, Text, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  findNodeHandle,
+  Image,
+  Pressable,
+  PressableStateCallbackType,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {VideoItem} from '../types';
 
@@ -8,15 +16,36 @@ interface Props {
   isFavorite: boolean;
   onPress: () => void;
   nextFocusUp?: number;
+  nextFocusLeft?: number;
+  nextFocusRight?: number;
+  lockLeft?: boolean;
+  lockRight?: boolean;
 }
+
+type PressableHandle = React.ElementRef<typeof Pressable>;
 
 export const NewReleaseCard: React.FC<Props> = ({
   item,
   isFavorite,
   onPress,
   nextFocusUp,
+  nextFocusLeft,
+  nextFocusRight,
+  lockLeft,
+  lockRight,
 }) => {
   const [focused, setFocused] = useState(false);
+  const [selfHandle, setSelfHandle] = useState<number | undefined>();
+  const pressableRef = useRef<PressableHandle>(null);
+
+  useEffect(() => {
+    const handle = pressableRef.current
+      ? findNodeHandle(pressableRef.current)
+      : null;
+    if (handle) {
+      setSelfHandle(handle);
+    }
+  }, []);
 
   const computedStyle = ({pressed}: PressableStateCallbackType) => [
     styles.card,
@@ -26,8 +55,11 @@ export const NewReleaseCard: React.FC<Props> = ({
 
   return (
     <Pressable
+      ref={pressableRef}
       focusable
       nextFocusUp={nextFocusUp}
+      nextFocusLeft={lockLeft ? selfHandle : nextFocusLeft}
+      nextFocusRight={lockRight ? selfHandle : nextFocusRight}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       style={computedStyle}

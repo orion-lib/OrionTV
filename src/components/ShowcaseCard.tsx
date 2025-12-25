@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
+  findNodeHandle,
   ImageBackground,
   Pressable,
   PressableStateCallbackType,
@@ -18,7 +19,13 @@ interface Props {
   onPress: () => void;
   hasTVPreferredFocus?: boolean;
   nextFocusUp?: number;
+  nextFocusLeft?: number;
+  nextFocusRight?: number;
+  lockLeft?: boolean;
+  lockRight?: boolean;
 }
+
+type PressableHandle = React.ElementRef<typeof Pressable>;
 
 const variantStyles: Record<Variant, {height: number; flex: number}> = {
   hero: {height: 220, flex: 1},
@@ -32,8 +39,23 @@ export const ShowcaseCard: React.FC<Props> = ({
   variant = 'wide',
   hasTVPreferredFocus,
   nextFocusUp,
+  nextFocusLeft,
+  nextFocusRight,
+  lockLeft,
+  lockRight,
 }) => {
   const [focused, setFocused] = useState(false);
+  const [selfHandle, setSelfHandle] = useState<number | undefined>();
+  const pressableRef = useRef<PressableHandle>(null);
+
+  useEffect(() => {
+    const handle = pressableRef.current
+      ? findNodeHandle(pressableRef.current)
+      : null;
+    if (handle) {
+      setSelfHandle(handle);
+    }
+  }, []);
 
   const computedStyle = ({pressed}: PressableStateCallbackType) => [
     styles.card,
@@ -44,9 +66,12 @@ export const ShowcaseCard: React.FC<Props> = ({
 
   return (
     <Pressable
+      ref={pressableRef}
       focusable
       hasTVPreferredFocus={hasTVPreferredFocus}
       nextFocusUp={nextFocusUp}
+      nextFocusLeft={lockLeft ? selfHandle : nextFocusLeft}
+      nextFocusRight={lockRight ? selfHandle : nextFocusRight}
       onPress={onPress}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

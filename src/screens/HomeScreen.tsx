@@ -1,5 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {
+  findNodeHandle,
   SafeAreaView,
   StatusBar,
   StyleSheet,
@@ -26,11 +27,30 @@ const GRID_COLUMNS = 4;
 
 type Nav = NativeStackNavigationProp<RootStackParamList>;
 
-const MoreCard: React.FC = () => {
+type PressableHandle = React.ElementRef<typeof Pressable>;
+
+const MoreCard: React.FC<{lockLeft?: boolean; lockRight?: boolean}> = ({
+  lockLeft,
+  lockRight,
+}) => {
   const [focused, setFocused] = useState(false);
+  const [selfHandle, setSelfHandle] = useState<number | undefined>();
+  const pressableRef = React.useRef<PressableHandle>(null);
+
+  React.useEffect(() => {
+    const handle = pressableRef.current
+      ? findNodeHandle(pressableRef.current)
+      : null;
+    if (handle) {
+      setSelfHandle(handle);
+    }
+  }, []);
   return (
     <Pressable
+      ref={pressableRef}
       focusable
+      nextFocusLeft={lockLeft ? selfHandle : undefined}
+      nextFocusRight={lockRight ? selfHandle : undefined}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       onPress={() => {}}
@@ -177,11 +197,13 @@ const HomeScreen: React.FC = () => {
           </View>
           <View style={styles.heroArea}>
             <View style={styles.heroRow}>
-              {heroItems.slice(0, 2).map(item => (
+              {heroItems.slice(0, 2).map((item, index, items) => (
                 <ShowcaseCard
                   key={item.id}
                   item={item}
                   variant="hero"
+                  lockLeft={index === 0}
+                  lockRight={index === items.length - 1}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -199,18 +221,20 @@ const HomeScreen: React.FC = () => {
             <EmptyState title="暂无内容" description="稍后再来看看吧" />
           ) : (
             <>
-                {gridRows.map((row, rowIndex) => (
-                  <View key={`row-${rowIndex}`} style={styles.gridRow}>
-                    {row.map(item => (
-                      <ShowcaseCard
-                        key={item.id}
-                        item={item}
-                        variant="tile"
-                        onPress={() => navigation.navigate('Detail', {id: item.id})}
-                      />
-                    ))}
+              {gridRows.map((row, rowIndex) => (
+                <View key={`row-${rowIndex}`} style={styles.gridRow}>
+                  {row.map((item, index) => (
+                    <ShowcaseCard
+                      key={item.id}
+                      item={item}
+                      variant="tile"
+                      lockLeft={index === 0}
+                      lockRight={index === row.length - 1}
+                      onPress={() => navigation.navigate('Detail', {id: item.id})}
+                    />
+                  ))}
                   {rowIndex === 0 && row.length < GRID_COLUMNS ? (
-                    <MoreCard />
+                    <MoreCard lockRight />
                   ) : null}
                 </View>
               ))}
@@ -221,11 +245,13 @@ const HomeScreen: React.FC = () => {
           <SectionHeader title="新上映" description="上新电影与剧集" />
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.horizontalList}>
-              {videos.map(item => (
+              {videos.map((item, index) => (
                 <NewReleaseCard
                   key={`new-${item.id}`}
                   item={item}
                   isFavorite={isFavorite(item.id)}
+                  lockLeft={index === 0}
+                  lockRight={index === videos.length - 1}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
