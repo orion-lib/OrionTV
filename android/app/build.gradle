@@ -133,3 +133,5 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer:1.4.1")
     implementation("androidx.media3:media3-ui:1.4.1")
 }
+
+apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
