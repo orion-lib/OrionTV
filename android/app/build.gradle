@@ -3,6 +3,10 @@ apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
 
 def projectRoot = rootDir.parentFile
+def ensureHermesParser = tasks.register("ensureHermesParser", Exec) {
+    workingDir projectRoot
+    commandLine("node", "scripts/ensure-hermes-parser.js")
+}
 def applyPatchPackage = tasks.register("applyPatchPackage", Exec) {
     workingDir projectRoot
     commandLine("npx", "patch-package")
@@ -126,7 +130,7 @@ android {
     }
 }
 
-preBuild.dependsOn(applyPatchPackage)
+preBuild.dependsOn(ensureHermesParser, applyPatchPackage)
 
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
