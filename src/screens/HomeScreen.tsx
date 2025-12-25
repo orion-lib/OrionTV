@@ -61,12 +61,19 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
-  const [currentTime, setCurrentTime] = useState<string>('');
+  const [currentTime, setCurrentTime] = useState<string>(
+    formatTime24(new Date()),
+  );
 
   useEffect(() => {
-    const updateTime = () => setCurrentTime(formatTime24(new Date()));
+    const updateTime = () => {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      setCurrentTime(`${hours}:${minutes}`);
+    };
     updateTime();
-    const interval = setInterval(updateTime, 60 * 1000);
+    const interval = setInterval(updateTime, 30 * 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -317,7 +324,7 @@ const styles = StyleSheet.create({
     height: 30,
     paddingHorizontal: 12,
     borderRadius: 15,
-    backgroundColor: '#0c0f1b',
+    backgroundColor: '#0b0d14',
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 10,
