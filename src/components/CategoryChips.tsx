@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import {
   findNodeHandle,
   LayoutChangeEvent,
@@ -28,7 +28,6 @@ export const CategoryChips: React.FC<Props> = ({
   onFocusChange,
   onFocusHandleChange,
 }) => {
-  const [focusedId, setFocusedId] = useState<string | null>(null);
   const preferredFocusId = useRef(activeId);
   const scrollRef = useRef<ScrollView>(null);
   const layoutMap = useRef<Record<string, {x: number; width: number}>>({});
@@ -96,7 +95,6 @@ export const CategoryChips: React.FC<Props> = ({
       contentContainerStyle={styles.container}>
       {data.map((item, index) => {
         const active = item.id === activeId;
-        const focused = item.id === focusedId;
         const leftId = data[index - 1]?.id ?? item.id;
         const rightId = data[index + 1]?.id ?? item.id;
         const selfHandle = getHandle(item.id);
@@ -114,15 +112,11 @@ export const CategoryChips: React.FC<Props> = ({
             nextFocusLeft={leftHandle}
             nextFocusRight={rightHandle}
             onFocus={() => {
-              setFocusedId(item.id);
               preferredFocusId.current = item.id;
               onFocusChange?.(item.id);
               onFocusHandleChange?.(selfHandle);
               scrollToChip(item.id);
             }}
-            onBlur={() =>
-              setFocusedId(current => (current === item.id ? null : current))
-            }
             onKeyDown={event => {
               if (isLeftKey(event)) {
                 event.preventDefault?.();
@@ -141,19 +135,23 @@ export const CategoryChips: React.FC<Props> = ({
               }
             }}
             onLayout={registerLayout(item.id)}
-            style={({pressed}) => [
+            style={({pressed, focused}) => [
               styles.chip,
               (active || focused) && styles.active,
               pressed && styles.pressed,
             ]}>
-            <Text
-              style={[
-                styles.label,
-                (active || focused) && styles.activeLabel,
-              ]}>
-              {item.title}
-            </Text>
-            {(active || focused) && <View style={styles.underline} />}
+            {({focused}) => (
+              <>
+                <Text
+                  style={[
+                    styles.label,
+                    (active || focused) && styles.activeLabel,
+                  ]}>
+                  {item.title}
+                </Text>
+                {(active || focused) && <View style={styles.underline} />}
+              </>
+            )}
           </Pressable>
         );
       })}

@@ -1,4 +1,4 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useRef} from 'react';
 import {
   NativeSyntheticEvent,
   SafeAreaView,
@@ -47,24 +47,20 @@ const PreferenceOption: React.FC<OptionProps> = ({
   onFocus,
   hasPreferredFocus,
 }) => {
-  const [focused, setFocused] = useState(false);
-
   return (
     <Pressable
       focusable
       hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
-        setFocused(true);
         onFocus?.();
       }}
-      onBlur={() => setFocused(false)}
       onPress={onPress}
       onKeyDown={event => {
         if (isSelectKey(event)) {
           onPress();
         }
       }}
-      style={[
+      style={({focused}) => [
         styles.option,
         active && styles.optionActive,
         focused && styles.optionFocused,
@@ -99,24 +95,23 @@ const ToggleRow: React.FC<ToggleProps> = ({
   onFocus,
   hasPreferredFocus,
 }) => {
-  const [focused, setFocused] = useState(false);
-
   return (
     <Pressable
       focusable
       hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
-        setFocused(true);
         onFocus?.();
       }}
-      onBlur={() => setFocused(false)}
       onPress={onToggle}
       onKeyDown={event => {
         if (isSelectKey(event) || isLeftKey(event) || isRightKey(event)) {
           onToggle();
         }
       }}
-      style={[styles.toggleRow, focused && styles.optionFocused]}>
+      style={({focused}) => [
+        styles.toggleRow,
+        focused && styles.optionFocused,
+      ]}>
       <View>
         <Text style={styles.label}>{title}</Text>
         <Text style={styles.desc}>{description}</Text>
@@ -143,24 +138,20 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   onFocus,
   hasPreferredFocus,
 }) => {
-  const [focused, setFocused] = useState(false);
-
   return (
     <Pressable
       focusable
       hasTVPreferredFocus={hasPreferredFocus}
       onFocus={() => {
-        setFocused(true);
         onFocus?.();
       }}
-      onBlur={() => setFocused(false)}
       onPress={onPress}
       onKeyDown={event => {
         if (isSelectKey(event)) {
           onPress();
         }
       }}
-      style={[styles.button, focused && styles.optionFocused]}>
+      style={({focused}) => [styles.button, focused && styles.optionFocused]}>
       <Text style={styles.buttonText}>{label}</Text>
     </Pressable>
   );
