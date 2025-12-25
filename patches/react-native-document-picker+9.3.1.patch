@@ -1,5 +1,5 @@
 diff --git a/node_modules/react-native-document-picker/android/src/main/java/com/reactnativedocumentpicker/RNDocumentPickerModule.java b/node_modules/react-native-document-picker/android/src/main/java/com/reactnativedocumentpicker/RNDocumentPickerModule.java
-index 5001525..cfb5d47 100644
+index 5001525..2606344 100644
 --- a/node_modules/react-native-document-picker/android/src/main/java/com/reactnativedocumentpicker/RNDocumentPickerModule.java
 +++ b/node_modules/react-native-document-picker/android/src/main/java/com/reactnativedocumentpicker/RNDocumentPickerModule.java
 @@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
@@ -11,7 +11,15 @@ index 5001525..cfb5d47 100644
  import com.facebook.react.bridge.Promise;
  import com.facebook.react.bridge.ReactApplicationContext;
  import com.facebook.react.bridge.ReactContext;
-@@ -229,11 +229,12 @@ public class RNDocumentPickerModule extends NativeDocumentPickerSpec {
+@@ -223,17 +223,19 @@ public class RNDocumentPickerModule extends NativeDocumentPickerSpec {
+         return;
+       }
+ 
+-      new ProcessDataTask(getReactApplicationContext(), uris, copyTo, promise).execute();
++      new ProcessDataTask(getReactApplicationContext(), uris, copyTo, promise)
++          .executeOnExecutor(GuardedAsyncTask.THREAD_POOL_EXECUTOR);
+     } catch (Exception e) {
+       sendError(E_UNEXPECTED_EXCEPTION, e.getLocalizedMessage(), e);
      }
    }
  
@@ -21,11 +29,11 @@ index 5001525..cfb5d47 100644
      private final List<Uri> uris;
      private final String copyTo;
      private final Promise promise;
-+    private ReadableArray result;
++    private ReadableArray results;
  
      protected ProcessDataTask(ReactContext reactContext, List<Uri> uris, String copyTo, Promise promise) {
        super(reactContext.getExceptionHandler());
-@@ -244,17 +245,17 @@ public class RNDocumentPickerModule extends NativeDocumentPickerSpec {
+@@ -244,17 +246,21 @@ public class RNDocumentPickerModule extends NativeDocumentPickerSpec {
      }
  
      @Override
@@ -36,14 +44,18 @@ index 5001525..cfb5d47 100644
          results.pushMap(getMetadata(uri));
        }
 -      return results;
-+      result = results;
++      this.results = results;
      }
  
      @Override
 -    protected void onPostExecuteGuarded(ReadableArray readableArray) {
 -      promise.resolve(readableArray);
-+    protected void onPostExecute(Void ignored) {
-+      promise.resolve(result);
++    protected void onPostExecute(Void unused) {
++      if (results == null) {
++        promise.resolve(Arguments.createArray());
++        return;
++      }
++      promise.resolve(results);
      }
  
      private WritableMap getMetadata(Uri uri) {
