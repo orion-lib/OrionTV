@@ -61,6 +61,33 @@ export const CategoryChips: React.FC<Props> = ({
     return handle ?? undefined;
   }, []);
 
+  useEffect(() => {
+    if (!onFocusHandleChange) {
+      return;
+    }
+    preferredFocusId.current = activeId;
+    const targetId = preferredFocusId.current ?? activeId;
+    let attempts = 0;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const trySetHandle = () => {
+      const handle = getHandle(targetId);
+      if (handle) {
+        onFocusHandleChange(handle);
+        return;
+      }
+      if (attempts < 10) {
+        attempts += 1;
+        timeoutId = setTimeout(trySetHandle, 50);
+      }
+    };
+    trySetHandle();
+    return () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [activeId, getHandle, onFocusHandleChange]);
+
   return (
     <ScrollView
       ref={scrollRef}
