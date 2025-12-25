@@ -33,9 +33,7 @@ export const TopTabBar: React.FC<BottomTabBarProps> = ({
 
   useEffect(() => {
     const formatTime = (date: Date) => {
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
+      return date.toTimeString().slice(0, 5);
     };
     const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();

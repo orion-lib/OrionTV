@@ -68,7 +68,10 @@ const HomeScreen: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
-    const updateTime = () => setCurrentTime(formatTime24(new Date()));
+    const formatTime = (date: Date) => {
+      return date.toTimeString().slice(0, 5);
+    };
+    const updateTime = () => setCurrentTime(formatTime(new Date()));
     updateTime();
     const interval = setInterval(updateTime, 60 * 1000);
     return () => clearInterval(interval);
