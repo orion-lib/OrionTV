@@ -33,7 +33,6 @@ const MoreCard: React.FC<{lockLeft?: boolean; lockRight?: boolean}> = ({
   lockLeft,
   lockRight,
 }) => {
-  const [focused, setFocused] = useState(false);
   const [selfHandle, setSelfHandle] = useState<number | undefined>();
   const pressableRef = React.useRef<PressableHandle>(null);
 
@@ -51,10 +50,8 @@ const MoreCard: React.FC<{lockLeft?: boolean; lockRight?: boolean}> = ({
       focusable
       nextFocusLeft={lockLeft ? selfHandle : undefined}
       nextFocusRight={lockRight ? selfHandle : undefined}
-      onFocus={() => setFocused(true)}
-      onBlur={() => setFocused(false)}
       onPress={() => {}}
-      style={[styles.moreWrapper, focused && styles.moreFocused]}>
+      style={({focused}) => [styles.moreWrapper, focused && styles.moreFocused]}>
       <Text style={styles.moreLabel}>更多</Text>
     </Pressable>
   );
@@ -64,7 +61,6 @@ const HomeScreen: React.FC = () => {
   const navigation = useNavigation<Nav>();
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
-  const [focusedAction, setFocusedAction] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
@@ -132,59 +128,57 @@ const HomeScreen: React.FC = () => {
                   item.name === 'Settings',
               ).map(item => {
                 const isSettings = item.name === 'Settings';
-                const isFocused = focusedAction === item.name;
                 if (isSettings) {
                   return (
-                    <React.Fragment key={item.name}>
-                      <Pressable
-                        focusable
-                        onFocus={() => setFocusedAction(item.name)}
-                        onBlur={() => setFocusedAction(null)}
-                        onPress={() => navigation.navigate(item.name)}
-                        style={[
-                          styles.quickActionItem,
-                          styles.quickActionIcon,
-                          isFocused && styles.quickActionFocused,
-                        ]}>
+                    <Pressable
+                      key={item.name}
+                      focusable
+                      onPress={() => navigation.navigate(item.name)}
+                      style={({focused}) => [
+                        styles.quickActionItem,
+                        styles.quickActionTimeWrapper,
+                        focused && styles.quickActionFocused,
+                      ]}>
+                      {({focused}) => (
                         <View style={styles.quickActionContent}>
                           <Icon
                             name={item.icon as never}
                             size={16}
-                            color={isFocused ? '#e9f2ff' : '#e2e8f0'}
+                            color={focused ? '#e9f2ff' : '#e2e8f0'}
                           />
+                          <View style={styles.quickActionTimePill}>
+                            <Text
+                              style={[
+                                styles.quickActionTime,
+                                focused && styles.quickActionTimeFocused,
+                              ]}>
+                              {currentTime}
+                            </Text>
+                          </View>
                         </View>
-                      </Pressable>
-                      <View style={styles.quickActionTimePill} focusable={false}>
-                        <Text
-                          style={[
-                            styles.quickActionTime,
-                            isFocused && styles.quickActionTimeFocused,
-                          ]}>
-                          {currentTime}
-                        </Text>
-                      </View>
-                    </React.Fragment>
+                      )}
+                    </Pressable>
                   );
                 }
                 return (
                   <Pressable
                     key={item.name}
                     focusable
-                    onFocus={() => setFocusedAction(item.name)}
-                    onBlur={() => setFocusedAction(null)}
                     onPress={() => navigation.navigate(item.name)}
-                    style={[
+                    style={({focused}) => [
                       styles.quickActionItem,
                       styles.quickActionIcon,
-                      isFocused && styles.quickActionFocused,
+                      focused && styles.quickActionFocused,
                     ]}>
-                    <View style={styles.quickActionContent}>
-                      <Icon
-                        name={item.icon as never}
-                        size={16}
-                        color={isFocused ? '#e9f2ff' : '#e2e8f0'}
-                      />
-                    </View>
+                    {({focused}) => (
+                      <View style={styles.quickActionContent}>
+                        <Icon
+                          name={item.icon as never}
+                          size={16}
+                          color={focused ? '#e9f2ff' : '#e2e8f0'}
+                        />
+                      </View>
+                    )}
                   </Pressable>
                 );
               })}
@@ -319,6 +313,11 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
+  },
+  quickActionTimeWrapper: {
+    height: 30,
+    borderRadius: 15,
+    paddingHorizontal: 10,
   },
   quickActionContent: {
     flexDirection: 'row',
