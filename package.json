@@ -27,7 +27,8 @@
     "react-native-toast-message": "^2.3.3",
     "react-native-vector-icons": "^10.3.0",
     "react-native-video": "^6.18.0",
-    "react-native-worklets": "^0.7.1"
+    "react-native-worklets": "^0.7.1",
+    "patch-package": "^8.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -46,7 +47,6 @@
     "babel-jest": "^29.7.0",
     "eslint": "^8.57.0",
     "jest": "^29.7.0",
-    "patch-package": "^8.0.1",
     "react-test-renderer": "19.2.0",
     "typescript": "^5.8.2"
   }
