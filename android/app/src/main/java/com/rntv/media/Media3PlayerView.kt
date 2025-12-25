@@ -6,12 +6,22 @@ import android.widget.FrameLayout
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.DefaultRenderersFactory
+import androidx.media3.exoplayer.mediacodec.MediaCodecSelector
+import androidx.media3.exoplayer.mediacodec.MediaCodecUtil
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 
 class Media3PlayerView(context: Context) : FrameLayout(context) {
   private val playerView: PlayerView = PlayerView(context)
-  private val exoPlayer: ExoPlayer = ExoPlayer.Builder(context).build()
+  private val exoPlayer: ExoPlayer =
+    ExoPlayer.Builder(context)
+      .setRenderersFactory(
+        DefaultRenderersFactory(context)
+          .setMediaCodecSelector(HardwareOnlyMediaCodecSelector)
+          .setEnableDecoderFallback(false),
+      )
+      .build()
 
   init {
     playerView.player = exoPlayer
@@ -50,5 +60,22 @@ class Media3PlayerView(context: Context) : FrameLayout(context) {
     exoPlayer.playWhenReady = false
     exoPlayer.stop()
     exoPlayer.release()
+  }
+
+  private companion object {
+    private val HardwareOnlyMediaCodecSelector =
+      MediaCodecSelector { mimeType, requiresSecureDecoder, requiresTunnelingDecoder ->
+        val decoderInfos =
+          MediaCodecUtil.getDecoderInfos(
+            mimeType,
+            requiresSecureDecoder,
+            requiresTunnelingDecoder,
+          )
+        if (!mimeType.startsWith("video/")) {
+          return@MediaCodecSelector decoderInfos
+        }
+
+        decoderInfos.filter { it.hardwareAccelerated && !it.softwareOnly }
+      }
   }
 }
