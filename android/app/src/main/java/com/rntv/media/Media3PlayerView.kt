@@ -71,7 +71,7 @@ class Media3PlayerView(context: Context) : FrameLayout(context) {
             requiresSecureDecoder,
             requiresTunnelingDecoder,
           )
-        val hardwareDecoders = decoderInfos.filterNot { it.isSoftwareOnly }
+        val hardwareDecoders = decoderInfos.filterNot { it.softwareOnly }
         if (hardwareDecoders.isNotEmpty()) {
           hardwareDecoders
         } else {

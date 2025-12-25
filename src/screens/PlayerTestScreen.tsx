@@ -1,6 +1,7 @@
 import React, {useCallback, useMemo, useRef, useState, useEffect} from 'react';
 import {
   Alert,
+  Modal,
   NativeSyntheticEvent,
   PermissionsAndroid,
   Platform,
@@ -94,6 +95,7 @@ const PlayerTestScreen: React.FC = () => {
   const [focusedPicker, setFocusedPicker] = useState(false);
   const [focusedBack, setFocusedBack] = useState(false);
   const [focusedPreview, setFocusedPreview] = useState(false);
+  const [fullscreenVisible, setFullscreenVisible] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
   const sectionOffsets = useRef<Record<string, number>>({});
 
@@ -277,7 +279,26 @@ const PlayerTestScreen: React.FC = () => {
         </View>
 
         <View style={styles.playerCard} onLayout={registerOffset('preview')}>
-          <Text style={styles.cardTitle}>播放预览</Text>
+          <View style={styles.previewHeader}>
+            <Text style={styles.cardTitle}>播放预览</Text>
+            <Pressable
+              focusable
+              disabled={!file}
+              onPress={() => setFullscreenVisible(true)}
+              onKeyDown={event => {
+                if (file && isSelectKey(event)) {
+                  setFullscreenVisible(true);
+                }
+              }}
+              style={({pressed}) => [
+                styles.fullscreenButton,
+                !file && styles.fullscreenButtonDisabled,
+                pressed && styles.fullscreenButtonPressed,
+              ]}>
+              <Icon name="expand" size={16} color="#e5e7eb" />
+              <Text style={styles.fullscreenButtonText}>全屏</Text>
+            </Pressable>
+          </View>
           <Pressable
             focusable
             onFocus={() => {
@@ -302,6 +323,46 @@ const PlayerTestScreen: React.FC = () => {
             )}
           </Pressable>
         </View>
+
+        <Modal
+          visible={fullscreenVisible}
+          animationType="fade"
+          presentationStyle="fullScreen"
+          onRequestClose={() => setFullscreenVisible(false)}>
+          <SafeAreaView style={styles.fullscreenContainer}>
+            <View style={styles.fullscreenHeader}>
+              <Text style={styles.fullscreenTitle}>全屏播放预览</Text>
+              <Pressable
+                focusable
+                onPress={() => setFullscreenVisible(false)}
+                onKeyDown={event => {
+                  if (isSelectKey(event)) {
+                    setFullscreenVisible(false);
+                  }
+                }}
+                style={({pressed}) => [
+                  styles.fullscreenCloseButton,
+                  pressed && styles.fullscreenCloseButtonPressed,
+                ]}>
+                <Icon name="close" size={18} color="#e5e7eb" />
+                <Text style={styles.fullscreenCloseText}>关闭</Text>
+              </Pressable>
+            </View>
+            {file ? (
+              <MediaPlayer
+                playerType={selectedPlayer}
+                style={styles.fullscreenVideo}
+                source={{uri: file.uri}}
+                resizeMode="contain"
+                controls
+              />
+            ) : (
+              <View style={styles.fullscreenEmpty}>
+                <Text style={styles.emptyText}>请先选择本地视频文件</Text>
+              </View>
+            )}
+          </SafeAreaView>
+        </Modal>
 
         <Text style={styles.footer}>
           播放器测试仅用于验证本地文件播放能力。首次选择文件时会申请
@@ -392,6 +453,30 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {opacity: 0.6},
   buttonText: {color: '#e5e7eb', fontWeight: '700'},
+  previewHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  fullscreenButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: '#1f2937',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  fullscreenButtonPressed: {
+    borderColor: '#7cc0ff',
+  },
+  fullscreenButtonDisabled: {
+    opacity: 0.5,
+  },
+  fullscreenButtonText: {color: '#e5e7eb', fontWeight: '700'},
   playerWrapper: {
     backgroundColor: '#0f172a',
     borderRadius: 12,
@@ -404,6 +489,32 @@ const styles = StyleSheet.create({
   },
   video: {width: '100%', height: '100%'},
   emptyText: {color: '#94a3b8'},
+  fullscreenContainer: {flex: 1, backgroundColor: '#020617'},
+  fullscreenHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#0f172a',
+  },
+  fullscreenTitle: {color: '#e5e7eb', fontSize: 18, fontWeight: '700'},
+  fullscreenCloseButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    backgroundColor: '#111827',
+    borderWidth: 1,
+    borderColor: 'transparent',
+  },
+  fullscreenCloseButtonPressed: {borderColor: '#7cc0ff'},
+  fullscreenCloseText: {color: '#e5e7eb', fontWeight: '700'},
+  fullscreenVideo: {flex: 1, width: '100%'},
+  fullscreenEmpty: {flex: 1, alignItems: 'center', justifyContent: 'center'},
   footer: {color: '#9ca3af', lineHeight: 20},
 });
 
