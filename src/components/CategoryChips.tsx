@@ -1,7 +1,8 @@
-import React, {useCallback, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   findNodeHandle,
   LayoutChangeEvent,
+  NativeSyntheticEvent,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -87,6 +88,7 @@ export const CategoryChips: React.FC<Props> = ({
             nextFocusRight={rightHandle}
             onFocus={() => {
               setFocusedId(item.id);
+              preferredFocusId.current = item.id;
               onFocusChange?.(item.id);
               onFocusHandleChange?.(selfHandle);
               scrollToChip(item.id);
@@ -94,6 +96,23 @@ export const CategoryChips: React.FC<Props> = ({
             onBlur={() =>
               setFocusedId(current => (current === item.id ? null : current))
             }
+            onKeyDown={event => {
+              if (isLeftKey(event)) {
+                event.preventDefault?.();
+                const nextId = data[index - 1]?.id;
+                if (nextId) {
+                  focusChip(nextId);
+                }
+                return;
+              }
+              if (isRightKey(event)) {
+                event.preventDefault?.();
+                const nextId = data[index + 1]?.id;
+                if (nextId) {
+                  focusChip(nextId);
+                }
+              }
+            }}
             onLayout={registerLayout(item.id)}
             style={({pressed}) => [
               styles.chip,

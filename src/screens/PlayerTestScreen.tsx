@@ -81,6 +81,8 @@ const requestStoragePermissions = async () => {
   return true;
 };
 
+const isDocumentPickerReady = () => Boolean(NativeModules.RNDocumentPicker);
+
 const PlayerTestScreen: React.FC = () => {
   const navigation = useNavigation();
   const [selectedPlayer, setSelectedPlayer] = useState<PlayerType>('media3');
