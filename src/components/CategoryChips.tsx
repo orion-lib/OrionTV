@@ -61,6 +61,25 @@ export const CategoryChips: React.FC<Props> = ({
     return handle ?? undefined;
   }, []);
 
+  useEffect(() => {
+    if (!onFocusHandleChange) {
+      return;
+    }
+    const targetId = preferredFocusId.current ?? activeId;
+    const handle = getHandle(targetId);
+    if (handle) {
+      onFocusHandleChange(handle);
+      return;
+    }
+    const frame = requestAnimationFrame(() => {
+      const retryHandle = getHandle(targetId);
+      if (retryHandle) {
+        onFocusHandleChange(retryHandle);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [activeId, getHandle, onFocusHandleChange]);
+
   return (
     <ScrollView
       ref={scrollRef}
