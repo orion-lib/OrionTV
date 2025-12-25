@@ -45,31 +45,13 @@ const HomeScreen: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('featured');
   const [focusedAction, setFocusedAction] = useState<string | null>(null);
 
-  const categoryTabs = useMemo(() => {
-    const liveTab = {id: 'live', title: '直播'};
-    const featuredIndex = categories.findIndex(item => item.id === 'featured');
-    if (featuredIndex === -1) {
-      return [liveTab, ...categories];
-    }
-    return [
-      ...categories.slice(0, featuredIndex + 1),
-      liveTab,
-      ...categories.slice(featuredIndex + 1),
-    ];
-  }, [categories]);
+  const categoryTabs = useMemo(() => categories, [categories]);
 
   const handleCategorySelect = (id: string) => {
-    if (id === 'live') {
-      navigation.navigate('Live');
-      return;
-    }
     setActiveCategory(id);
   };
 
   const handleCategoryFocus = (id: string) => {
-    if (id === 'live') {
-      return;
-    }
     setActiveCategory(id);
   };
 

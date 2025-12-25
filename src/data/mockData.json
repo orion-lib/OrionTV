@@ -1,6 +1,7 @@
 {
   "categories": [
     {"id": "featured", "title": "推荐"},
+    {"id": "live", "title": "直播"},
     {"id": "zone", "title": "专区"},
     {"id": "commentary", "title": "解说"},
     {"id": "movie", "title": "电影"},
@@ -176,6 +177,39 @@
       "categoryId": "short",
       "tags": ["短剧", "快节奏"],
       "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4"
+    },
+    {
+      "id": "16",
+      "title": "城市直播间",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1478720568477-152d9b164e26?auto=format&fit=crop&w=900&q=80",
+      "description": "全天候城市生活直播，捕捉每个高光瞬间。",
+      "duration": "直播中",
+      "categoryId": "live",
+      "tags": ["直播", "城市"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
+    },
+    {
+      "id": "17",
+      "title": "赛事直通车",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=900&q=80",
+      "description": "热门赛事同步直播，精彩不间断。",
+      "duration": "直播中",
+      "categoryId": "live",
+      "tags": ["直播", "体育"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4"
+    },
+    {
+      "id": "18",
+      "title": "音乐舞台 Live",
+      "year": "2024",
+      "poster": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80",
+      "description": "现场舞台与音乐节直播合集。",
+      "duration": "直播中",
+      "categoryId": "live",
+      "tags": ["直播", "音乐"],
+      "source": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4"
     }
   ],
   "liveChannels": [
