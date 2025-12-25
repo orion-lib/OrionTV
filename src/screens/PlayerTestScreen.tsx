@@ -299,6 +299,12 @@ const PlayerTestScreen: React.FC = () => {
               <Text style={styles.fullscreenButtonText}>全屏</Text>
             </Pressable>
           </View>
+          <Text style={styles.playerStatus}>
+            当前播放器：
+            {selectedPlayer === 'media3'
+              ? 'Media3（硬解码优先）'
+              : 'React Native Video'}
+          </Text>
           <Pressable
             focusable
             onFocus={() => {
@@ -477,6 +483,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   fullscreenButtonText: {color: '#e5e7eb', fontWeight: '700'},
+  playerStatus: {color: '#94a3b8', marginBottom: 12},
   playerWrapper: {
     backgroundColor: '#0f172a',
     borderRadius: 12,

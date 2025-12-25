@@ -71,12 +71,11 @@ class Media3PlayerView(context: Context) : FrameLayout(context) {
             requiresSecureDecoder,
             requiresTunnelingDecoder,
           )
-        val hardwareDecoders = decoderInfos.filterNot { it.softwareOnly }
-        if (hardwareDecoders.isNotEmpty()) {
-          hardwareDecoders
-        } else {
-          decoderInfos
+        if (!mimeType.startsWith("video/")) {
+          return@MediaCodecSelector decoderInfos
         }
+
+        decoderInfos.filter { it.hardwareAccelerated && !it.softwareOnly }
       }
   }
 }
