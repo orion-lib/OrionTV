@@ -45,9 +45,6 @@ const HomeScreen: React.FC = () => {
   const {categories, videos, isFavorite} = useMedia();
   const [activeCategory, setActiveCategory] = useState<string>('featured');
   const [focusedAction, setFocusedAction] = useState<string | null>(null);
-  const [focusedCategoryHandle, setFocusedCategoryHandle] = useState<
-    number | undefined
-  >(undefined);
   const [currentTime, setCurrentTime] = useState<string>('');
 
   useEffect(() => {
@@ -176,7 +173,6 @@ const HomeScreen: React.FC = () => {
               activeId={activeCategory}
               onChange={handleCategorySelect}
               onFocusChange={handleCategoryFocus}
-              onFocusHandleChange={setFocusedCategoryHandle}
             />
           </View>
           <View style={styles.heroArea}>
@@ -186,7 +182,6 @@ const HomeScreen: React.FC = () => {
                   key={item.id}
                   item={item}
                   variant="hero"
-                  nextFocusUp={focusedCategoryHandle}
                   onPress={() => navigation.navigate('Detail', {id: item.id})}
                 />
               ))}
@@ -211,9 +206,6 @@ const HomeScreen: React.FC = () => {
                         key={item.id}
                         item={item}
                         variant="tile"
-                        nextFocusUp={
-                          rowIndex === 0 ? focusedCategoryHandle : undefined
-                        }
                         onPress={() => navigation.navigate('Detail', {id: item.id})}
                       />
                     ))}
