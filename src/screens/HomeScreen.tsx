@@ -116,6 +116,40 @@ const HomeScreen: React.FC = () => {
                   item.name === 'Settings',
               ).map(item => {
                 const isSettings = item.name === 'Settings';
+                const isFocused = focusedAction === item.name;
+                if (isSettings) {
+                  return (
+                    <React.Fragment key={item.name}>
+                      <Pressable
+                        focusable
+                        onFocus={() => setFocusedAction(item.name)}
+                        onBlur={() => setFocusedAction(null)}
+                        onPress={() => navigation.navigate(item.name)}
+                        style={[
+                          styles.quickActionItem,
+                          styles.quickActionIcon,
+                          isFocused && styles.quickActionFocused,
+                        ]}>
+                        <View style={styles.quickActionContent}>
+                          <Icon
+                            name={item.icon as never}
+                            size={16}
+                            color={isFocused ? '#e9f2ff' : '#e2e8f0'}
+                          />
+                        </View>
+                      </Pressable>
+                      <View style={styles.quickActionTimePill} focusable={false}>
+                        <Text
+                          style={[
+                            styles.quickActionTime,
+                            isFocused && styles.quickActionTimeFocused,
+                          ]}>
+                          {currentTime}
+                        </Text>
+                      </View>
+                    </React.Fragment>
+                  );
+                }
                 return (
                   <Pressable
                     key={item.name}
@@ -125,29 +159,15 @@ const HomeScreen: React.FC = () => {
                     onPress={() => navigation.navigate(item.name)}
                     style={[
                       styles.quickActionItem,
-                      isSettings
-                        ? styles.quickActionWide
-                        : styles.quickActionIcon,
-                      focusedAction === item.name && styles.quickActionFocused,
+                      styles.quickActionIcon,
+                      isFocused && styles.quickActionFocused,
                     ]}>
                     <View style={styles.quickActionContent}>
                       <Icon
                         name={item.icon as never}
                         size={16}
-                        color={
-                          focusedAction === item.name ? '#e9f2ff' : '#e2e8f0'
-                        }
+                        color={isFocused ? '#e9f2ff' : '#e2e8f0'}
                       />
-                      {isSettings ? (
-                        <Text
-                          style={[
-                            styles.quickActionTime,
-                            focusedAction === item.name &&
-                              styles.quickActionTimeFocused,
-                          ]}>
-                          {currentTime}
-                        </Text>
-                      ) : null}
                     </View>
                   </Pressable>
                 );
@@ -282,15 +302,19 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
   },
-  quickActionWide: {
-    height: 30,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-  },
   quickActionContent: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+  },
+  quickActionTimePill: {
+    height: 30,
+    paddingHorizontal: 12,
+    borderRadius: 15,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
   },
   quickActionTime: {
     color: '#cbd5e1',
