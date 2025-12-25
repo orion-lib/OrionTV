@@ -15,3 +15,14 @@ jest.mock('react-native-screens', () => ({
 jest.mock('@react-native-async-storage/async-storage', () =>
   require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
 );
+jest.mock(
+  'react-native-document-picker',
+  () => ({
+    pick: jest.fn(),
+    pickSingle: jest.fn(),
+    types: {video: 'video'},
+    isCancel: jest.fn(() => false),
+    isInProgress: jest.fn(() => false),
+  }),
+  {virtual: true},
+);

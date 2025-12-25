@@ -1,6 +1,5 @@
 import React, {useCallback, useRef, useState} from 'react';
 import {
-  findNodeHandle,
   LayoutChangeEvent,
   Pressable,
   ScrollView,
@@ -24,11 +23,9 @@ export const CategoryChips: React.FC<Props> = ({
   onFocusChange,
 }) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
-  const [, forceRender] = useState(0);
   const preferredFocusId = useRef(activeId);
   const scrollRef = useRef<ScrollView>(null);
   const layoutMap = useRef<Record<string, {x: number; width: number}>>({});
-  const focusHandles = useRef<Record<string, number | null>>({});
 
   const registerLayout = useCallback(
     (id: string) => (event: LayoutChangeEvent) => {
@@ -36,14 +33,6 @@ export const CategoryChips: React.FC<Props> = ({
     },
     [],
   );
-
-  const registerFocusHandle = useCallback((id: string, ref: Pressable | null) => {
-    const handle = ref ? findNodeHandle(ref) : null;
-    if (focusHandles.current[id] !== handle) {
-      focusHandles.current[id] = handle;
-      forceRender(value => value + 1);
-    }
-  }, []);
 
   const scrollToChip = useCallback((id: string) => {
     const layout = layoutMap.current[id];
@@ -56,13 +45,6 @@ export const CategoryChips: React.FC<Props> = ({
     });
   }, []);
 
-  const getFocusHandle = useCallback((id?: string) => {
-    if (!id) {
-      return undefined;
-    }
-    return focusHandles.current[id] ?? undefined;
-  }, []);
-
   return (
     <ScrollView
       ref={scrollRef}
@@ -72,14 +54,9 @@ export const CategoryChips: React.FC<Props> = ({
       {data.map((item, index) => {
         const active = item.id === activeId;
         const focused = item.id === focusedId;
-        const leftId = data[index - 1]?.id;
-        const rightId = data[index + 1]?.id;
-        const isFirst = index === 0;
-        const isLast = index === data.length - 1;
         return (
           <Pressable
             key={item.id}
-            ref={ref => registerFocusHandle(item.id, ref)}
             onPress={() => onChange(item.id)}
             focusable
             hasTVPreferredFocus={item.id === preferredFocusId.current}
@@ -92,8 +69,6 @@ export const CategoryChips: React.FC<Props> = ({
               setFocusedId(current => (current === item.id ? null : current))
             }
             onLayout={registerLayout(item.id)}
-            nextFocusLeft={getFocusHandle(isFirst ? item.id : leftId)}
-            nextFocusRight={getFocusHandle(isLast ? item.id : rightId)}
             style={({pressed}) => [
               styles.chip,
               (active || focused) && styles.active,
