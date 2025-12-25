@@ -1,5 +1,6 @@
 import React, {useCallback, useRef, useState} from 'react';
 import {
+  findNodeHandle,
   LayoutChangeEvent,
   Pressable,
   ScrollView,
@@ -14,18 +15,23 @@ interface Props {
   activeId: string;
   onChange: (id: string) => void;
   onFocusChange?: (id: string) => void;
+  onFocusHandleChange?: (handle?: number) => void;
 }
+
+type PressableHandle = React.ElementRef<typeof Pressable>;
 
 export const CategoryChips: React.FC<Props> = ({
   data,
   activeId,
   onChange,
   onFocusChange,
+  onFocusHandleChange,
 }) => {
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const preferredFocusId = useRef(activeId);
   const scrollRef = useRef<ScrollView>(null);
   const layoutMap = useRef<Record<string, {x: number; width: number}>>({});
+  const chipRefs = useRef<Record<string, PressableHandle | null>>({});
 
   const registerLayout = useCallback(
     (id: string) => (event: LayoutChangeEvent) => {
@@ -45,6 +51,15 @@ export const CategoryChips: React.FC<Props> = ({
     });
   }, []);
 
+  const getHandle = useCallback((id?: string) => {
+    if (!id) {
+      return undefined;
+    }
+    const node = chipRefs.current[id];
+    const handle = node ? findNodeHandle(node) : null;
+    return handle ?? undefined;
+  }, []);
+
   return (
     <ScrollView
       ref={scrollRef}
@@ -54,15 +69,26 @@ export const CategoryChips: React.FC<Props> = ({
       {data.map((item, index) => {
         const active = item.id === activeId;
         const focused = item.id === focusedId;
+        const leftId = data[index - 1]?.id ?? item.id;
+        const rightId = data[index + 1]?.id ?? item.id;
+        const selfHandle = getHandle(item.id);
+        const leftHandle = getHandle(leftId) ?? selfHandle;
+        const rightHandle = getHandle(rightId) ?? selfHandle;
         return (
           <Pressable
             key={item.id}
+            ref={node => {
+              chipRefs.current[item.id] = node;
+            }}
             onPress={() => onChange(item.id)}
             focusable
             hasTVPreferredFocus={item.id === preferredFocusId.current}
+            nextFocusLeft={leftHandle}
+            nextFocusRight={rightHandle}
             onFocus={() => {
               setFocusedId(item.id);
               onFocusChange?.(item.id);
+              onFocusHandleChange?.(selfHandle);
               scrollToChip(item.id);
             }}
             onBlur={() =>
