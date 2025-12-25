@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import 'react-native-gesture-handler';
 import {
   DefaultTheme,
@@ -7,7 +7,7 @@ import {
 import {enableScreens} from 'react-native-screens';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {
-  ActivityIndicator,
+  Animated,
   StatusBar,
   StyleSheet,
   Text,
@@ -31,14 +31,23 @@ const BOOT_BACKGROUND = '#0b0d14';
 
 function App(): JSX.Element {
   const [isBooting, setIsBooting] = useState(true);
+  const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setIsBooting(false);
-    }, 350);
+    const animation = Animated.timing(progress, {
+      toValue: 1,
+      duration: 900,
+      useNativeDriver: false,
+    });
 
-    return () => clearTimeout(timeout);
-  }, []);
+    animation.start(() => {
+      setIsBooting(false);
+    });
+
+    return () => {
+      animation.stop();
+    };
+  }, [progress]);
 
   if (isBooting) {
     return (
@@ -48,8 +57,20 @@ function App(): JSX.Element {
           backgroundColor={BOOT_BACKGROUND}
         />
         <View style={styles.loadingContainer}>
-          <ActivityIndicator color="#7c8cff" size="large" />
           <Text style={styles.loadingText}>加载中...</Text>
+          <View style={styles.progressTrack}>
+            <Animated.View
+              style={[
+                styles.progressIndicator,
+                {
+                  width: progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['12%', '100%'],
+                  }),
+                },
+              ]}
+            />
+          </View>
         </View>
       </SafeAreaProvider>
     );
@@ -78,7 +99,19 @@ const styles = StyleSheet.create({
   loadingText: {
     color: '#d6d8e5',
     fontSize: 14,
-    marginTop: 12,
+    marginBottom: 16,
+  },
+  progressTrack: {
+    width: 220,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: 'rgba(124, 140, 255, 0.2)',
+    overflow: 'hidden',
+  },
+  progressIndicator: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: '#7c8cff',
   },
 });
 
