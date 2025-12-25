@@ -107,7 +107,7 @@ const PlayerTestScreen: React.FC = () => {
 
   useEffect(() => {
     setSelectedPlayer(
-      preferences.player === 'media3' && !isMedia3Available
+      preferences.player === 'media3' && !isMedia3Available()
         ? 'legacy'
         : preferences.player,
     );
@@ -187,7 +187,7 @@ const PlayerTestScreen: React.FC = () => {
         <View style={styles.card} onLayout={registerOffset('player')}>
           <Text style={styles.cardTitle}>选择播放器</Text>
           {PLAYER_OPTIONS.map(option => {
-            const isDisabled = option.key === 'media3' && !isMedia3Available;
+            const isDisabled = option.key === 'media3' && !isMedia3Available();
             return (
               <Pressable
                 key={option.key}
@@ -235,7 +235,7 @@ const PlayerTestScreen: React.FC = () => {
               </Pressable>
             );
           })}
-          {!isMedia3Available ? (
+          {!isMedia3Available() ? (
             <Text style={styles.helperText}>
               当前设备未注册 Media3 播放器组件，将自动使用内置播放器。
             </Text>
