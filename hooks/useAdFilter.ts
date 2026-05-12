@@ -8,13 +8,23 @@ import {
   clearFilterCache,
 } from '@/services/adFilter';
 
+/**
+ * 广告过滤 Hook
+ * 提供广告过滤相关的状态和操作方法
+ */
 export const useAdFilter = () => {
   const { removeAds, customAdRules } = useSettingsStore();
 
+  /**
+   * 是否为代码模式
+   */
   const isCodeMode = useMemo(() => {
     return customAdRules && customAdRules.includes('function');
   }, [customAdRules]);
 
+  /**
+   * 过滤 M3U8 内容
+   */
   const filterM3U8 = useCallback(
     (m3u8Content: string): string => {
       if (!removeAds) {
@@ -25,6 +35,9 @@ export const useAdFilter = () => {
     [removeAds]
   );
 
+  /**
+   * 检测单个片段
+   */
   const checkSegment = useCallback(
     (url: string, duration?: number) => {
       if (!removeAds) {
@@ -35,6 +48,9 @@ export const useAdFilter = () => {
     [removeAds]
   );
 
+  /**
+   * 获取统计信息
+   */
   const getStats = useCallback(
     (m3u8Content: string) => {
       if (!removeAds) {
@@ -55,6 +71,9 @@ export const useAdFilter = () => {
     [removeAds]
   );
 
+  /**
+   * 刷新缓存
+   */
   const refreshCache = useCallback(() => {
     clearFilterCache();
   }, []);

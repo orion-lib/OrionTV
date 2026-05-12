@@ -126,13 +126,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
   setPassword: (password) => set({ password }),
   setRemoteInputEnabled: (enabled) => set({ remoteInputEnabled: enabled }),
   setRemoveAds: (enabled) => {
-    logger.info(`[AD_FILTER] removeAds changed to: ${enabled}`);
+    logger.info(`[AD_FILTER] 去广告设置已更改: ${enabled}`);
     adFilterCache.clear();
     clearFilterCache();
     set({ removeAds: enabled });
   },
   setCustomAdRules: (rules) => {
-    logger.info(`[AD_FILTER] customAdRules changed, clearing cache`);
+    logger.info(`[AD_FILTER] 自定义广告规则已更改，正在清除缓存`);
     adFilterCache.clear();
     clearFilterCache();
     set({ customAdRules: rules });
@@ -149,9 +149,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
 
     if (!/^https?:\/\//i.test(processedApiBaseUrl)) {
       const hostPart = processedApiBaseUrl.split("/")[0];
-      // Simple check for IP address format.
+      // 简单检查是否为 IP 地址格式
       const isIpAddress = /^((\d{1,3}\.){3}\d{1,3})(:\d+)?$/.test(hostPart);
-      // Check if the domain includes a port.
+      // 检查域名是否包含端口
       const hasPort = /:\d+/.test(hostPart);
 
       if (isIpAddress || hasPort) {
@@ -175,7 +175,7 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       await AsyncStorage.setItem('authCookies', '');
     }
     api.setBaseUrl(processedApiBaseUrl);
-    // Also update the URL in the state so the input field shows the processed URL
+    // 同时更新状态中的 URL，使输入框显示处理后的 URL
     set({ isModalVisible: false, apiBaseUrl: processedApiBaseUrl, serverConfigError: null });
     
     try {

@@ -194,7 +194,7 @@ const useDetailStore = create<DetailState>((set, get) => ({
           }
         }
       } else {
-        // Standard navigation: fetch resources, then fetch details one by one
+        // 标准导航：先获取资源列表，然后逐个获取详情
         const resourcesStart = performance.now();
         logger.info(`[PERF] API getResources START - query: "${q}"`);
         

@@ -81,7 +81,7 @@ export class PlayerSettingsManager {
   static async save(source: string, id: string, settings: PlayerSettings): Promise<void> {
     const allSettings = await this.getAll();
     const key = generateKey(source, id);
-    // Only save if there are actual values to save
+    // 仅在实际有值需要保存时才保存
     if (settings.introEndTime !== undefined || settings.outroStartTime !== undefined || settings.playbackRate !== undefined) {
       allSettings[key] = { ...allSettings[key], ...settings };
     } else {
@@ -264,7 +264,7 @@ export class PlayRecordManager {
   }
 
   static async clearAll(): Promise<void> {
-    await PlayerSettingsManager.clearAll(); // Always clear local settings
+    await PlayerSettingsManager.clearAll(); // 始终清除本地设置
 
     if (this.getStorageType() === "localstorage") {
       await AsyncStorage.removeItem(STORAGE_KEYS.PLAY_RECORDS);

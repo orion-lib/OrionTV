@@ -69,19 +69,19 @@ export default function SettingsScreen() {
     if (lastMessage && !targetPage) {
       const realMessage = lastMessage.split("_")[0];
       handleRemoteInput(realMessage);
-      clearMessage(); // Clear the message after processing
+      clearMessage(); // 处理完成后清除消息
       markAsChanged();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastMessage, targetPage]);
 
   const handleRemoteInput = (message: string) => {
-    // Handle remote input based on currently focused section
+    // 根据当前焦点区域处理遥控器输入
     if (currentSection === "api" && apiSectionRef.current) {
-      // API Config Section
+      // API 配置区域
       setApiBaseUrl(message);
     } else if (currentSection === "livestream" && liveStreamSectionRef.current) {
-      // Live Stream Section
+      // 直播源区域
       setM3uUrl(message);
     }
   };

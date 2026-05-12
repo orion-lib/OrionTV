@@ -239,7 +239,7 @@ const useHomeStore = create<HomeState>((set, get) => ({
           }));
         }
       } else if (selectedCategory.tags) {
-        // It's a container category, do not load content, but clear current content
+        // 这是容器分类，不加载内容，但清除当前内容
         set({ contentData: [], hasMore: false });
       } else {
         set({ hasMore: false });
