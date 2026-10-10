@@ -2,7 +2,7 @@
   "name": "OrionTV",
   "private": true,
   "main": "expo-router/entry",
-  "version": "1.3.13",
+  "version": "1.3.14",
   "scripts": {
     "start": "EXPO_TV=1 EXPO_USE_METRO_WORKSPACE_ROOT=1 expo start",
     "android": "EXPO_TV=1 EXPO_USE_METRO_WORKSPACE_ROOT=1 expo run:android",
