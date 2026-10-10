@@ -253,8 +253,9 @@ const useHomeStore = create<HomeState>((set, get) => ({
       if (err.message === "API_URL_NOT_SET") {
         errorMessage = "请点击右上角设置按钮，配置您的服务器地址";
       } else if (err.message === "UNAUTHORIZED") {
+        // 会话超时：API 层已尝试自动重登并重试，仍失败说明重登也没成功，
+        // 此时才提示用户重新登录（登录框由 restoreSession 弹出）。
         errorMessage = "认证失败，请重新登录";
-        useAuthStore.setState({ isLoggedIn: false, isLoginModalVisible: true });
       } else if (err.message.includes("Network")) {
         errorMessage = "网络连接失败，请检查网络连接";
       } else if (err.message.includes("timeout")) {
@@ -311,6 +312,9 @@ const useHomeStore = create<HomeState>((set, get) => ({
 
   refreshPlayRecords: async () => {
     const { apiBaseUrl } = useSettingsStore.getState();
+    // 设置尚未加载完成（apiBaseUrl 为空）时无法判断登录态，直接跳过，
+    // 避免冷启动首帧（子组件 focus 早于 loadSettings 完成）误删"最近播放"分类。
+    if (!apiBaseUrl) return;
     await useAuthStore.getState().checkLoginStatus(apiBaseUrl);
     const { isLoggedIn } = useAuthStore.getState();
     if (!isLoggedIn) {

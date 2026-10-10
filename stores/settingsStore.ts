@@ -7,6 +7,18 @@ import Logger from "@/utils/Logger";
 
 const logger = Logger.withTag('SettingsStore');
 
+// 模块级引用：当前正在进行的 fetchServerConfig Promise。
+// 供 authStore.checkLoginStatus 直接 await，避免用固定超时轮询导致冷启动误判。
+let serverConfigPromise: Promise<void> | null = null;
+
+/**
+ * 获取当前正在进行的 fetchServerConfig Promise（若没有则返回 null）。
+ * 调用方可 await 它以确保 serverConfig 已就绪，而不是用固定超时轮询。
+ */
+export function getServerConfigPromise(): Promise<void> | null {
+  return serverConfigPromise;
+}
+
 interface SettingsState {
   apiBaseUrl: string;
   m3uUrl: string;
@@ -59,20 +71,24 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
       await get().fetchServerConfig();
     }
   },
-  fetchServerConfig: async () => {
-    set({ isLoadingServerConfig: true });
-    try {
-      const config = await api.getServerConfig();
-      if (config) {
-        storageConfig.setStorageType(config.StorageType);
-        set({ serverConfig: config });
+  fetchServerConfig: () => {
+    const p = (async () => {
+      set({ isLoadingServerConfig: true });
+      try {
+        const config = await api.getServerConfig();
+        if (config) {
+          storageConfig.setStorageType(config.StorageType);
+          set({ serverConfig: config });
+        }
+      } catch (error) {
+        set({ serverConfig: null });
+        logger.error("Failed to fetch server config:", error);
+      } finally {
+        set({ isLoadingServerConfig: false });
       }
-    } catch (error) {
-      set({ serverConfig: null });
-      logger.error("Failed to fetch server config:", error);
-    } finally {
-      set({ isLoadingServerConfig: false });
-    }
+    })();
+    serverConfigPromise = p;
+    return p;
   },
   setApiBaseUrl: (url) => set({ apiBaseUrl: url }),
   setM3uUrl: (url) => set({ m3uUrl: url }),

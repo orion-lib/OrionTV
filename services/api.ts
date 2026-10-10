@@ -78,6 +78,9 @@ export interface ServerConfig {
 export class API {
   public baseURL: string = "";
 
+  // 会话恢复回调（由 authStore 注册），401 时自动重登并重试一次
+  private sessionRestorer: (() => Promise<boolean>) | null = null;
+
   constructor(baseURL?: string) {
     if (baseURL) {
       this.baseURL = baseURL;
@@ -88,14 +91,33 @@ export class API {
     this.baseURL = url;
   }
 
+  public setSessionRestorer(restorer: (() => Promise<boolean>) | null) {
+    this.sessionRestorer = restorer;
+  }
+
   private async _fetch(url: string, options: RequestInit = {}): Promise<Response> {
     if (!this.baseURL) {
       throw new Error("API_URL_NOT_SET");
     }
 
+    // 框架默认会携带 cookie，无需手动设置
     const response = await fetch(`${this.baseURL}${url}`, options);
 
     if (response.status === 401) {
+      // 会话过期：自动重登后重试一次（登录接口本身除外，避免循环）
+      if (this.sessionRestorer && !url.startsWith("/api/login")) {
+        const restored = await this.sessionRestorer();
+        if (restored) {
+          const retryResponse = await fetch(`${this.baseURL}${url}`, options);
+          if (retryResponse.status === 401) {
+            throw new Error("UNAUTHORIZED");
+          }
+          if (!retryResponse.ok) {
+            throw new Error(`HTTP error! status: ${retryResponse.status}`);
+          }
+          return retryResponse;
+        }
+      }
       throw new Error("UNAUTHORIZED");
     }
 
